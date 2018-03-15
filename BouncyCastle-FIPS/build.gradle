@@ -46,15 +46,20 @@ eclipse {
     }
 }
 
-// In this section you declare where to find the dependencies of your project
+   
 repositories {
-    // Use jcenter for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-    
-        maven {
-       		url "https://mahdjoub.net/artifactory/DistriMind-Public"
-   		} 
-    jcenter()
+
+
+   	maven {
+       		url "${artifactory_Url}/gradle-release"
+       		if (user!="")
+       		{
+	       		credentials {
+	              username "${artifactory_user}"
+	              password "${artifactory_password}"
+	            }
+	         }
+   	} 
 }
 
 dependencies {
@@ -96,15 +101,15 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     from "../LICENSE"
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
+/*task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
     from javadoc.destinationDir
     from "../LICENSE"
-}
+}*/
 
 artifacts {
     archives sourcesJar
-    archives javadocJar
+    //archives javadocJar
 }
 
 jar {
@@ -125,7 +130,7 @@ publishing {
         	
             from components.java
             artifact sourcesJar
-            artifact javadocJar
+            //artifact javadocJar
             
         }
     }
