@@ -960,9 +960,9 @@ public final class FipsAES
 
         Algorithm algorithm = vKey.getAlgorithm();
 
-        if (algorithm != ALGORITHM)
+        if (!algorithm.equals(ALGORITHM))
         {
-            if (algorithm != fipsAlgorithm)
+            if (!algorithm.equals(fipsAlgorithm))
             {
                 // FSM_TRANS:5.AES.2,"AES KEY VALIDITY TEST", "USER COMMAND REJECTED", "Validity test on AES key failed"
                 throw new IllegalKeyException("FIPS Key not for specified algorithm");
@@ -978,9 +978,9 @@ public final class FipsAES
     {
         public BlockCipher createEngine()
         {
-            return SelfTestExecutor.validate(ALGORITHM, new AESFastEngine(), new VariantKatTest<AESFastEngine>()
+            return SelfTestExecutor.validate(ALGORITHM, new AESEngine(), new VariantKatTest<AESEngine>()
             {
-                public void evaluate(AESFastEngine aesEngine)
+                public void evaluate(AESEngine aesEngine)
                 {
                     byte[] input = Hex.decode("00112233445566778899aabbccddeeff");
                     byte[] output = Hex.decode("8ea2b7ca516745bfeafc49904b496089");

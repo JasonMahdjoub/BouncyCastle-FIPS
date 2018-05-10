@@ -189,7 +189,7 @@ class ProvPKCS12
 
         byte[] key = deriver.deriveKey(keyType, (keySizeInBits + 7) / 8);
 
-        return new SecretKeySpec(key, algName);
+        return new PBKDFPBEKey(key, algName, pbeKeySpec);
     }
 
     static byte[] getSecretKey(SecretKey pbeKey, PBEParameterSpec pbeSpec, PasswordBasedDeriver.KeyType keyType, int keySizeInBits)
@@ -310,7 +310,7 @@ class ProvPKCS12
 
         // use of final causes problems with JDK 1.2 compiler
         private java.security.cert.CertificateFactory certFact;
-        private Provider fipsProvider;
+        private BouncyCastleFipsProvider fipsProvider;
         private ASN1ObjectIdentifier keyAlgorithm;
         private ASN1ObjectIdentifier certAlgorithm;
 
@@ -427,6 +427,10 @@ class ProvPKCS12
         public boolean engineContainsAlias(
             String alias)
         {
+            if (alias == null)
+            {
+                throw new NullPointerException("alias value is null");
+            }
             return (certs.get(alias) != null || keys.get(alias) != null);
         }
 
@@ -823,24 +827,17 @@ class ProvPKCS12
         public void engineSetEntry(String alias, KeyStore.Entry entry, KeyStore.ProtectionParameter protParam)
             throws KeyStoreException
         {
-            if (protParam != null)
+            if (entry instanceof KeyStore.PrivateKeyEntry)
             {
-                throw new KeyStoreException("PKCS12 can only accept null as a protection parameter for individual entries.");
+                super.engineSetEntry(alias, entry, new KeyStore.PasswordProtection(new char[0]));
+            }
+            else if (entry instanceof KeyStore.SecretKeyEntry)
+            {
+                throw new KeyStoreException("PKCS12 does not support storage of symmetric keys.");
             }
             else
             {
-                if (entry instanceof KeyStore.PrivateKeyEntry)
-                {
-                    super.engineSetEntry(alias, entry, new KeyStore.PasswordProtection(new char[0]));
-                }
-                else if (entry instanceof KeyStore.SecretKeyEntry)
-                {
-                    throw new KeyStoreException("PKCS12 does not support storage of symmetric keys.");
-                }
-                else
-                {
-                    super.engineSetEntry(alias, entry, null);
-                }
+                super.engineSetEntry(alias, entry, null);
             }
         }
 
@@ -1249,7 +1246,7 @@ class ProvPKCS12
                             else if (b.getBagId().equals(keyBag))
                             {
                                 org.bouncycastle.asn1.pkcs.PrivateKeyInfo kInfo = org.bouncycastle.asn1.pkcs.PrivateKeyInfo.getInstance(b.getBagValue());
-                                PrivateKey privKey = BouncyCastleFipsProvider.getPrivateKey(kInfo);
+                                PrivateKey privKey = fipsProvider.getPrivateKey(kInfo);
 
                                 String alias = null;
                                 ASN1OctetString localId = null;

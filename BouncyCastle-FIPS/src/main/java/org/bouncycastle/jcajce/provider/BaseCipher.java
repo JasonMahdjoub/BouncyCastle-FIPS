@@ -83,17 +83,17 @@ class BaseCipher
         private PBEScheme scheme;
 
         Builder(BouncyCastleFipsProvider fipsProvider, int blockSize, Parameters... parameters)
-         {
-             this.fipsProvider = fipsProvider;
-             this.blockSize = blockSize;
-             this.baseParametersMap = new HashMap<Algorithm, Parameters>(parameters.length);
-             this.algorithms = new Algorithm[parameters.length];
-             for (int i = 0; i != parameters.length; i++)
-             {
-                 this.baseParametersMap.put(parameters[i].getAlgorithm(), parameters[i]);
-                 this.algorithms[i] = parameters[i].getAlgorithm();
-             }
-         }
+        {
+            this.fipsProvider = fipsProvider;
+            this.blockSize = blockSize;
+            this.baseParametersMap = new HashMap<Algorithm, Parameters>(parameters.length);
+            this.algorithms = new Algorithm[parameters.length];
+            for (int i = 0; i != parameters.length; i++)
+            {
+                this.baseParametersMap.put(parameters[i].getAlgorithm(), parameters[i]);
+                this.algorithms[i] = parameters[i].getAlgorithm();
+            }
+        }
 
         Builder withFixedKeySize(int keySizeInBits)
         {
@@ -270,7 +270,7 @@ class BaseCipher
 
     protected AlgorithmParameters engineGetParameters()
     {
-        if (engineParams == null)
+        if (engineParams == null && cipher != null)
         {
             Parameters params = cipher.getParameters();
             String  name = Utils.getBaseName(params.getAlgorithm());
@@ -570,7 +570,8 @@ class BaseCipher
 
         Parameters parameters;
 
-        if (key instanceof PBEKey || scheme != null || params instanceof PBEParameterSpec)
+
+        if ((key instanceof PBEKey && !(key instanceof PBKDFPBEKey)) || scheme != null || params instanceof PBEParameterSpec)
         {
             PBEParameterSpec spec;
 

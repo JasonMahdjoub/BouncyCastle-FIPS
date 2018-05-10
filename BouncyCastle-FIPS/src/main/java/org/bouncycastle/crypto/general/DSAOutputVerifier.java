@@ -3,6 +3,7 @@ package org.bouncycastle.crypto.general;
 import java.io.IOException;
 import java.math.BigInteger;
 
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Primitive;
@@ -13,6 +14,7 @@ import org.bouncycastle.crypto.Parameters;
 import org.bouncycastle.crypto.internal.DSA;
 import org.bouncycastle.crypto.internal.Digest;
 import org.bouncycastle.crypto.internal.io.DigestOutputStream;
+import org.bouncycastle.util.Arrays;
 
 class DSAOutputVerifier<T extends Parameters>
     implements OutputVerifier<T>
@@ -75,6 +77,10 @@ class DSAOutputVerifier<T extends Parameters>
         {
             byte[] r = new byte[32];
             byte[] s = new byte[32];
+            if (encoding.length != 64)
+            {
+                throw new IOException("malformed signature");
+            }
 
             System.arraycopy(encoding, 0, s, 0, 32);
             System.arraycopy(encoding, 32, r, 0, 32);
@@ -103,6 +109,14 @@ class DSAOutputVerifier<T extends Parameters>
         else
         {
             ASN1Sequence s = (ASN1Sequence)ASN1Primitive.fromByteArray(encoding);
+            if (s.size() != 2)
+            {
+                throw new IOException("malformed signature");
+            }
+            if (!Arrays.areEqual(encoding, s.getEncoded(ASN1Encoding.DER)))
+            {
+                throw new IOException("malformed signature");
+            }
 
             sig[0] = ASN1Integer.getInstance(s.getObjectAt(0)).getValue();
             sig[1] = ASN1Integer.getInstance(s.getObjectAt(1)).getValue();

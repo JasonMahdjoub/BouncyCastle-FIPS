@@ -383,6 +383,8 @@ public class BaseISO9796d2Signer
         clearBlock(mBuf);
         clearBlock(block);
 
+        messageLength = 0;
+        
         return b;
     }
 
@@ -562,11 +564,15 @@ public class BaseISO9796d2Signer
         clearBlock(mBuf);
         clearBlock(block);
 
+        messageLength = 0;
+        
         return true;
     }
 
     private boolean returnFalse(byte[] block)
     {
+        messageLength = 0;
+
         clearBlock(mBuf);
         clearBlock(block);
 

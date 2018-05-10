@@ -725,9 +725,9 @@ public final class FipsTripleDES
 
         Algorithm algorithm = key.getAlgorithm();
 
-        if (algorithm != ALGORITHM)
+        if (!algorithm.equals(ALGORITHM))
         {
-            if (algorithm != parameters.getAlgorithm())
+            if (!algorithm.equals(parameters.getAlgorithm()))
             {
                 // FSM_TRANS:5.TDES.2,"TDES KEY VALIDITY TEST", "USER COMMAND REJECTED", "Validity test on TDES key failed"
                 throw new IllegalKeyException("FIPS Key not for specified algorithm");

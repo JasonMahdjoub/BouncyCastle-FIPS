@@ -59,10 +59,7 @@ class DsaSigner
             }
             else
             {
-                if (kCalculator instanceof RandomDsaKCalculator)
-                {
-                    throw new IllegalArgumentException("No random provided where one required.");
-                }
+                throw new IllegalArgumentException("No random provided where one required.");
             }
         }
         else
@@ -95,7 +92,8 @@ class DsaSigner
 
         BigInteger  k = kCalculator.nextK();
 
-        BigInteger  r = params.getG().modPow(k, params.getP()).mod(params.getQ());
+        // the randomizer is to conceal timing information related to k and x.
+        BigInteger  r = params.getG().modPow(k.add(getRandomizer(params.getQ(), random)), params.getP()).mod(params.getQ());
 
         k = k.modInverse(params.getQ()).multiply(
                     m.add(((DsaPrivateKeyParameters)key).getX().multiply(r)));
@@ -161,5 +159,13 @@ class DsaSigner
 
             return new BigInteger(1, trunc);
         }
+    }
+
+    private BigInteger getRandomizer(BigInteger q, SecureRandom provided)
+    {
+        // Calculate a random multiple of q to add to k. Note that g^q = 1 (mod p), so adding multiple of q to k does not change r.
+        int randomBits = 7;
+
+        return new BigInteger(randomBits, provided).add(BigInteger.valueOf(128)).multiply(q);
     }
 }

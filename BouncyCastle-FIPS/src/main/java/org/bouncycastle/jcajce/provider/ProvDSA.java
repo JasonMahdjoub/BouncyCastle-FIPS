@@ -386,6 +386,11 @@ class ProvDSA
             Class spec)
             throws InvalidKeySpecException
         {
+            if (spec == null)
+            {
+                throw new InvalidKeySpecException("null spec is invalid");
+            }
+
             if (spec.isAssignableFrom(DSAPublicKeySpec.class) && key instanceof DSAPublicKey)
             {
                 DSAPublicKey k = (DSAPublicKey)key;
@@ -415,7 +420,12 @@ class ProvDSA
                 return new ProvDSAPrivateKey(privateKeyConverter.convertKey(FipsDSA.ALGORITHM, (PrivateKey)key));
             }
 
-            throw new InvalidKeyException("Key type unrecognized: " + key.getClass().getName());
+            if (key != null)
+            {
+                throw new InvalidKeyException("Key type unrecognized: " + key.getClass().getName());
+            }
+
+            throw new InvalidKeyException("Key is null");
         }
 
         public PrivateKey generatePrivate(PrivateKeyInfo keyInfo)
@@ -448,7 +458,14 @@ class ProvDSA
         {
             if (keySpec instanceof DSAPublicKeySpec)
             {
-                return new ProvDSAPublicKey(FipsDSA.ALGORITHM, (DSAPublicKeySpec)keySpec);
+                try
+                {
+                    return new ProvDSAPublicKey(FipsDSA.ALGORITHM, (DSAPublicKeySpec)keySpec);
+                }
+                catch (Exception e)
+                {
+                    throw new InvalidKeySpecException("invalid KeySpec: " + e.getMessage(), e);
+                }
             }
 
             return super.engineGeneratePublic(keySpec);
@@ -658,9 +675,13 @@ class ProvDSA
 
                 genGen = null;
             }
-            else
+            else if (genParamSpec != null)
             {
                 throw new InvalidAlgorithmParameterException("Unknown AlgorithmParameterSpec passed to DSA parameters generator: " + genParamSpec.getClass().getName());
+            }
+            else
+            {
+                throw new InvalidAlgorithmParameterException("null AlgorithmParameterSpec passed to DSA parameters generator");
             }
         }
 

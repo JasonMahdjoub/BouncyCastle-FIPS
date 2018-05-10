@@ -2,6 +2,8 @@ package org.bouncycastle.jcajce.provider;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidParameterSpecException;
 
@@ -43,39 +45,67 @@ class GcmSpecUtil
         }
     }
 
-    static AlgorithmParameterSpec extractGcmSpec(ASN1Primitive spec)
+    static AlgorithmParameterSpec extractGcmSpec(final ASN1Primitive spec)
         throws InvalidParameterSpecException
     {
-        try
+        Object rv = AccessController.doPrivileged(new PrivilegedAction<Object>()
         {
-            GCMParameters gcmParams = GCMParameters.getInstance(spec);
-            Constructor constructor = gcmSpecClass.getConstructor(new Class[]{Integer.TYPE, byte[].class});
+            public Object run()
+            {
+                try
+                {
+                    GCMParameters gcmParams = GCMParameters.getInstance(spec);
+                    Constructor constructor = gcmSpecClass.getConstructor(new Class[]{Integer.TYPE, byte[].class});
 
-            return (AlgorithmParameterSpec)constructor.newInstance(new Object[] { Integers.valueOf(gcmParams.getIcvLen() * 8), gcmParams.getNonce() });
-        }
-        catch (NoSuchMethodException e)
+                    return constructor.newInstance(new Object[]{Integers.valueOf(gcmParams.getIcvLen() * 8), gcmParams.getNonce()});
+                }
+                catch (NoSuchMethodException e)
+                {
+                    return new InvalidParameterSpecException("no constructor found!");   // should never happen
+                }
+                catch (Exception e)
+                {
+                    return new InvalidParameterSpecException("construction failed: " + e.getMessage());   // should never happen
+                }
+            }
+        });
+        if (rv instanceof AlgorithmParameterSpec)
         {
-            throw new InvalidParameterSpecException("No constructor found!");   // should never happen
+            return (AlgorithmParameterSpec)rv;
         }
-        catch (Exception e)
+        else
         {
-            throw new InvalidParameterSpecException("Construction failed: " + e.getMessage());   // should never happen
+            throw (InvalidParameterSpecException)rv;
         }
     }
 
-    static GCMParameters extractGcmParameters(AlgorithmParameterSpec paramSpec)
+    static GCMParameters extractGcmParameters(final AlgorithmParameterSpec paramSpec)
         throws InvalidParameterSpecException
     {
-        try
+        Object rv = AccessController.doPrivileged(new PrivilegedAction<Object>()
         {
-            Method tLen = gcmSpecClass.getDeclaredMethod("getTLen", new Class[0]);
-            Method iv= gcmSpecClass.getDeclaredMethod("getIV", new Class[0]);
+            public Object run()
+            {
+                try
+                {
+                    Method tLen = gcmSpecClass.getDeclaredMethod("getTLen", new Class[0]);
+                    Method iv = gcmSpecClass.getDeclaredMethod("getIV", new Class[0]);
 
-            return new GCMParameters((byte[])iv.invoke(paramSpec, new Object[0]), ((Integer)tLen.invoke(paramSpec, new Object[0])).intValue() / 8);
-        }
-        catch (Exception e)
+                    return new GCMParameters((byte[])iv.invoke(paramSpec, new Object[0]), ((Integer)tLen.invoke(paramSpec, new Object[0])).intValue() / 8);
+                }
+                catch (Exception e)
+                {
+                    return new InvalidParameterSpecException("cannot process GCMParameterSpec: " + e.getMessage());
+                }
+            }
+        });
+        if (rv instanceof GCMParameters)
         {
-            throw new InvalidParameterSpecException("Cannot process GCMParameterSpec");
+            return (GCMParameters)rv;
+        }
+        else
+        {
+            throw (InvalidParameterSpecException)rv;
         }
     }
 

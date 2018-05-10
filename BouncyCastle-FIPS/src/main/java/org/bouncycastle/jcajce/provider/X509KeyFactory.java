@@ -16,6 +16,12 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 class X509KeyFactory
     extends KeyFactorySpi
 {
+    private final BouncyCastleFipsProvider fipsProvider;
+
+    X509KeyFactory(BouncyCastleFipsProvider fipsProvider)
+    {
+        this.fipsProvider = fipsProvider;
+    }
 
     protected PrivateKey engineGeneratePrivate(
         KeySpec keySpec)
@@ -26,7 +32,7 @@ class X509KeyFactory
             try
             {
                 PrivateKeyInfo info = PrivateKeyInfo.getInstance(((PKCS8EncodedKeySpec)keySpec).getEncoded());
-                PrivateKey     key = BouncyCastleFipsProvider.getPrivateKey(info);
+                PrivateKey     key = fipsProvider.getPrivateKey(info);
 
                 if (key != null)
                 {
@@ -53,7 +59,7 @@ class X509KeyFactory
             try
             {
                 SubjectPublicKeyInfo info = SubjectPublicKeyInfo.getInstance(((X509EncodedKeySpec)keySpec).getEncoded());
-                PublicKey            key = BouncyCastleFipsProvider.getPublicKey(info);
+                PublicKey            key = fipsProvider.getPublicKey(info);
 
                 if (key != null)
                 {

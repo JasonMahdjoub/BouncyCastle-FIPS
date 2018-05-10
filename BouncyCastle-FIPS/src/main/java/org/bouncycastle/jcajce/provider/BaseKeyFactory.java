@@ -30,9 +30,13 @@ abstract class BaseKeyFactory
                 throw new InvalidKeySpecException(e.getMessage(), e);
             }
         }
-        else
+        else if (keySpec != null)
         {
             throw new InvalidKeySpecException("keySpec for PrivateKey not recognized: " + keySpec.getClass().getName());
+        }
+        else
+        {
+            throw new InvalidKeySpecException("null keySpec passed for PrivateKey");
         }
     }
 
@@ -51,9 +55,13 @@ abstract class BaseKeyFactory
                 throw new InvalidKeySpecException(e.getMessage(), e);
             }
         }
-        else
+        else if (keySpec != null)
         {
             throw new InvalidKeySpecException("keySpec for PublicKey not recognized: " + keySpec.getClass().getName());
+        }
+        else
+        {
+            throw new InvalidKeySpecException("null keySpec passed for PublicKey");
         }
     }
 

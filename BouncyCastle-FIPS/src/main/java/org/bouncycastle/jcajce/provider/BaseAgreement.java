@@ -145,6 +145,11 @@ class BaseAgreement
         boolean lastPhase) 
         throws InvalidKeyException, IllegalStateException
     {
+        if (parameters == null)
+        {
+            throw new IllegalStateException("KeyAgreement not initialized");
+        }
+
         Algorithm algorithm = parameters.getAlgorithm();
 
         if (!(key instanceof PublicKey))
@@ -195,6 +200,11 @@ class BaseAgreement
     protected byte[] engineGenerateSecret()
         throws IllegalStateException
     {
+        if (result == null)
+        {
+            throw new IllegalStateException("KeyAgreement not initialized");
+        }
+
         if (kdfAlgorithm != null)
         {
             throw new UnsupportedOperationException(

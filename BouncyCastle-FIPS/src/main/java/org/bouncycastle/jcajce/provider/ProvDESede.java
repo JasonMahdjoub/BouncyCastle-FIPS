@@ -288,8 +288,9 @@ final class ProvDESede
             }));
 
             provider.addAlias("Cipher", "PBEWITHSHAAND3-KEYDESEDE-CBC", PKCSObjectIdentifiers.pbeWithSHAAnd3_KeyTripleDES_CBC);
-            provider.addAlias("Cipher", "PBEWITHSHAAND3-KEYDESEDE-CBC", "PBEWITHSHA1ANDDESEDE");
+            provider.addAlias("Cipher", "PBEWITHSHAAND3-KEYDESEDE-CBC", "PBEWITHSHA1ANDDESEDE", "PBEWITHSHAAND3KEYTRIPLEDES");
             provider.addAlias("Cipher", "PBEWITHSHAAND2-KEYDESEDE-CBC", PKCSObjectIdentifiers.pbeWithSHAAnd2_KeyTripleDES_CBC);
+            provider.addAlias("Cipher", "PBEWITHSHAAND2-KEYDESEDE-CBC", "PBEWITHSHAAND2KEYTRIPLEDES");
             provider.addAlias("Alg.Alias.Cipher.PBEWITHSHA1ANDDESEDE-CBC", "PBEWITHSHAAND3-KEYDESEDE-CBC");
             provider.addAlias("Alg.Alias.Cipher.PBEWITHSHAAND3-KEYTRIPLEDES-CBC", "PBEWITHSHAAND3-KEYDESEDE-CBC");
             provider.addAlias("Alg.Alias.Cipher.PBEWITHSHAAND2-KEYTRIPLEDES-CBC", "PBEWITHSHAAND2-KEYDESEDE-CBC");

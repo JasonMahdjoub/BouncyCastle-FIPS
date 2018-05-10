@@ -38,4 +38,15 @@ public class TestRandomBigInteger
     {
         super(new FixedSecureRandom.BigInteger(encoding));
     }
+
+    /**
+     * Constructor which ensures encoding will produce a BigInteger from a request from the passed in bitLength.
+     *
+     * @param bitLength bit length for the BigInteger data request.
+     * @param encoding bytes making up the encoding.
+     */
+    public TestRandomBigInteger(int bitLength, byte[] encoding)
+    {
+        super(new FixedSecureRandom.BigInteger(bitLength, encoding));
+    }
 }

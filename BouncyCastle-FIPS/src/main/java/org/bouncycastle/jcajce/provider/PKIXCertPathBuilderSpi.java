@@ -31,9 +31,9 @@ import org.bouncycastle.jcajce.PKIXExtendedBuilderParameters;
 class PKIXCertPathBuilderSpi
     extends CertPathBuilderSpi
 {
-    private final Provider fipsProvider;
+    private final BouncyCastleFipsProvider fipsProvider;
 
-    PKIXCertPathBuilderSpi(Provider fipsProvider)
+    PKIXCertPathBuilderSpi(BouncyCastleFipsProvider fipsProvider)
     {
         this.fipsProvider = fipsProvider;
     }

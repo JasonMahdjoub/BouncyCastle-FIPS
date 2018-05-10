@@ -9,7 +9,6 @@ import java.security.spec.KeySpec;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -259,7 +258,7 @@ class ProvPBEPBKDF2
                     );
                 }
 
-                return new SecretKeySpec(deriver.deriveKey(PasswordBasedDeriver.KeyType.CIPHER, (pbeSpec.getKeyLength() + 7) / 8), keyAlg);
+                return new PBKDFPBEKey(deriver.deriveKey(PasswordBasedDeriver.KeyType.CIPHER, (pbeSpec.getKeyLength() + 7) / 8), keyAlg, pbeSpec);
             }
 
             throw new InvalidKeySpecException("Invalid KeySpec: " + keySpec.getClass().getName());

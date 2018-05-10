@@ -126,6 +126,11 @@ class BaseSecretKeyFactory
             return new ProvSecretKeySpec(new ValidatedSymmetricKey(algorithm, validator.validated(key.getEncoded())), algorithmName);
         }
 
+        if (keySpec == null)
+        {
+            throw new InvalidKeySpecException("null KeySpec passed to SecretKeyFactory");
+        }
+
         throw new InvalidKeySpecException("Unknown KeySpec passed to SecretKeyFactory: " + keySpec.getClass().getName());
     }
 }

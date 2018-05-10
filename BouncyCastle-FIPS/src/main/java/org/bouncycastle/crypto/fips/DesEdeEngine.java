@@ -28,7 +28,7 @@ class DesEdeEngine
     private int[]               workingKey3 = null;
 
     private boolean             forEncryption;
-
+    private boolean             firstBlock;
     private int                 blockCount;
 
     /**
@@ -83,7 +83,9 @@ class DesEdeEngine
             workingKey3 = workingKey1;
         }
 
+        // these shouldn't be changed by reset as they are properties of the key.
         blockCount = 0;
+        firstBlock = true;
     }
 
     public String getAlgorithmName()
@@ -117,15 +119,26 @@ class DesEdeEngine
             throw new OutputLengthException("output buffer too short");
         }
 
-        if (blockCount >= MAX_BLOCK_COUNT)
-        {
-            throw new IllegalStateException("attempt to process more than " + MAX_BLOCK_COUNT + " blocks with TripleDES");
-        }
-
         byte[] temp = new byte[BLOCK_SIZE];
 
         if (forEncryption)
         {
+            if (workingKey1 == workingKey3)
+            {
+                if (blockCount >= MAX_BLOCK_COUNT)
+                {
+                    throw new IllegalStateException("attempt to process more than " + MAX_BLOCK_COUNT + " blocks with 2-Key TripleDES");
+                }
+            }
+            else
+            {
+                if (blockCount == 0 && !firstBlock)
+                {
+                    throw new IllegalStateException("attempt to process too many blocks with 3-Key TripleDES");
+                }
+                firstBlock = false;
+            }
+
             desFunc(workingKey1, in, inOff, temp, 0);
             desFunc(workingKey2, temp, 0, temp, 0);
             desFunc(workingKey3, temp, 0, out, outOff);

@@ -27,6 +27,12 @@ class KeyUtils
 
     static BigInteger validated(DHDomainParameters dhParams, BigInteger y)
     {
+        // TLS check
+        if (y.compareTo(TWO) < 0 || y.compareTo(dhParams.getP().subtract(TWO)) > 0)
+        {
+            throw new IllegalArgumentException("Y value is out of range");
+        }
+
         if (dhParams.getQ() != null)
         {
             // FSM_STATE:5.10, "SP 800-56A ASSURANCES", "The module is performing SP 800-56A Assurances self-test"
@@ -41,7 +47,7 @@ class KeyUtils
         }
         else
         {
-            return y;         // we can't validate without Q.
+            return y;         // we can't really validate without Q.
         }
     }
 

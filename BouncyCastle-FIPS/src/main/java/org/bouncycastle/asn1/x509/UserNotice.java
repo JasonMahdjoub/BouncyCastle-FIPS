@@ -26,8 +26,8 @@ import org.bouncycastle.asn1.DERSequence;
 public class UserNotice 
     extends ASN1Object
 {
-    private NoticeReference noticeRef;
-    private DisplayText     explicitText;
+    private final NoticeReference noticeRef;
+    private final DisplayText     explicitText;
    
     /**
      * Creates a new <code>UserNotice</code> instance.
@@ -78,11 +78,18 @@ public class UserNotice
            if (as.getObjectAt(0).toASN1Primitive() instanceof ASN1Sequence)
            {
                noticeRef = NoticeReference.getInstance(as.getObjectAt(0));
+               explicitText = null;
            }
            else
            {
                explicitText = DisplayText.getInstance(as.getObjectAt(0));
+               noticeRef = null;
            }
+       }
+       else if (as.size() == 0)       // neither field set!
+       {
+           noticeRef = null;
+           explicitText = null;
        }
        else
        {

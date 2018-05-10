@@ -1,7 +1,7 @@
 package org.bouncycastle.jcajce.provider;
 
 import java.io.IOException;
-import java.io.PushbackInputStream;
+import java.io.InputStream;
 
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.util.encoders.Base64;
@@ -23,7 +23,7 @@ class PEMUtil
     }
 
     private String readLine(
-        PushbackInputStream in)
+        InputStream in)
         throws IOException
     {
         int             c;
@@ -44,22 +44,26 @@ class PEMUtil
         }
 
         // make sure we parse to end of line.
-
-        while (((c = in.read()) == '\r') && c == '\n' && (c >= 0))
+        if (c == '\r')
         {
-            ;
-        }
+            // a '\n' may follow
+            in.mark(1);
+            if (((c = in.read()) == '\n'))
+            {
+                in.mark(1);
+            }
 
-        if (c > 0)
-        {
-            in.unread(c);
+            if (c > 0)
+            {
+                in.reset();
+            }
         }
 
         return l.toString();
     }
 
     ASN1Sequence readPEMObject(
-        PushbackInputStream in)
+        InputStream in)
         throws IOException
     {
         String line;

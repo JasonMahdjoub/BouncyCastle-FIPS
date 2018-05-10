@@ -328,7 +328,10 @@ public class IETFUtils
         }
         else
         {
-            IETFUtils.appendTypeAndValue(buf, rdn.getFirst(), oidSymbols);
+            if (rdn.getFirst() != null)
+            {
+                IETFUtils.appendTypeAndValue(buf, rdn.getFirst(), oidSymbols);
+            }
         }
     }
 

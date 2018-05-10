@@ -39,7 +39,7 @@ class ConcatenationKDFGenerator
         }
         else
         {
-            throw new IllegalArgumentException("KDF parameters required for KDF2Generator");
+            throw new IllegalArgumentException("KDF parameters required for KDF generator");
         }
     }
 

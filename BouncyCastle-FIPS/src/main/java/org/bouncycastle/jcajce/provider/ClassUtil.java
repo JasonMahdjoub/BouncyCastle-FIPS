@@ -10,7 +10,6 @@ import javax.crypto.BadPaddingException;
 class ClassUtil
 {
     private static final Constructor aeadBadTagConstructor;
-    private static final Constructor vimIDConstructor;
 
     static
     {
@@ -23,16 +22,8 @@ class ClassUtil
         {
             aeadBadTagConstructor = null;
         }
-        Class vimIDClass = lookup("java.rmi.dgc.VMID");
-        if (vimIDClass != null)
-        {
-            vimIDConstructor = findConstructor(vimIDClass);
-        }
-        else
-        {
-            vimIDConstructor = null;
-        }
     }
+
 
     private static Constructor findConstructor(Class clazz)
     {
@@ -94,27 +85,5 @@ class ClassUtil
         }
 
         throw new BadPaddingException(message);
-    }
-
-    public static String getVIMID()
-    {
-        if (vimIDConstructor != null)
-        {
-            Object vimID = null;
-            try
-            {
-                vimID = vimIDConstructor.newInstance();
-            }
-            catch (Exception i)
-            {
-                // might happen, fall through if it does
-            }
-            if (vimID != null)
-            {
-                return vimID.toString();
-            }
-        }
-
-        return "No VIM ID"; // TODO: maybe there is a system property we can use here.
     }
 }

@@ -50,6 +50,7 @@ import org.bouncycastle.crypto.internal.io.SignerOutputStream;
 import org.bouncycastle.crypto.internal.params.ParametersWithRandom;
 import org.bouncycastle.crypto.internal.params.RsaKeyParameters;
 import org.bouncycastle.crypto.internal.params.RsaPrivateCrtKeyParameters;
+import org.bouncycastle.crypto.internal.signers.BaseRsaDigestSigner;
 import org.bouncycastle.util.Arrays;
 
 /**
@@ -1287,7 +1288,7 @@ public final class RSA
             {
                 byte[] sig = engine.processBlock(signature, 0, signature.length);
 
-                return Arrays.constantTimeAreEqual(input, sig);
+                return BaseRsaDigestSigner.checkPKCS1Sig(input, sig);
             }
             catch (org.bouncycastle.crypto.internal.InvalidCipherTextException e)
             {

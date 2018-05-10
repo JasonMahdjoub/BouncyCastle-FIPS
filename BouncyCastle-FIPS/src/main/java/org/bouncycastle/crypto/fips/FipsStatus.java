@@ -268,13 +268,13 @@ public final class FipsStatus
         JarFile result = null;
 
         final String markerName = LICENSE.class.getCanonicalName().replace(".", "/").replace("LICENSE", "MARKER");
-        final String marker = LICENSE.class.getClassLoader().getResource(markerName).toString();
+        final String marker = getMarker(LICENSE.class, markerName);
 
         if (marker != null && marker.startsWith("jar:file:") && marker.contains("!/"))
         {
             try
             {
-                String jarFilename = URLDecoder.decode(marker.substring("jar:file:".length(), marker.indexOf("!/")), "UTF-8");
+                String jarFilename = URLDecoder.decode(marker.substring("jar:file:".length(), marker.lastIndexOf("!/")), "UTF-8");
 
                 result = new JarFile(jarFilename);
             }
@@ -324,6 +324,26 @@ public final class FipsStatus
                     loadClass(cls);
                 }
             }
+        }
+    }
+
+    static String getMarker(Class sourceClass, final String markerName)
+    {
+        ClassLoader loader = sourceClass.getClassLoader();
+
+        if (loader != null)
+        {
+            return loader.getResource(markerName).toString();
+        }
+        else
+        {
+            return AccessController.doPrivileged(new PrivilegedAction<String>()
+            {
+                public String run()
+                {
+                    return ClassLoader.getSystemResource(markerName).toString();
+                }
+            });
         }
     }
 }

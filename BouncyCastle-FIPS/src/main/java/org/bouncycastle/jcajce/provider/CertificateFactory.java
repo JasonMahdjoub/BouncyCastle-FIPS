@@ -1,9 +1,9 @@
 package org.bouncycastle.jcajce.provider;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PushbackInputStream;
-import java.security.Provider;
 import java.security.cert.CRL;
 import java.security.cert.CRLException;
 import java.security.cert.CertPath;
@@ -32,6 +32,7 @@ import org.bouncycastle.asn1.cms.SignedDataParser;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.CertificateList;
+import org.bouncycastle.util.io.Streams;
 
 /**
  * class for dealing with X509 certificates.
@@ -46,7 +47,7 @@ class CertificateFactory
     private static final PEMUtil PEM_CERT_PARSER = new PEMUtil("CERTIFICATE");
     private static final PEMUtil PEM_CRL_PARSER = new PEMUtil("CRL");
 
-    private final Provider fipsProvider;
+    private final BouncyCastleFipsProvider fipsProvider;
 
     private ASN1Set sData = null;
     private int                sDataObjectCount = 0;
@@ -57,7 +58,7 @@ class CertificateFactory
     private InputStream currentCrlStream = null;
     private SignedDataParser signedDataParser = null;
 
-    CertificateFactory(Provider fipsProvider)
+    CertificateFactory(BouncyCastleFipsProvider fipsProvider)
     {
         this.fipsProvider = fipsProvider;
     }
@@ -159,7 +160,7 @@ class CertificateFactory
     }
 
     private java.security.cert.Certificate readPEMCertificate(
-        PushbackInputStream in)
+        InputStream in)
         throws IOException, CertificateParsingException
     {
         ASN1Sequence seq = PEM_CERT_PARSER.readPEMObject(in);
@@ -180,7 +181,7 @@ class CertificateFactory
     }
     
     private CRL readPEMCRL(
-        PushbackInputStream in)
+        InputStream in)
         throws IOException, CRLException
     {
         ASN1Sequence seq = PEM_CRL_PARSER.readPEMObject(in);
@@ -302,7 +303,18 @@ class CertificateFactory
 
             if (certificate == null)
             {
-                PushbackInputStream pis = new PushbackInputStream(in);
+                InputStream pis;
+
+                if (in.markSupported())
+                {
+                    pis = in;
+                }
+                else
+                {
+                    pis = new ByteArrayInputStream(Streams.readAll(in));
+                }
+
+                pis.mark(1);
                 int tag = pis.read();
 
                 if (tag == -1)
@@ -310,7 +322,7 @@ class CertificateFactory
                     return null;
                 }
 
-                pis.unread(tag);
+                pis.reset();
 
                 if (tag != 0x30)  // assume ascii PEM encoded.
                 {
@@ -363,9 +375,10 @@ class CertificateFactory
         throws CertificateException
     {
         List certs = new ArrayList();
+        BufferedInputStream in = new BufferedInputStream(inStream);
 
         java.security.cert.Certificate certificate;
-        while ((certificate = readCertificate(inStream)) != null)
+        while ((certificate = readCertificate(in)) != null)
         {
             certs.add(certificate);
         }
@@ -408,7 +421,18 @@ class CertificateFactory
 
             if (crl == null)
             {
-                PushbackInputStream pis = new PushbackInputStream(inStream);
+                InputStream pis;
+
+                if (inStream.markSupported())
+                {
+                    pis = inStream;
+                }
+                else
+                {
+                    pis = new ByteArrayInputStream(Streams.readAll(inStream));
+                }
+
+                pis.mark(1);
                 int tag = pis.read();
 
                 if (tag == -1)
@@ -416,8 +440,7 @@ class CertificateFactory
                     return null;
                 }
 
-                pis.unread(tag);
-
+                pis.reset();
                 if (tag != 0x30)  // assume ascii PEM encoded.
                 {
                     crl = readPEMCRL(pis);
@@ -476,9 +499,10 @@ class CertificateFactory
         throws CRLException
     {
         List crls = new ArrayList();
+        BufferedInputStream in = new BufferedInputStream(inStream);
 
         CRL crl;
-        while ((crl = readCrl(inStream)) != null)
+        while ((crl = readCrl(in)) != null)
         {
             crls.add(crl);
         }

@@ -16,8 +16,6 @@ import org.bouncycastle.crypto.internal.signers.BaseRsaDigestSigner;
 class RsaDigestSigner
     extends BaseRsaDigestSigner
 {
-    private final AsymmetricBlockCipher rsaEngine = new PKCS1Encoding((AsymmetricBlockCipher)FipsRegister.getProvider(FipsRSA.ALGORITHM).createEngine());
-
     private static final Hashtable oidMap = new Hashtable();
 
     /*

@@ -594,6 +594,11 @@ class ProvBCFKS
         @Override
         public boolean engineContainsAlias(String alias)
         {
+            if (alias == null)
+            {
+                throw new NullPointerException("alias value is null");
+            }
+
             return entries.containsKey(alias);
         }
 
@@ -634,6 +639,11 @@ class ProvBCFKS
         @Override
         public String engineGetCertificateAlias(Certificate certificate)
         {
+            if (certificate == null)
+            {
+                return null;
+            }
+
             byte[] encodedCert;
             try
             {

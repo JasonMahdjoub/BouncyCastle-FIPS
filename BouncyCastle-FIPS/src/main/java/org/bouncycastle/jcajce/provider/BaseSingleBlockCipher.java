@@ -41,6 +41,7 @@ import org.bouncycastle.crypto.Algorithm;
 import org.bouncycastle.crypto.AsymmetricKey;
 import org.bouncycastle.crypto.AsymmetricOperatorFactory;
 import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.bouncycastle.crypto.InvalidWrappingException;
 import org.bouncycastle.crypto.KeyUnwrapper;
 import org.bouncycastle.crypto.KeyWrapOperatorFactory;
 import org.bouncycastle.crypto.KeyWrapper;
@@ -566,11 +567,31 @@ class BaseSingleBlockCipher
             cipher = Utils.addRandomIfNeeded(operatorFactory.createBlockEncryptor(param, algParameters), random);
             break;
         case Cipher.DECRYPT_MODE:
+            // a number of APIs, including the JSSE, use DECRYPT rather than unwrap as HSM will store the key internally,
+            // we handle this by allowing decrypt for wrap mode only ciphers.
             if (wrapModeOnly)
             {
-                throw new InvalidParameterException("Cipher available for WRAP_MODE and UNWRAP_MODE only");
+                if (alg instanceof FipsAlgorithm)
+                {
+                    keyUnwrapper = fipsKeyWrapOperatorFactory.createKeyUnwrapper(param, algParameters);
+                }
+                else
+                {
+                    try
+                    {
+                        keyUnwrapper = generalKeyWrapOperatorFactory.createKeyUnwrapper(param, algParameters);
+                    }
+                    catch (ClassCastException e)
+                    {
+                        throw new InvalidParameterException("Cipher does not support WRAP_MODE");
+                    }
+                }
+                keyUnwrapper = Utils.addRandomIfNeeded(keyUnwrapper, random);
             }
-            cipher = Utils.addRandomIfNeeded(operatorFactory.createBlockDecryptor(param, algParameters), random);
+            else
+            {
+                cipher = Utils.addRandomIfNeeded(operatorFactory.createBlockDecryptor(param, algParameters), random);
+            }
             break;
         default:
             throw new InvalidParameterException("Unknown opmode " + opmode + " passed to single block cipher");
@@ -674,7 +695,10 @@ class BaseSingleBlockCipher
             throw new ShortBufferException("Not enough space for output");
         }
 
-        bOut.write(input, inputOffset, inputLen);
+        if (input != null)
+        {
+            bOut.write(input, inputOffset, inputLen);
+        }
 
         checkBufferSize();
 
@@ -692,9 +716,12 @@ class BaseSingleBlockCipher
 
     private void checkBufferSize()
     {
-        if (bOut.size() > cipher.getInputSize())
+        if (cipher != null)
         {
-            throw new ArrayIndexOutOfBoundsException("Too much data for block: maximum " + cipher.getInputSize() + " bytes");
+            if (bOut.size() > cipher.getInputSize())
+            {
+                throw new ArrayIndexOutOfBoundsException("Too much data for block: maximum " + cipher.getInputSize() + " bytes");
+            }
         }
     }
 
@@ -714,18 +741,40 @@ class BaseSingleBlockCipher
                 }
                 catch (PlainInputProcessingException e)
                 {
-                    throw new IllegalBlockSizeException("Unable to encrypt block: " + e.getMessage());
+                    throw new IllegalBlockSizeException("unable to encrypt block: " + e.getMessage());
                 }
             }
             else
             {
-                try
+                if (cipher != null)
                 {
-                    return ((SingleBlockDecryptor)cipher).decryptBlock(bytes, 0, bytes.length);
+                    try
+                    {
+                        return ((SingleBlockDecryptor)cipher).decryptBlock(bytes, 0, bytes.length);
+                    }
+                    catch (final InvalidCipherTextException e)
+                    {
+                        throw new BadBlockException("unable to decrypt block", e);
+                    }
+                    catch (final ArrayIndexOutOfBoundsException e)
+                    {
+                        throw new BadBlockException("unable to decrypt block", e);
+                    }
                 }
-                catch (InvalidCipherTextException e)
+                else
                 {
-                    throw new BadPaddingException("Unable to decrypt block: " + e.getMessage());
+                    try
+                    {
+                        return keyUnwrapper.unwrap(bytes, 0, bytes.length);
+                    }
+                    catch (final InvalidWrappingException e)
+                    {
+                        throw new BadBlockException("unable to decrypt block", e);
+                    }
+                    catch (final ArrayIndexOutOfBoundsException e)
+                    {
+                        throw new BadBlockException("unable to decrypt block", e);
+                    }
                 }
             }
         }
@@ -781,7 +830,7 @@ class BaseSingleBlockCipher
         }
         catch (Exception e)
         {
-            throw new InvalidKeyException(e.getMessage(), e.getCause());
+            throw new InvalidKeyException("unwrapping failed", e);
         }
 
         return BaseWrapCipher.rebuildKey(wrappedKeyAlgorithm, wrappedKeyType, encoded, fipsProvider);
@@ -798,6 +847,24 @@ class BaseSingleBlockCipher
         catch (Exception e)
         {
             return null;
+        }
+    }
+
+    private static class BadBlockException
+        extends BadPaddingException
+    {
+        private Throwable cause;
+
+        public BadBlockException(String msg, Throwable cause)
+        {
+            super(msg);
+
+            this.cause = cause;
+        }
+
+        public Throwable getCause()
+        {
+            return cause;
         }
     }
 }

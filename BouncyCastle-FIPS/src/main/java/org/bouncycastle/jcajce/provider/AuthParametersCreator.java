@@ -5,6 +5,7 @@ import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
 
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.RC2ParameterSpec;
 
 import org.bouncycastle.asn1.cms.GCMParameters;
 import org.bouncycastle.crypto.AuthenticationParameters;
@@ -52,6 +53,16 @@ class AuthParametersCreator<T extends AuthenticationParametersWithIV>
             {
                 throw new InvalidAlgorithmParameterException("Cannot process GCMParameterSpec: " + e.getMessage(), e);
             }
+        }
+
+        if (spec instanceof RC2ParameterSpec)
+        {
+            return baseParameters.withIV(((RC2ParameterSpec)spec).getIV());
+        }
+
+        if (spec != null)
+        {
+            throw new InvalidAlgorithmParameterException("Unknown AlgorithmParameterSpec found: " + spec.getClass().getName());
         }
 
         if (forEncryption && baseParameters.getAlgorithm().requiresAlgorithmParameters())

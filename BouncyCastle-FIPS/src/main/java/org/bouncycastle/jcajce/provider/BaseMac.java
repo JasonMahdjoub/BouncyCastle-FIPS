@@ -82,7 +82,10 @@ class BaseMac
 
     protected void engineReset()
     {
-        macCalculator.reset();
+        if (macCalculator != null)
+        {
+            macCalculator.reset();
+        }
     }
 
     protected void engineUpdate(

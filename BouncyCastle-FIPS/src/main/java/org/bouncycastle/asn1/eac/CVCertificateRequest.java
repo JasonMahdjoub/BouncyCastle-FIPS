@@ -37,7 +37,7 @@ public class CVCertificateRequest
 
             initCertBody(ASN1ApplicationSpecific.getInstance(seq.getObjectAt(0)));
 
-            outerSignature = DERApplicationSpecific.getInstance(seq.getObjectAt(seq.size() - 1)).getContents();
+            outerSignature = ASN1ApplicationSpecific.getInstance(seq.getObjectAt(seq.size() - 1)).getContents();
         }
         else
         {

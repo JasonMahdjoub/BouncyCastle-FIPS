@@ -138,7 +138,14 @@ class ProvDH
         {
             if (keySpec instanceof DHPublicKeySpec)
             {
-                return new ProvDHPublicKey(FipsDH.ALGORITHM, (DHPublicKeySpec)keySpec);
+                try
+                {
+                    return new ProvDHPublicKey(FipsDH.ALGORITHM, (DHPublicKeySpec)keySpec);
+                }
+                catch (Exception e)
+                {
+                    throw new InvalidKeySpecException("invalid KeySpec: " + e.getMessage(), e);
+                }
             }
             return super.engineGeneratePublic(keySpec);
         }
@@ -148,6 +155,11 @@ class ProvDH
             Class spec)
             throws InvalidKeySpecException
         {
+            if (spec == null)
+            {
+                throw new InvalidKeySpecException("null spec is invalid");
+            }
+
             if (spec.isAssignableFrom(DHPrivateKeySpec.class) && key instanceof DHPrivateKey)
             {
                 DHPrivateKey k = (DHPrivateKey)key;
@@ -177,7 +189,12 @@ class ProvDH
                 return new ProvDHPrivateKey(privateKeyConverter.convertKey(FipsDH.ALGORITHM, (PrivateKey)key));
             }
 
-            throw new InvalidKeyException("Key type unrecognized: " + key.getClass().getName());
+            if (key != null)
+            {
+                throw new InvalidKeyException("Key type unrecognized: " + key.getClass().getName());
+            }
+
+            throw new InvalidKeyException("Key is null");
         }
 
         public PrivateKey generatePrivate(PrivateKeyInfo info)

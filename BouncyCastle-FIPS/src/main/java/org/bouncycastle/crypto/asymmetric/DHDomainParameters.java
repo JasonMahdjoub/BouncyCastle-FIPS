@@ -60,8 +60,8 @@ public class DHDomainParameters
      * Minimal constructor for parameters able to be used to verify a public key.
      *
      * @param p the prime p defining the Galois field.
+     * @param q specifies the prime factor of p - 1.
      * @param g the generator of the multiplicative subgroup of order g.
-     * @param q specifies the prime factor of p - 1
      */
     public DHDomainParameters(
         BigInteger p,
@@ -75,8 +75,8 @@ public class DHDomainParameters
      * Minimal constructor for parameters able to be used to verify a public key with a private value length.
      *
      * @param p the prime p defining the Galois field.
+     * @param q specifies the prime factor of p - 1.
      * @param g the generator of the multiplicative subgroup of order g.
-     * @param q specifies the prime factor of p - 1
      * @param l the maximum bit length for the private value.
      */
     public DHDomainParameters(
@@ -92,8 +92,8 @@ public class DHDomainParameters
      * Parameters which can verify a public key with private value lengths.
      *
      * @param p the prime p defining the Galois field.
+     * @param q specifies the prime factor of p - 1.
      * @param g the generator of the multiplicative subgroup of order g.
-     * @param q specifies the prime factor of p - 1
      * @param m the minimum bit length for the private value.
      * @param l the maximum bit length for the private value.
      */
@@ -111,8 +111,8 @@ public class DHDomainParameters
      * Standard constructor - the full X9.42 parameter set.
      *
      * @param p the prime p defining the Galois field.
+     * @param q specifies the prime factor of p - 1.
      * @param g the generator of the multiplicative subgroup of order g.
-     * @param q specifies the prime factor of p - 1
      * @param j optionally specifies the value that satisfies the equation p = jq+1
      * @param validation parameters for validating these domain parameters.
      */
@@ -130,8 +130,8 @@ public class DHDomainParameters
      * X9.42 parameters with private value length.
      *
      * @param p the prime p defining the Galois field.
+     * @param q specifies the prime factor of p - 1.
      * @param g the generator of the multiplicative subgroup of order g.
-     * @param q specifies the prime factor of p - 1
      * @param l the maximum bit length for the private value.
      * @param validation parameters for validating these domain parameters.
      */
@@ -149,8 +149,8 @@ public class DHDomainParameters
      * Base constructor - the full domain parameter set.
      *
      * @param p the prime p defining the Galois field.
+     * @param q specifies the prime factor of p - 1.
      * @param g the generator of the multiplicative subgroup of order g.
-     * @param q specifies the prime factor of p - 1
      * @param m the minimum bit length for the private value.
      * @param l the maximum bit length for the private value.
      * @param j optionally specifies the value that satisfies the equation p = jq+1

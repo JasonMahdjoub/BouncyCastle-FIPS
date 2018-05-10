@@ -146,6 +146,11 @@ class ProvECGOST3410
             Class spec)
             throws InvalidKeySpecException
         {
+            if (spec == null)
+            {
+                throw new InvalidKeySpecException("null spec is invalid");
+            }
+
             if (spec.isAssignableFrom(ECGOST3410PublicKeySpec.class) && key instanceof ECGOST3410PublicKey)
             {
                 ECGOST3410PublicKey k = (ECGOST3410PublicKey)key;
@@ -180,7 +185,12 @@ class ProvECGOST3410
                 return new ProvECGOST3410PrivateKey(privateKeyConverter.convertKey(ECGOST3410.ALGORITHM, (PrivateKey)key));
             }
 
-            throw new InvalidKeyException("Key type unrecognized: " + key.getClass().getName());
+            if (key != null)
+            {
+                throw new InvalidKeyException("Key type unrecognized: " + key.getClass().getName());
+            }
+
+            throw new InvalidKeyException("Key is null");
         }
 
         protected PrivateKey engineGeneratePrivate(

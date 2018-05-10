@@ -24,9 +24,13 @@ import org.bouncycastle.crypto.internal.paddings.PaddedBufferedBlockCipher;
 import org.bouncycastle.crypto.internal.paddings.TBCPadding;
 import org.bouncycastle.crypto.internal.paddings.X923Padding;
 import org.bouncycastle.crypto.internal.params.ParametersWithRandom;
+import org.bouncycastle.util.Pack;
+import org.bouncycastle.util.Strings;
 
 class BlockCipherUtils
 {
+    private static SecureRandom defaultRandomPadder;
+
     static BufferedBlockCipher createBlockCipher(EngineProvider<BlockCipher> provider, FipsParameters parameter)
     {
         BlockCipher cipher = provider.createEngine();
@@ -114,7 +118,14 @@ class BlockCipherUtils
                 }
                 else
                 {
-                    cipherParameters = new ParametersWithRandom(cipherParameters, CryptoServicesRegistrar.getSecureRandom());
+                    try
+                    {
+                        cipherParameters = new ParametersWithRandom(cipherParameters, CryptoServicesRegistrar.getSecureRandom());
+                    }
+                    catch (IllegalStateException e)
+                    {
+                        cipherParameters = new ParametersWithRandom(cipherParameters, getDefaultRandomPadder());
+                    }
                 }
             }
         }
@@ -141,5 +152,17 @@ class BlockCipherUtils
         }
 
         return cipher;
+    }
+
+    static synchronized SecureRandom getDefaultRandomPadder()
+    {
+        if (defaultRandomPadder == null)
+        {
+             defaultRandomPadder = FipsDRBG.SHA512.fromDefaultEntropy().
+                 setPersonalizationString(Strings.toByteArray("Bouncy Castle FIPS Default Padder"))
+                 .build(Pack.longToBigEndian(System.currentTimeMillis()),false);
+        }
+
+        return defaultRandomPadder;
     }
 }

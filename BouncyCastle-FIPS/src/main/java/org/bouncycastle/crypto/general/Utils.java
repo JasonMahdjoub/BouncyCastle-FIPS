@@ -31,9 +31,9 @@ class Utils
     {
         Algorithm keyAlgorithm = key.getAlgorithm();
 
-        if (keyAlgorithm != generalAlgorithm)
+        if (!keyAlgorithm.equals(generalAlgorithm))
         {
-            if (keyAlgorithm != paramAlgorithm)
+            if (!keyAlgorithm.equals(paramAlgorithm))
             {
                 throw new IllegalKeyException("Key not for appropriate algorithm");
             }

@@ -45,7 +45,7 @@ class KtsCipherSpi
     {
         this.fipsProvider = fipsProvider;
         this.algorithmName = algorithmName;
-        this.kemFact = SecretKeyFactory.getInstance(algorithmName, fipsProvider);
+        this.kemFact = SecretKeyFactory.getInstance("RSA-KAS-KEM", fipsProvider);
     }
 
     @Override

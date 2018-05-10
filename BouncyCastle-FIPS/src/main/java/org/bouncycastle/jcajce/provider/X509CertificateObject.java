@@ -62,7 +62,7 @@ import org.bouncycastle.util.encoders.Hex;
 class X509CertificateObject
     extends X509Certificate
 {
-    private final Provider fipsProvider;
+    private final BouncyCastleFipsProvider fipsProvider;
     private final org.bouncycastle.asn1.x509.Certificate    c;
     private final BasicConstraints            basicConstraints;
     private final boolean[]                   keyUsage;
@@ -72,7 +72,7 @@ class X509CertificateObject
     private volatile int                hashValue;
 
     public X509CertificateObject(
-        Provider fipsProvider,
+        BouncyCastleFipsProvider fipsProvider,
         org.bouncycastle.asn1.x509.Certificate c)
         throws CertificateParsingException
     {
@@ -526,7 +526,7 @@ class X509CertificateObject
             // we cache the public key as assurance checking can be quite expensive
             if (publicKeyValue == null)
             {
-                publicKeyValue = BouncyCastleFipsProvider.getPublicKey(c.getSubjectPublicKeyInfo());
+                publicKeyValue = fipsProvider.getPublicKey(c.getSubjectPublicKeyInfo());
             }
             return publicKeyValue;
         }

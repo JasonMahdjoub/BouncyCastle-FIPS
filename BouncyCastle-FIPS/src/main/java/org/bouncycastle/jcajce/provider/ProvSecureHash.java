@@ -1,6 +1,7 @@
 package org.bouncycastle.jcajce.provider;
 
 import java.security.InvalidAlgorithmParameterException;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
 import java.security.spec.InvalidKeySpecException;
@@ -14,9 +15,15 @@ import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
 import org.bouncycastle.crypto.AuthenticationParameters;
 import org.bouncycastle.crypto.CryptoServicesRegistrar;
 import org.bouncycastle.crypto.DigestOperatorFactory;
+import org.bouncycastle.crypto.OutputDigestCalculator;
+import org.bouncycastle.crypto.Parameters;
 import org.bouncycastle.crypto.SymmetricKeyGenerator;
+import org.bouncycastle.crypto.UpdateOutputStream;
+import org.bouncycastle.crypto.fips.FipsDigestOperatorFactory;
+import org.bouncycastle.crypto.fips.FipsSHS;
 import org.bouncycastle.crypto.general.GeneralParameters;
 import org.bouncycastle.crypto.general.SecureHash;
+import org.bouncycastle.crypto.internal.Digest;
 
 class ProvSecureHash
 {
@@ -124,42 +131,46 @@ class ProvSecureHash
 
         public void configure(final BouncyCastleFipsProvider provider)
         {
-            provider.addAlgorithmImplementation("MessageDigest.MD5", PREFIX + "$Digest", new GuardedEngineCreator(new EngineCreator()
+            // special case due to TLS 1.1
+            provider.addAlgorithmImplementation("MessageDigest.MD5", PREFIX + "$Digest", new EngineCreator()
             {
                 public Object createInstance(Object constructorParameter)
                 {
-                    return getDigestImplementation(SecureHash.MD5);
+                    return new MD5MessageDigest();
                 }
-            }));
+            });
             provider.addAlias("MessageDigest", "MD5", PKCSObjectIdentifiers.md5);
 
-            addHMACAlgorithm(provider, "MD5", PREFIX + "$HashMac", new GuardedEngineCreator(new EngineCreator()
-                {
-                    public Object createInstance(Object constructorParameter)
+            if (!CryptoServicesRegistrar.isInApprovedOnlyMode())
+            {
+                addHMACAlgorithm(provider, "MD5", PREFIX + "$HashMac", new GuardedEngineCreator(new EngineCreator()
                     {
-                        return new BaseHMac(SecureHash.Algorithm.MD5_HMAC, new ParametersCreator(SecureHash.MD5_HMAC));
-                    }
-                }), PREFIX + "$KeyGenerator", new GuardedEngineCreator(new EngineCreator()
-                {
-                    public Object createInstance(Object constructorParameter)
-                    {
-                        return new BaseKeyGenerator(provider, "HmacMD5", 128, new KeyGeneratorCreator()
+                        public Object createInstance(Object constructorParameter)
                         {
-                            public SymmetricKeyGenerator createInstance(int keySize, SecureRandom random)
-                            {
-                                return new SecureHash.KeyGenerator(SecureHash.Algorithm.MD5_HMAC, keySize, random);
-                            }
-                        });
-                    }
-                }),
-                PREFIX + "$SecretKeyFactory", new GuardedEngineCreator(new EngineCreator()
-                {
-                    public Object createInstance(Object constructorParameter)
+                            return new BaseHMac(SecureHash.Algorithm.MD5_HMAC, new ParametersCreator(SecureHash.MD5_HMAC));
+                        }
+                    }), PREFIX + "$KeyGenerator", new GuardedEngineCreator(new EngineCreator()
                     {
-                        return new BaseSecretKeyFactory("HmacMD5", SecureHash.Algorithm.MD5_HMAC, anythingGoesValidator);
-                    }
-                }));
-            addHMACAlias(provider, "MD5", IANAObjectIdentifiers.hmacMD5);
+                        public Object createInstance(Object constructorParameter)
+                        {
+                            return new BaseKeyGenerator(provider, "HmacMD5", 128, new KeyGeneratorCreator()
+                            {
+                                public SymmetricKeyGenerator createInstance(int keySize, SecureRandom random)
+                                {
+                                    return new SecureHash.KeyGenerator(SecureHash.Algorithm.MD5_HMAC, keySize, random);
+                                }
+                            });
+                        }
+                    }),
+                    PREFIX + "$SecretKeyFactory", new GuardedEngineCreator(new EngineCreator()
+                    {
+                        public Object createInstance(Object constructorParameter)
+                        {
+                            return new BaseSecretKeyFactory("HmacMD5", SecureHash.Algorithm.MD5_HMAC, anythingGoesValidator);
+                        }
+                    }));
+                addHMACAlias(provider, "MD5", IANAObjectIdentifiers.hmacMD5);
+            }
         }
     }
 
@@ -439,6 +450,67 @@ class ProvSecureHash
                         return new BaseSecretKeyFactory("HmacWhirlpool", SecureHash.Algorithm.WHIRLPOOL_HMAC, anythingGoesValidator);
                     }
                 }));
+        }
+    }
+
+    // MD5 is a special case due to TLS.
+    private static class MD5MessageDigest
+        extends MessageDigest
+        implements Cloneable
+    {
+        private final MD5Digest baseDigest;
+
+        protected MD5MessageDigest()
+        {
+            super("MD5");
+            baseDigest = new MD5Digest();
+        }
+
+        protected MD5MessageDigest(MD5Digest md5Digest)
+        {
+            super("MD5");
+            baseDigest = new MD5Digest(md5Digest);
+        }
+
+        protected void engineReset()
+        {
+            baseDigest.reset();
+        }
+
+        protected void engineUpdate(
+            byte    input)
+        {
+            baseDigest.update(input);
+        }
+
+        protected void engineUpdate(
+            byte[]  input,
+            int     offset,
+            int     len)
+        {
+            baseDigest.update(input, offset, len);
+        }
+
+        protected byte[] engineDigest()
+        {
+            byte[]  digestBytes = new byte[baseDigest.getDigestSize()];
+
+            baseDigest.doFinal(digestBytes, 0);
+
+            engineReset();
+
+            return digestBytes;
+        }
+
+        protected int engineGetDigestLength()
+        {
+            return baseDigest.getDigestSize();
+        }
+
+        public Object clone()
+            throws CloneNotSupportedException
+        {
+            return new MD5MessageDigest(baseDigest);
         }
     }
 }

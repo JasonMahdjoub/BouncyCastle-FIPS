@@ -92,5 +92,4 @@ public interface BCObjectIdentifiers
      * NewHope
      */
     ASN1ObjectIdentifier newHope = bc_exch.branch("1");
-
 }

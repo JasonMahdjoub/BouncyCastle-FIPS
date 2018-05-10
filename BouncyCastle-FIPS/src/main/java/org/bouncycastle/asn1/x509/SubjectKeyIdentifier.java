@@ -57,7 +57,7 @@ public class SubjectKeyIdentifier
     protected SubjectKeyIdentifier(
         ASN1OctetString keyid)
     {
-        this.keyidentifier = keyid.getOctets();
+        this(keyid.getOctets());
     }
 
     public byte[] getKeyIdentifier()
@@ -67,6 +67,6 @@ public class SubjectKeyIdentifier
 
     public ASN1Primitive toASN1Primitive()
     {
-        return new DEROctetString(keyidentifier);
+        return new DEROctetString(getKeyIdentifier());
     }
 }

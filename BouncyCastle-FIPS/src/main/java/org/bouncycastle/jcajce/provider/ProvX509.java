@@ -12,7 +12,7 @@ class ProvX509
         {
             public Object createInstance(Object constructorParameter)
             {
-                return new X509KeyFactory();
+                return new X509KeyFactory(provider);
             }
         });
         provider.addAlias("Alg.Alias.KeyFactory.X509", "X.509");

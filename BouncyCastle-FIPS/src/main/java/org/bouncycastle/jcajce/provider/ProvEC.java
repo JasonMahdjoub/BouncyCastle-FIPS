@@ -62,7 +62,7 @@ class ProvEC
     extends AsymmetricAlgorithmProvider
 {
     private static final AgreementFactory fipsDHFactory = new FipsEC.DHAgreementFactory();
-    private static final AgreementFactory fipsMQVFactory = new FipsEC.MQVAgreementFactory();
+    private static final AgreementFactory fipsMQVFactory = Properties.isOverrideSet("org.bouncycastle.ec.disable_mqv") ? null : new FipsEC.MQVAgreementFactory();
     private static final SignatureOperatorFactory fipsDsaFactory = new FipsEC.DSAOperatorFactory();
 
     private static final Map<String, String> generalEcAttributes = new HashMap<String, String>();
@@ -743,8 +743,11 @@ class ProvEC
             {
                 return new ProvECPrivateKey(privateKeyConverter.convertKey(algorithm, (PrivateKey)key));
             }
-
-            throw new InvalidKeyException("Key type unrecognized: " + key.getClass().getName());
+            else if (key != null)
+            {
+                throw new InvalidKeyException("Key type unrecognized: " + key.getClass().getName());
+            }
+            throw new InvalidKeyException("Key is null");
         }
 
         protected KeySpec engineGetKeySpec(
@@ -752,6 +755,11 @@ class ProvEC
             Class spec)
             throws InvalidKeySpecException
         {
+            if (spec == null)
+            {
+                throw new InvalidKeySpecException("null spec is invalid");
+            }
+
             if (spec.isAssignableFrom(ECPublicKeySpec.class) && key instanceof ECPublicKey)
             {
                 ECPublicKey k = (ECPublicKey)key;

@@ -7,6 +7,7 @@ import org.bouncycastle.crypto.AuthenticationParametersWithIV;
 import org.bouncycastle.crypto.CryptoServicesRegistrar;
 import org.bouncycastle.crypto.Parameters;
 import org.bouncycastle.crypto.ParametersWithIV;
+import org.bouncycastle.crypto.fips.FipsDRBG;
 import org.bouncycastle.crypto.internal.BlockCipher;
 import org.bouncycastle.crypto.internal.BufferedBlockCipher;
 import org.bouncycastle.crypto.internal.CipherParameters;
@@ -43,9 +44,13 @@ import org.bouncycastle.crypto.internal.params.KeyParameterImpl;
 import org.bouncycastle.crypto.internal.params.ParametersWithRandom;
 import org.bouncycastle.crypto.internal.wrappers.SP80038FWrapEngine;
 import org.bouncycastle.crypto.internal.wrappers.SP80038FWrapWithPaddingEngine;
+import org.bouncycastle.util.Pack;
+import org.bouncycastle.util.Strings;
 
 class CipherUtils
 {
+    private static SecureRandom defaultRandomPadder;
+
     static BufferedBlockCipher createBlockCipher(EngineProvider<BlockCipher> provider, Parameters parameter)
     {
         GeneralAlgorithm algorithm = (GeneralAlgorithm)parameter.getAlgorithm();
@@ -81,8 +86,8 @@ class CipherUtils
             cipher = new OFBBlockCipher(cipher, 128);
             break;
         case OFB256:
-             cipher = new OFBBlockCipher(cipher, 256);
-             break;
+            cipher = new OFBBlockCipher(cipher, 256);
+            break;
         case CTR:
             cipher = new SICBlockCipher(cipher);
             break;
@@ -157,7 +162,14 @@ class CipherUtils
                 }
                 else
                 {
-                    cipherParameters = new ParametersWithRandom(cipherParameters, CryptoServicesRegistrar.getSecureRandom());
+                    try
+                    {
+                        cipherParameters = new ParametersWithRandom(cipherParameters, CryptoServicesRegistrar.getSecureRandom());
+                    }
+                    catch (IllegalStateException e)
+                    {
+                        cipherParameters = new ParametersWithRandom(cipherParameters, getDefaultRandomPadder());
+                    }
                 }
             }
         }
@@ -169,7 +181,7 @@ class CipherUtils
 
     static AEADBlockCipher createAEADCipher(GeneralAlgorithm algorithm, EngineProvider<BlockCipher> provider)
     {
-        AEADBlockCipher  cipher;
+        AEADBlockCipher cipher;
 
         switch (((Mode)algorithm.basicVariation()))
         {
@@ -193,7 +205,7 @@ class CipherUtils
     }
 
     static AEADBlockCipher createStandardAEADCipher(boolean forEncryption, ValidatedSymmetricKey key, EngineProvider<BlockCipher> engineProvider,
-                                                final AuthenticationParametersWithIV parameters)
+                                                    final AuthenticationParametersWithIV parameters)
     {
         KeyParameter keyParameter = new KeyParameterImpl(key.getKeyBytes());
 
@@ -201,9 +213,9 @@ class CipherUtils
     }
 
     static AEADBlockCipher createStandardAEADCipher(boolean forEncryption, KeyParameter keyParameter, EngineProvider<BlockCipher> engineProvider,
-                                                final AuthenticationParametersWithIV parameters)
+                                                    final AuthenticationParametersWithIV parameters)
     {
-        final AEADBlockCipher  cipher = CipherUtils.createAEADCipher((GeneralAlgorithm)parameters.getAlgorithm(), engineProvider);
+        final AEADBlockCipher cipher = CipherUtils.createAEADCipher((GeneralAlgorithm)parameters.getAlgorithm(), engineProvider);
 
         if (parameters.getIV() != null)
         {
@@ -373,4 +385,16 @@ class CipherUtils
         return wrapper;
     }
 
+
+    static synchronized SecureRandom getDefaultRandomPadder()
+    {
+        if (defaultRandomPadder == null)
+        {
+            defaultRandomPadder = FipsDRBG.SHA512.fromDefaultEntropy().
+                setPersonalizationString(Strings.toByteArray("Bouncy Castle General Default Padder"))
+                .build(Pack.longToBigEndian(System.currentTimeMillis()), false);
+        }
+
+        return defaultRandomPadder;
+    }
 }

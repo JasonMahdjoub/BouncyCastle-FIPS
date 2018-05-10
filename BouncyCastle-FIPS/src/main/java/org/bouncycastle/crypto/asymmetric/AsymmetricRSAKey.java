@@ -120,17 +120,15 @@ public abstract class AsymmetricRSAKey
 
     /**
      * Check to see if a key can be used for a specific usage. Essentially this will return false if
-     * the modulus is associated with a different usage already. If the module is not running in
-     * approved mode the system property "org.bouncycastle.rsa.allow_multi_use" can be set to "true" to
-     * override this check.
+     * the modulus is associated with a different usage already. The system property "org.bouncycastle.rsa.allow_multi_use"
+     * can be set to "true" to override this check.
      *
      * @param usage usage for the RSA key.
      * @return true if the modulus is already associated with the usage, or has not being used already.
      */
     public boolean canBeUsed(Usage usage)
     {
-        return (!CryptoServicesRegistrar.isInApprovedOnlyMode() && Properties.isOverrideSet("org.bouncycastle.rsa.allow_multi_use"))
-            || keyMarker.canBeUsed(usage);
+        return Properties.isOverrideSet("org.bouncycastle.rsa.allow_multi_use") || keyMarker.canBeUsed(usage);
     }
 
     protected void zeroize()

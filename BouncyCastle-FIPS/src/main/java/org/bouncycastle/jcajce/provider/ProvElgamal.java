@@ -176,6 +176,11 @@ class ProvElgamal
             Class spec)
             throws InvalidKeySpecException
         {
+            if (spec == null)
+            {
+                throw new InvalidKeySpecException("null spec is invalid");
+            }
+
             if (spec.isAssignableFrom(DHPrivateKeySpec.class) && key instanceof DHPrivateKey)
             {
                 DHPrivateKey k = (DHPrivateKey)key;
@@ -205,7 +210,12 @@ class ProvElgamal
                 return new ProvDHPrivateKey(ProvDH.privateKeyConverter.convertKey(ElGamal.ALGORITHM, (PrivateKey)key));
             }
 
-            throw new InvalidKeyException("Key type unrecognized: " + key.getClass().getName());
+            if (key != null)
+            {
+                throw new InvalidKeyException("Key type unrecognized: " + key.getClass().getName());
+            }
+
+            throw new InvalidKeyException("Key is null");
         }
 
         public PrivateKey generatePrivate(PrivateKeyInfo info)

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.security.Provider;
 import java.security.SecureRandom;
 
+import org.bouncycastle.util.Pack;
 import org.bouncycastle.util.encoders.Hex;
 
 /**
@@ -32,7 +33,6 @@ public class FixedSecureRandom
     }
 
     private byte[]       _data;
-    
     private int          _index;
 
     /**
@@ -72,9 +72,19 @@ public class FixedSecureRandom
             super(data);
         }
 
+        public BigInteger(int bitLength, byte[] data)
+        {
+            super(expandToBitLength(bitLength, data));
+        }
+
         public BigInteger(String hexData)
         {
             this(Hex.decode(hexData));
+        }
+
+        public BigInteger(int bitLength, String hexData)
+        {
+            super(expandToBitLength(bitLength, Hex.decode(hexData)));
         }
     }
 
@@ -146,13 +156,16 @@ public class FixedSecureRandom
                         {
                             bOut.write(data, data.length - (w + 4), 4);
                         }
+                        if (data.length - len != 0)
+                        {
+                            for (int w = 0; w != 4 - (data.length - len); w++)
+                            {
+                                bOut.write(0);
+                            }
+                        }
                         for (int w = 0; w != data.length - len; w++)
                         {
-                            bOut.write(data[w]);
-                        }
-                        for (int w = 0; w != 4 - (data.length - len); w++)
-                        {
-                            bOut.write(0);
+                            bOut.write(data[len + w]);
                         }
                     }
                     else
@@ -202,7 +215,7 @@ public class FixedSecureRandom
         val |= nextValue() << 16;
         val |= nextValue() << 8;
         val |= nextValue();
-        
+
         return val;
     }
     
@@ -253,6 +266,45 @@ public class FixedSecureRandom
 
             index += bytes.length;
         }
+    }
+
+    private static byte[] expandToBitLength(int bitLength, byte[] v)
+    {
+        if ((bitLength + 7) / 8 > v.length)
+        {
+            byte[] tmp = new byte[(bitLength + 7) / 8];
+            System.arraycopy(v, 0, tmp, tmp.length - v.length, v.length);
+            if (isAndroidStyle)
+            {
+                if (bitLength % 32 != 0)
+                {
+                    tmp = new byte[((bitLength + 31) / 32) * 4];
+                    System.arraycopy(v, 0, tmp, tmp.length - v.length, v.length);
+
+                    int i = Pack.bigEndianToInt(tmp, 0);
+                    Pack.intToBigEndian(i << (32 - (bitLength % 32)), tmp, 0);
+                }
+            }
+
+            return tmp;
+        }
+        else
+        {
+            if (isAndroidStyle && bitLength < (v.length * 8))
+            {
+                if (bitLength % 32 != 0)
+                {
+                    byte[] tmp = new byte[((bitLength + 31) / 32) * 4];
+                    System.arraycopy(v, 0, tmp, tmp.length - v.length, v.length);
+                    int i = Pack.bigEndianToInt(tmp, 0);
+                    Pack.intToBigEndian(i << (32 - (bitLength % 32)), tmp, 0);
+
+                    return tmp;
+                }
+            }
+        }
+
+        return v;
     }
 
     private static class DummyProvider

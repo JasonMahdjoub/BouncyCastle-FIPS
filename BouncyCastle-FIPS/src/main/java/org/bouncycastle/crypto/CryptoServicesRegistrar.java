@@ -18,6 +18,7 @@ import org.bouncycastle.crypto.fips.FipsSecureRandom;
 import org.bouncycastle.crypto.fips.FipsStatus;
 import org.bouncycastle.crypto.fips.FipsUnapprovedOperationError;
 import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
+import org.bouncycastle.util.Properties;
 import org.bouncycastle.util.encoders.Hex;
 
 /**
@@ -115,7 +116,7 @@ public final class CryptoServicesRegistrar
          {
              checkPermission(AbleToUseUnapprovedMode);
 
-             return false;
+             return Properties.isOverrideSet("org.bouncycastle.fips.approved_only");
          }
          catch (SecurityException e)
          {

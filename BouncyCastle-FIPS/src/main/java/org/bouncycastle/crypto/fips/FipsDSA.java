@@ -29,6 +29,7 @@ import org.bouncycastle.crypto.internal.test.ConsistencyTest;
 import org.bouncycastle.math.internal.Primes;
 import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.util.test.FixedSecureRandom;
 import org.bouncycastle.util.test.TestRandomBigInteger;
 
 /**
@@ -887,7 +888,9 @@ public final class FipsDSA
 
                     AsymmetricCipherKeyPair kp = kpGen.generateKeyPair();
 
-                    signer.init(true, new ParametersWithRandom(kp.getPrivate(), new TestRandomBigInteger(Hex.decode("735959CC4463B8B440E407EECA8A473BF6A6D1FE657546F67D401F05"))));
+                    signer.init(true, new ParametersWithRandom(kp.getPrivate(), new FixedSecureRandom(
+                        new FixedSecureRandom.BigInteger("735959CC4463B8B440E407EECA8A473BF6A6D1FE657546F67D401F05"),
+                        new FixedSecureRandom.Data(Hex.decode("01020304")))));
 
                     byte[] msg = Hex.decode("23097D223405D8228642A477BDA255B32AADBCE4BDA0B3F7E36C9DA7");
 

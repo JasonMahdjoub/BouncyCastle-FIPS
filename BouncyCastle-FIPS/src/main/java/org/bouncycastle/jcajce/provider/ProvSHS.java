@@ -42,6 +42,11 @@ class ProvSHS
         public AuthenticationParameters createParameters(boolean forEncryption, AlgorithmParameterSpec spec, SecureRandom random)
             throws InvalidAlgorithmParameterException
         {
+            if (spec != null)
+            {
+                throw new InvalidAlgorithmParameterException("Unknown AlgorithmParameterSpec found: " + spec.getClass().getName());
+            }
+
             return getBaseParameters();
         }
     }

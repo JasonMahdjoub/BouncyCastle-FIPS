@@ -40,10 +40,12 @@ import org.bouncycastle.crypto.internal.params.ParametersWithRandom;
 import org.bouncycastle.crypto.internal.params.RsaKeyGenerationParameters;
 import org.bouncycastle.crypto.internal.params.RsaKeyParameters;
 import org.bouncycastle.crypto.internal.params.RsaPrivateCrtKeyParameters;
+import org.bouncycastle.crypto.internal.signers.BaseRsaDigestSigner;
 import org.bouncycastle.crypto.internal.test.ConsistencyTest;
 import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.BigIntegers;
 import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.util.test.FixedSecureRandom;
 import org.bouncycastle.util.test.TestRandomData;
 
 /**
@@ -1246,10 +1248,10 @@ public final class FipsRSA
         public SecretWithEncapsulation extractSecret(byte[] encapsulation, int offset, int length)
             throws InvalidCipherTextException
         {
-            return doExtraction(ENGINE_PROVIDER.createEngine(), encapsulation, offset, length);
+            return doExtraction(getPrivateKeyParameters(privKey), ENGINE_PROVIDER.createEngine(), encapsulation, offset, length);
         }
 
-        private SecretWithEncapsulation doExtraction(AsymmetricBlockCipher rsaEngine, byte[] encapsulation, int offset, int length)
+        private SecretWithEncapsulation doExtraction(RsaKeyParameters privKeyParams, AsymmetricBlockCipher rsaEngine, byte[] encapsulation, int offset, int length)
             throws InvalidCipherTextException
         {
             AsymmetricBlockCipher ktsEngine;
@@ -1265,7 +1267,7 @@ public final class FipsRSA
                 ktsEngine = new OAEPEncoding(rsaEngine, FipsSHS.createDigest(oeapParams.digestAlgorithm), FipsSHS.createDigest(oeapParams.mgfDigestAlgorithm), oeapParams.encodingParams);
             }
 
-            ktsEngine.init(false, new ParametersWithRandom(getPrivateKeyParameters(privKey), random));
+            ktsEngine.init(false, new ParametersWithRandom(privKeyParams, random));
 
             try
             {
@@ -1459,12 +1461,7 @@ public final class FipsRSA
                 throws Exception
             {
                 byte[] rngData1 = Hex.decode(
-                    "697140a15ddcb8dc01b7f97d929c20c99f9b1348fa80d67350183e44ca9a90d958758d0299b95fb442338e7c3d359507" +
-                        "6f05c51b0152bc8a68a1d0b9eb4077ad716a357f72b10130669eeeb4c7454afe742c14dbcfd469c1f2171b59d2c5" +
-                        "b3ebb704157b7df5b8bd68ab15b003355dd3ec033bee5e3d418a8b3dd357d1491414" +
-                    "3b40b0a6e1900bd1f1bf238f75cbba9a93144bd9ec6ddfe500de2318730d0f55e4ee05cd58201c1993500ff1396a4e66" +
-                        "fe868f3eaa8cf09752d48426da24186e7870e610efecc9dc02f959c258d8bbdbc354d652c68e778bb6e523fcd086" +
-                        "77d48afbed4f15af72f82b870e4d4b658456dea6f581deb9e6d19a9baa0e30f46023ce4cf74c1caef7e0455f4210" +
+                    "ce4cf74c1caef7e0455f4210" +
                         "e13fde6847f56c939aedfed9d24c2e6a7c661c461b436ade0a9afd6457be92af33c2626b319e060e943561221509" +
                         "9f9369aaca72351dad4dc14a4c418dbe7fd3b273e91d45fa615c15be8d5e0b97b6aca713cbc549ed4ef2d82f5f8e" +
                         "03b0d0d95d6ce7c7695f8bba938746eff19b70d2c2d56fab");
@@ -1474,7 +1471,18 @@ public final class FipsRSA
                         "f7a5385c7282090fe3a171d915dde703e384b0b9de529ae3a45d8db4f5c2ddb74b550f1b8efc9bb99a6c2c07ff51" +
                         "2a66f307b6ba3e6db67daa2eb7440683b994e67ae574ec8b2e1253cb8b7f6241de19");
 
-                GeneratorImpl genImp = new GeneratorImpl(new RsaKeyParameters(false, katM, katE), new KTSParameters(ALGORITHM_SVE), new TestRandomData(rngData1));
+                byte[] zVal = Hex.decode(
+                    "697140a15ddcb8dc01b7f97d929c20c99f9b1348fa80d67350183e44ca9a90d958758d0299b95fb442338e7c3d359507" +
+                        "6f05c51b0152bc8a68a1d0b9eb4077ad716a357f72b10130669eeeb4c7454afe742c14dbcfd469c1f2171b59d2c5" +
+                        "b3ebb704157b7df5b8bd68ab15b003355dd3ec033bee5e3d418a8b3dd357d14914143b40b0a6e1900bd1f1bf238f" +
+                        "75cbba9a93144bd9ec6ddfe500de2318730d0f55e4ee05cd58201c1993500ff1396a4e66fe868f3eaa8cf09752d4" +
+                        "8426da24186e7870e610efecc9dc02f959c258d8bbdbc354d652c68e778bb6e523fcd08677d48afbed4f15af72f8" +
+                        "2b870e4d4b658456dea6f581deb9e6d19a9baa0e30f46023");
+
+                GeneratorImpl genImp = new GeneratorImpl(new RsaKeyParameters(false, katM, katE), new KTSParameters(ALGORITHM_SVE),
+                    new FixedSecureRandom(
+                        new FixedSecureRandom.BigInteger(2048, zVal),
+                        new FixedSecureRandom.Data(rngData1)));
 
                 SecretWithEncapsulation secWithEnc = genImp.doGeneration(provider.createEngine());
 
@@ -1490,16 +1498,10 @@ public final class FipsRSA
                     fail("Self test SVE encryption KAT failed.");
                 }
 
-                ExtractorImpl extractImp = new ExtractorImpl(new AsymmetricRSAPrivateKey(ALGORITHM_SVE, testPrivKey.getModulus(), testPrivKey.getExponent()), new KTSParameters(ALGORITHM_SVE), new TestRandomData(rngData2));
-
-                byte[] agreedValue = extractImp.doExtraction(provider.createEngine(), encapsulation, 0, encapsulation.length).getSecret();
-                if (!Arrays.areEqual(Hex.decode(
-                    "697140a15ddcb8dc01b7f97d929c20c99f9b1348fa80d67350183e44ca9a90d958758d0299b95fb442338e7c3d359507" +
-                        "6f05c51b0152bc8a68a1d0b9eb4077ad716a357f72b10130669eeeb4c7454afe742c14dbcfd469c1f2171b59d2c5" +
-                        "b3ebb704157b7df5b8bd68ab15b003355dd3ec033bee5e3d418a8b3dd357d14914143b40b0a6e1900bd1f1bf238f" +
-                        "75cbba9a93144bd9ec6ddfe500de2318730d0f55e4ee05cd58201c1993500ff1396a4e66fe868f3eaa8cf09752d4" +
-                        "8426da24186e7870e610efecc9dc02f959c258d8bbdbc354d652c68e778bb6e523fcd08677d48afbed4f15af72f8" +
-                        "2b870e4d4b658456dea6f581deb9e6d19a9baa0e30f46023"), agreedValue))
+                ExtractorImpl extractImp = new ExtractorImpl(new AsymmetricRSAPrivateKey(ALGORITHM_SVE, testPrivKey.getModulus(), testPrivKey.getExponent()), new KTSParameters(ALGORITHM_SVE), Utils.testRandom);
+                // use testPrivKey to avoid permissions issue if SecurityManager involved.
+                byte[] agreedValue = extractImp.doExtraction(testPrivKey, provider.createEngine(), encapsulation, 0, encapsulation.length).getSecret();
+                if (!Arrays.areEqual(zVal, agreedValue))
                 {
                     fail("Self test SVE decryption KAT failed.");
                 }
@@ -1745,8 +1747,8 @@ public final class FipsRSA
             try
             {
                 byte[] sig = engine.processBlock(signature, 0, signature.length);
-
-                return Arrays.constantTimeAreEqual(input, sig);
+ 
+                return BaseRsaDigestSigner.checkPKCS1Sig(input, sig);
             }
             catch (org.bouncycastle.crypto.internal.InvalidCipherTextException e)
             {

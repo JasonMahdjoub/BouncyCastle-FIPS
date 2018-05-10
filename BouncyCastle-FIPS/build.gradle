@@ -65,12 +65,18 @@ repositories {
 dependencies {
 }
 
+def javaVersion=7
+sourceCompatibility = javaVersion
+targetCompatibility= javaVersion
+version='1.0.1-DMRECOMPILE'
+
 allprojects {
 	group='org.bouncycastle'
-    repositories {
-        jcenter() 
-    }
-    
+  
+    //compileJava.options.compilerArgs << "-Xlint"
+    //compileJava.options.compilerArgs.addAll(['--release', javaVersion])
+    if (project.hasProperty('javaHomeVersion') && javaHomeVersion.toFloat()>1.8)
+    	javadoc.options.addStringOption("html5", "-quiet")
 
 	if (propFile.canRead())
 	{
@@ -88,11 +94,9 @@ allprojects {
 			compileTestJava.options.extensionDirs = "${jdk}/jre/lib/ext/"
 		}
 	}
+	
 }
 
-sourceCompatibility = 1.7
-targetCompatibility=1.7
-version='1.0.4'
 
 
 task sourcesJar(type: Jar, dependsOn: classes) {

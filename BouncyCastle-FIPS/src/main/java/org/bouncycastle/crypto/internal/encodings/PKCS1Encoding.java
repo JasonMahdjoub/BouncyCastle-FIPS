@@ -8,6 +8,7 @@ import org.bouncycastle.crypto.internal.CipherParameters;
 import org.bouncycastle.crypto.internal.InvalidCipherTextException;
 import org.bouncycastle.crypto.internal.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.internal.params.ParametersWithRandom;
+import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.Properties;
 
 /**
@@ -34,6 +35,7 @@ public class PKCS1Encoding
     private boolean                 forEncryption;
     private boolean                 forPrivateKey;
     private boolean                 useStrictLength;
+    private byte[]                  dudBlock;
 
     /**
      * Basic constructor.
@@ -85,6 +87,7 @@ public class PKCS1Encoding
 
         this.forPrivateKey = kParam.isPrivate();
         this.forEncryption = forEncryption;
+        this.dudBlock = new byte[engine.getOutputBlockSize()];
     }
 
     public int getInputBlockSize()
@@ -191,55 +194,41 @@ public class PKCS1Encoding
 
         if (block.length < getOutputBlockSize())
         {
-            throw new InvalidCipherTextException("block truncated");
+            block = dudBlock;
         }
 
         byte type = block[0];
 
+        boolean badType;
         if (forPrivateKey)
         {
-            if (type != 2)
-            {
-                throw new InvalidCipherTextException("unknown block type");
-            }
+            badType = (type != 2);
         }
         else
         {
-            if (type != 1)
-            {
-                throw new InvalidCipherTextException("unknown block type");
-            }
+            badType = (type != 1);
         }
 
-        if (useStrictLength && block.length != engine.getOutputBlockSize())
-        {
-            throw new InvalidCipherTextException("block incorrect size");
-        }
+        boolean incorrectLength = (useStrictLength & (block.length != engine.getOutputBlockSize()));
         
         //
         // find and extract the message block.
         //
-        int start;
-        
-        for (start = 1; start != block.length; start++)
-        {
-            byte pad = block[start];
-            
-            if (pad == 0)
-            {
-                break;
-            }
-            if (type == 1 && pad != (byte)0xff)
-            {
-                throw new InvalidCipherTextException("block padding incorrect");
-            }
-        }
+        int start = findStart(type, block);
 
         start++;           // data should start at the next byte
 
-        if (start > block.length || start < HEADER_LENGTH)
+        if (badType | start < HEADER_LENGTH)
         {
-            throw new InvalidCipherTextException("no data in block");
+            Arrays.fill(block, (byte)0);
+            throw new InvalidCipherTextException("block incorrect");
+        }
+
+        // if we get this far, it's likely to be a genuine encoding error
+        if (incorrectLength)
+        {
+            Arrays.fill(block, (byte)0);
+            throw new InvalidCipherTextException("block incorrect size");
         }
 
         byte[]  result = new byte[block.length - start];
@@ -247,5 +236,30 @@ public class PKCS1Encoding
         System.arraycopy(block, start, result, 0, result.length);
 
         return result;
+    }
+
+    private int findStart(byte type, byte[] block)
+        throws InvalidCipherTextException
+    {
+        int start = -1;
+        boolean padErr = false;
+
+        for (int i = 1; i != block.length; i++)
+        {
+            byte pad = block[i];
+
+            if (pad == 0 & start < 0)
+            {
+                start = i;
+            }
+            padErr |= (type == 1 & start < 0 & pad != (byte)0xff);
+        }
+
+        if (padErr)
+        {
+            return -1;
+        }
+
+        return start;
     }
 }

@@ -172,7 +172,7 @@ class PKCS5S2ParametersGenerator<T extends Parameters>
             throw new IllegalStateException("Unknown type in deriveKeyAndIV: " + keyType.name());
         }
 
-        rv[1] = Arrays.copyOfRange(dKey, keySizeInBytes, ivSizeInBytes);
+        rv[1] = Arrays.copyOfRange(dKey, keySizeInBytes, keySizeInBytes + ivSizeInBytes);
 
         return rv;
     }

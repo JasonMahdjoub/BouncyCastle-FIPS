@@ -15,11 +15,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.CryptoServicesRegistrar;
+import org.bouncycastle.crypto.EntropySource;
+import org.bouncycastle.crypto.EntropySourceProvider;
 import org.bouncycastle.crypto.fips.FipsDRBG;
 import org.bouncycastle.crypto.fips.FipsSecureRandom;
 import org.bouncycastle.crypto.fips.FipsStatus;
@@ -43,8 +48,18 @@ import org.bouncycastle.util.Strings;
  *         C:DEFRND[SHA1];ENABLE{All};
  *     </pre>
  *     Possible values for the DRBG type are "SHA1", "SHA224", "SHA256", "SHA384", "SHA512", "SHA512(224)", "SHA512(256)",
- *     "HMACSHA1", "HMACSHA224", "HMACSHA256", "HMACSHA384", "HMACSHA512", "HMACSHA512(224)", "HMACSHA512(256)", "CTRAES128",
- *     "CTRAES192", CTRAES256", and "CTRDESEDE",
+ *     "HMACrovRandSHA1", "HMACSHA224", "HMACSHA256", "HMACSHA384", "HMACSHA512", "HMACSHA512(224)", "HMACSHA512(256)", "CTRAES128",
+ *     "CTRAES192", CTRAES256", and "CTRDESEDE".
+ * </p>
+ * <p>
+ *     The default DRBG is configured to be prediction resistant. In situations where the amount of entropy is constrained
+ *     the default DRBG can be configured to use an entropy pool based on a SHA-512 SP 800-90A DRBG. To configure this use:
+ *     <pre>
+ *         C:HYBRID;ENABLE{All};
+ *     </pre>
+ *     or include the string "HYBRID;" in the previous command string setting the DRBG. After initial seeding the entropy pool will
+ *     start a reseeding thread which it will begin polling once 20 samples have been taken since the last seeding and will do a reseed
+ *     as soon as new entropy bytes are returned.
  * </p>
  * <p>
  *     <b>Note</b>: if the provider is created by an "approved mode" thread, only FIPS approved algorithms will be available from it.
@@ -54,7 +69,7 @@ import org.bouncycastle.util.Strings;
 public final class BouncyCastleFipsProvider
     extends Provider
 {
-    private static final String info = "BouncyCastle Security Provider (FIPS edition) v0.90";
+    private static final String info = "BouncyCastle Security Provider (FIPS edition) v1.0.1";
 
     public static final String PROVIDER_NAME = "BCFIPS";
 
@@ -63,7 +78,6 @@ public final class BouncyCastleFipsProvider
 
     static
     {
-
         drbgTable.put("SHA1", FipsDRBG.SHA1);
         drbgTable.put("SHA224", FipsDRBG.SHA224);
         drbgTable.put("SHA256", FipsDRBG.SHA256);
@@ -107,17 +121,19 @@ public final class BouncyCastleFipsProvider
         drbgStrengthTable.put("CTRDESEDE", 112);
     }
 
-    private final SecureRandom entropySource;
+    private volatile SecureRandom entropySource;
 
     private FipsDRBG.Base providerDefaultRandomBuilder = FipsDRBG.SHA512;
     private int providerDefaultSecurityStrength = 256;
 
+    private boolean hybridSource = false;
     private SecureRandom providerDefaultRandom;
+    private int providerDefaultRandomSecurityStrength = providerDefaultSecurityStrength;
 
     private Map<String, BcService> serviceMap = new HashMap<String, BcService>();
     private Map<String, EngineCreator> creatorMap = new HashMap<String, EngineCreator>();
 
-    private static final Map<ASN1ObjectIdentifier, AsymmetricKeyInfoConverter> keyInfoConverters = new HashMap<ASN1ObjectIdentifier, AsymmetricKeyInfoConverter>();
+    private final Map<ASN1ObjectIdentifier, AsymmetricKeyInfoConverter> keyInfoConverters = new HashMap<ASN1ObjectIdentifier, AsymmetricKeyInfoConverter>();
 
     /**
      * Base constructor - build a provider with the default configuration.
@@ -130,7 +146,7 @@ public final class BouncyCastleFipsProvider
     /**
      * Constructor accepting a configuration string.
      *
-     * @param config  the config string.
+     * @param config the config string.
      */
     public BouncyCastleFipsProvider(String config)
     {
@@ -141,12 +157,12 @@ public final class BouncyCastleFipsProvider
      * Constructor accepting a config string and a user defined source of entropy to be used for the providers locally
      * configured DRBG.
      *
-     * @param config the config string.
+     * @param config        the config string.
      * @param entropySource a SecureRandom which can act as an entropy source.
      */
     public BouncyCastleFipsProvider(String config, SecureRandom entropySource)
     {
-        super(PROVIDER_NAME, 0.9, info);
+        super(PROVIDER_NAME, 1.01, info);
 
         // TODO: add support for file parsing, selective disable.
 
@@ -173,11 +189,12 @@ public final class BouncyCastleFipsProvider
         new ProvSHS.SHA3_256().configure(this);
         new ProvSHS.SHA3_384().configure(this);
         new ProvSHS.SHA3_512().configure(this);
+        new ProvSecureHash.MD5().configure(this);  // TLS exception
 
         if (!CryptoServicesRegistrar.isInApprovedOnlyMode())
         {
             new ProvSecureHash.GOST3411().configure(this);
-            new ProvSecureHash.MD5().configure(this);
+
             new ProvSecureHash.RIPEMD128().configure(this);
             new ProvSecureHash.RIPEMD160().configure(this);
             new ProvSecureHash.RIPEMD256().configure(this);
@@ -254,6 +271,11 @@ public final class BouncyCastleFipsProvider
             new ProvPKIX().configure(this);
         }
 
+        if (Properties.isOverrideSet("org.bouncycastle.jca.enable_jks"))
+        {
+            new ProvJKS().configure(this);
+        }
+
         new ProvRandom().configure(this);
     }
 
@@ -277,6 +299,10 @@ public final class BouncyCastleFipsProvider
                 {
                     throw new IllegalArgumentException("Unknown DEFRND - " + rnd + " - found in config string.");
                 }
+            }
+            else if (command.startsWith("HYBRID"))
+            {
+                hybridSource = true;
             }
             else if (command.startsWith("ENABLE"))
             {
@@ -306,11 +332,23 @@ public final class BouncyCastleFipsProvider
         return command.substring(start + 1, end);
     }
 
-    SecureRandom getDefaultSecureRandom()
+    int getProviderDefaultSecurityStrength()
     {
+        return providerDefaultSecurityStrength;
+    }
+
+    FipsDRBG.Base getProviderDefaultRandomBuilder()
+    {
+        return providerDefaultRandomBuilder;
+    }
+
+    public SecureRandom getDefaultSecureRandom()
+    {
+        SecureRandom defRandom;
+
         try
         {
-            return CryptoServicesRegistrar.getSecureRandom();
+            defRandom = CryptoServicesRegistrar.getSecureRandom();
         }
         catch (IllegalStateException e)
         {
@@ -319,31 +357,61 @@ public final class BouncyCastleFipsProvider
             {
                 if (providerDefaultRandom == null)
                 {
-                    // we set providerDefault here as we end up recursing due to personalization string
-                    if (entropySource == null)
-                    {
-                        providerDefaultRandom = AccessController.doPrivileged(new PrivilegedAction<SecureRandom>()
-                        {
-                            public SecureRandom run()
-                            {
-                                return new CoreSecureRandom();
-                            }
-                        });
-                    }
-                    else
-                    {
-                        providerDefaultRandom = entropySource;
-                    }
+                    SecureRandom sourceOfEntropy = getDefaultEntropySource();
 
+                    // we set providerDefault here as we end up recursing due to personalization string
                     providerDefaultRandom = providerDefaultRandomBuilder
-                        .fromEntropySource(providerDefaultRandom, true)
+                        .fromEntropySource(sourceOfEntropy, true)
                         .setPersonalizationString(generatePersonalizationString())
-                        .build(providerDefaultRandom.generateSeed((providerDefaultSecurityStrength / (2 * 8)) + 1), true, Strings.toByteArray("Bouncy Castle FIPS Provider"));
+                        .build(sourceOfEntropy.generateSeed((providerDefaultSecurityStrength / (2 * 8)) + 1), true, Strings.toByteArray("Bouncy Castle FIPS Provider"));
                 }
 
-                return providerDefaultRandom;
+                defRandom = providerDefaultRandom;
             }
         }
+
+        synchronized (this)
+        {
+            // we only allow this value to go down as we want to avoid people getting the wrong idea
+            // about a provider produced random they might have.
+            if (defRandom instanceof FipsSecureRandom)
+            {
+                int securityStrength = ((FipsSecureRandom)defRandom).getSecurityStrength();
+
+                if (securityStrength < providerDefaultRandomSecurityStrength)
+                {
+                    providerDefaultRandomSecurityStrength = securityStrength;
+                }
+            }
+            else
+            {
+                providerDefaultRandomSecurityStrength = -1;     // unknown
+            }
+        }
+
+        return defRandom;
+    }
+
+    SecureRandom getDefaultEntropySource()
+    {
+        // this has to be a lazy evaluation
+        if (entropySource == null)
+        {
+            this.entropySource = AccessController.doPrivileged(new PrivilegedAction<SecureRandom>()
+            {
+                public SecureRandom run()
+                {
+                    if (hybridSource)
+                    {
+                        return new HybridSecureRandom();
+                    }
+
+                    return new CoreSecureRandom();
+                }
+            });
+        }
+
+        return entropySource;
     }
 
     /**
@@ -353,14 +421,10 @@ public final class BouncyCastleFipsProvider
      */
     public int getDefaultRandomSecurityStrength()
     {
-        SecureRandom defRandom = getDefaultSecureRandom();
-
-        if (defRandom instanceof FipsSecureRandom)
+        synchronized (this)
         {
-            return ((FipsSecureRandom)defRandom).getSecurityStrength();
+            return providerDefaultRandomSecurityStrength;
         }
-
-        return -1;   // unknown
     }
 
     void addAttribute(String key, String attributeName, String attributeValue)
@@ -580,12 +644,12 @@ public final class BouncyCastleFipsProvider
 
     private byte[] generatePersonalizationString()
     {
-        return Arrays.concatenate(Strings.toUTF8ByteArray(ClassUtil.getVIMID()), Pack.longToBigEndian(Thread.currentThread().getId()), Pack.longToBigEndian(System.currentTimeMillis()));
+        return Arrays.concatenate(Pack.longToBigEndian(Thread.currentThread().getId()), Pack.longToBigEndian(System.currentTimeMillis()));
     }
 
-    private static final Map<Map<String, String>, Map<String, String> > attributeMaps = new HashMap<Map<String, String>, Map<String, String>>();
+    private final Map<Map<String, String>, Map<String, String> > attributeMaps = new HashMap<Map<String, String>, Map<String, String>>();
 
-    private static Map<String, String> getAttributeMap(Map<String, String> attributeMap)
+    private Map<String, String> getAttributeMap(Map<String, String> attributeMap)
     {
         Map<String, String> attrMap = attributeMaps.get(attributeMap);
         if (attrMap != null)
@@ -612,7 +676,7 @@ public final class BouncyCastleFipsProvider
         }
     }
 
-    static PublicKey getPublicKey(SubjectPublicKeyInfo publicKeyInfo)
+    PublicKey getPublicKey(SubjectPublicKeyInfo publicKeyInfo)
         throws IOException
     {
         AsymmetricKeyInfoConverter converter = keyInfoConverters.get(publicKeyInfo.getAlgorithm().getAlgorithm());
@@ -625,7 +689,7 @@ public final class BouncyCastleFipsProvider
         return converter.generatePublic(publicKeyInfo);
     }
 
-    static PrivateKey getPrivateKey(PrivateKeyInfo privateKeyInfo)
+    PrivateKey getPrivateKey(PrivateKeyInfo privateKeyInfo)
         throws IOException
     {
         AsymmetricKeyInfoConverter converter = keyInfoConverters.get(privateKeyInfo.getPrivateKeyAlgorithm().getAlgorithm());
@@ -710,6 +774,126 @@ public final class BouncyCastleFipsProvider
             catch (Exception e)
             {
                 return new sun.security.provider.Sun();
+            }
+        }
+    }
+
+    private static class HybridSecureRandom
+        extends SecureRandom
+    {
+        private final AtomicBoolean seedAvailable = new AtomicBoolean(false);
+        private final AtomicInteger samples = new AtomicInteger(0);
+        private final SecureRandom baseRandom = new CoreSecureRandom();
+        private final FipsSecureRandom drbg;
+
+        HybridSecureRandom()
+        {
+            super(null, null);         // stop getDefaultRNG() call
+            
+            drbg = FipsDRBG.SHA512.fromEntropySource(new EntropySourceProvider()
+                {
+                    public EntropySource get(final int bitsRequired)
+                    {
+                        return new SignallingEntropySource(bitsRequired);
+                    }
+                })
+                .setPersonalizationString(Strings.toByteArray("Bouncy Castle Hybrid Entropy Source"))
+                .build(baseRandom.generateSeed(32), false, null);     // 32 byte nonce
+        }
+
+        public void setSeed(byte[] seed)
+        {
+            if (drbg != null)
+            {
+                drbg.setSeed(seed);
+            }
+        }
+
+        public void setSeed(long seed)
+        {
+            if (drbg != null)
+            {
+                drbg.setSeed(seed);
+            }
+        }
+        
+        public byte[] generateSeed(int numBytes)
+        {
+            byte[] data = new byte[numBytes];
+
+            // after 20 samples we'll start to check if there is new seed material.
+            if (samples.getAndIncrement() > 20)
+            {
+                if (seedAvailable.getAndSet(false))
+                {
+                    samples.set(0);
+                    drbg.reseed();
+                }
+            }
+
+            drbg.nextBytes(data);
+
+            return data;
+        }
+
+        private class SignallingEntropySource
+            implements EntropySource
+        {
+            private final int byteLength;
+            private final AtomicReference entropy = new AtomicReference();
+            private final AtomicBoolean scheduled = new AtomicBoolean(false);
+
+            SignallingEntropySource(int bitsRequired)
+            {
+                this.byteLength = (bitsRequired + 7) / 8;
+            }
+
+            public boolean isPredictionResistant()
+            {
+                return true;
+            }
+
+            public byte[] getEntropy()
+            {
+                byte[] seed = (byte[])entropy.getAndSet(null);
+
+                if (seed == null || seed.length != byteLength)
+                {
+                    seed = baseRandom.generateSeed(byteLength);
+                }
+                else
+                {
+                    scheduled.set(false);
+                }
+
+                if (!scheduled.getAndSet(true))
+                {
+                    new Thread(new EntropyGatherer(byteLength)).start();
+                }
+
+                return seed;
+            }
+
+            public int entropySize()
+            {
+                return byteLength * 8;
+            }
+
+            private class EntropyGatherer
+                implements Runnable
+            {
+                private final int numBytes;
+
+                EntropyGatherer(int numBytes)
+                {
+                    this.numBytes = numBytes;
+                }
+
+                public void run()
+                {
+                    entropy.set(baseRandom.generateSeed(numBytes));
+                    seedAvailable.set(true);
+                }
             }
         }
     }

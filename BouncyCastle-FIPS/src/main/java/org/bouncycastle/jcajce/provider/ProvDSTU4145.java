@@ -165,6 +165,11 @@ class ProvDSTU4145
             Class spec)
             throws InvalidKeySpecException
         {
+            if (spec == null)
+            {
+                throw new InvalidKeySpecException("null spec is invalid");
+            }
+
             if (spec.isAssignableFrom(DSTU4145PublicKeySpec.class) && key instanceof DSTU4145PublicKey)
             {
                 DSTU4145PublicKey k = (DSTU4145PublicKey)key;
@@ -194,7 +199,12 @@ class ProvDSTU4145
                 return new ProvDSTU4145PrivateKey(privateKeyConverter.convertKey(DSTU4145.ALGORITHM, (PrivateKey)key));
             }
 
-            throw new InvalidKeyException("Key type unrecognized: " + key.getClass().getName());
+            if (key != null)
+            {
+                throw new InvalidKeyException("Key type unrecognized: " + key.getClass().getName());
+            }
+
+            throw new InvalidKeyException("Key is null");
         }
 
         protected PrivateKey engineGeneratePrivate(

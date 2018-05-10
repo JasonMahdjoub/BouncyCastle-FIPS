@@ -110,8 +110,8 @@ class BaseSignature
         throws InvalidKeyException
     {
         AsymmetricPrivateKey key = privateKeyConverter.convertKey(parameters.getAlgorithm(), privateKey);
-
-        signer = Utils.addRandomIfNeeded(operatorFactory.createSigner(key, parameters), random);
+              // TODO: should change addRandomIfNeeded in 1.1 (maybe? - it's correct in this case but is it always?
+        signer = Utils.addRandomIfNeeded(operatorFactory.createSigner(key, parameters), random != null ? random : fipsProvider.getDefaultSecureRandom());
         dataStream = signer.getSigningStream();
     }
 

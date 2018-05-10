@@ -9,7 +9,9 @@ import java.security.KeyFactory;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.Provider;
+import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -110,5 +112,11 @@ public class ProviderJcaJceHelper
         throws CertificateException
     {
         return CertificateFactory.getInstance(algorithm, provider);
+    }
+
+    public SecureRandom createSecureRandom(String algorithm)
+        throws NoSuchAlgorithmException, NoSuchProviderException
+    {
+        return SecureRandom.getInstance(algorithm, provider);
     }
 }

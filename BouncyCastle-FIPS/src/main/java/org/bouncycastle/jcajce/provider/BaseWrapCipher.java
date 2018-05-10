@@ -8,7 +8,6 @@ import java.security.Key;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.Provider;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
@@ -453,7 +452,7 @@ class BaseWrapCipher
         return rebuildKey(wrappedKeyAlgorithm, wrappedKeyType, encoded, fipsProvider);
     }
 
-    static Key rebuildKey(String wrappedKeyAlgorithm, int wrappedKeyType, byte[] encoded, Provider fipsProvider)
+    static Key rebuildKey(String wrappedKeyAlgorithm, int wrappedKeyType, byte[] encoded, BouncyCastleFipsProvider fipsProvider)
         throws InvalidKeyException, NoSuchAlgorithmException
     {
         if (wrappedKeyType == Cipher.SECRET_KEY)
@@ -468,7 +467,7 @@ class BaseWrapCipher
                 {
                     PrivateKeyInfo in = PrivateKeyInfo.getInstance(encoded);
 
-                    PrivateKey privKey = BouncyCastleFipsProvider.getPrivateKey(in);
+                    PrivateKey privKey = fipsProvider.getPrivateKey(in);
 
                     if (privKey != null)
                     {
@@ -499,7 +498,7 @@ class BaseWrapCipher
                 {
                     SubjectPublicKeyInfo in = SubjectPublicKeyInfo.getInstance(encoded);
 
-                    PublicKey pubKey = BouncyCastleFipsProvider.getPublicKey(in);
+                    PublicKey pubKey = fipsProvider.getPublicKey(in);
 
                     if (pubKey != null)
                     {

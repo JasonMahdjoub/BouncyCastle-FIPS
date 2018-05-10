@@ -5,7 +5,6 @@ import java.security.spec.KeySpec;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.crypto.PasswordBasedDeriver;
 import org.bouncycastle.crypto.general.PBKD;
@@ -52,7 +51,7 @@ class ProvOpenSSLPBKDF
 
                 PasswordBasedDeriver deriver = new PBKD.DeriverFactory().createDeriver(PBKD.OpenSSL.using(Strings.toByteArray(pbeSpec.getPassword())).withSalt(pbeSpec.getSalt()));
 
-                return new SecretKeySpec(deriver.deriveKey(PasswordBasedDeriver.KeyType.CIPHER, pbeSpec.getKeyLength() / 8), "PBKDF-OpenSSL");
+                return new PBKDFPBEKey(deriver.deriveKey(PasswordBasedDeriver.KeyType.CIPHER, pbeSpec.getKeyLength() / 8), "PBKDF-OpenSSL", pbeSpec);
             }
 
             throw new InvalidKeySpecException("Invalid KeySpec: " + keySpec.getClass().getName());

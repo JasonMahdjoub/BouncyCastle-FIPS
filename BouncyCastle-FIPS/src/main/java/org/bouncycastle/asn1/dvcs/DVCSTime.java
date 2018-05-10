@@ -24,8 +24,8 @@ public class DVCSTime
     extends ASN1Object
     implements ASN1Choice
 {
-    private ASN1GeneralizedTime genTime;
-    private ContentInfo timeStampToken;
+    private final ASN1GeneralizedTime genTime;
+    private final ContentInfo timeStampToken;
 
     // constructors:
 
@@ -37,10 +37,12 @@ public class DVCSTime
     public DVCSTime(ASN1GeneralizedTime genTime)
     {
         this.genTime = genTime;
+        this.timeStampToken = null;
     }
 
     public DVCSTime(ContentInfo timeStampToken)
     {
+        this.genTime = null;
         this.timeStampToken = timeStampToken;
     }
 
@@ -84,18 +86,14 @@ public class DVCSTime
 
     public ASN1Primitive toASN1Primitive()
     {
-
         if (genTime != null)
         {
             return genTime;
         }
-
-        if (timeStampToken != null)
+        else
         {
             return timeStampToken.toASN1Primitive();
         }
-
-        return null;
     }
 
     public String toString()

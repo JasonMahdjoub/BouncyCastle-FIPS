@@ -151,38 +151,7 @@ public class BaseRsaDigestSigner
             throw new InvalidSignatureException("Unable to process signature: " + e.getMessage(), e);
         }
 
-        if (sig.length == expected.length)
-        {
-            return Arrays.constantTimeAreEqual(sig, expected);
-        }
-        else if (sig.length == expected.length - 2)  // NULL left out
-        {
-            int sigOffset = sig.length - hash.length - 2;
-            int expectedOffset = expected.length - hash.length - 2;
-
-            expected[1] -= 2;      // adjust lengths
-            expected[3] -= 2;
-
-            int nonEqual = 0;
-
-            for (int i = 0; i < hash.length; i++)
-            {
-                nonEqual |= (sig[sigOffset + i] ^ expected[expectedOffset + i]);
-            }
-
-            for (int i = 0; i < sigOffset; i++)
-            {
-                nonEqual |= (sig[i] ^ expected[i]);  // check header less NULL
-            }
-
-            return nonEqual == 0;
-        }
-        else
-        {
-            Arrays.constantTimeAreEqual(expected, expected);  // keep time "steady".
-
-            return false;
-        }
+        return checkPKCS1Sig(expected, sig);
     }
 
     public void reset()
@@ -197,5 +166,39 @@ public class BaseRsaDigestSigner
         DigestInfo dInfo = new DigestInfo(algId, hash);
 
         return dInfo.getEncoded(ASN1Encoding.DER);
+    }
+
+
+    public static boolean checkPKCS1Sig(byte[] expected, byte[] sig)
+    {
+        if (sig.length == expected.length)
+        {
+            return Arrays.constantTimeAreEqual(expected, sig);
+        }
+        if (sig.length == expected.length - 2)  // NULL left out
+        {
+            expected[1] -= 2;      // adjust lengths
+            expected[3] -= 2;
+
+            int sigOffset = 4 + expected[3];
+            int expectedOffset = sigOffset + 2;
+            int nonEqual = 0;
+
+            for (int i = 0; i < expected.length - expectedOffset; i++)
+            {
+                nonEqual |= (sig[sigOffset + i] ^ expected[expectedOffset + i]);
+            }
+
+            for (int i = 0; i < sigOffset; i++)
+            {
+                nonEqual |= (sig[i] ^ expected[i]);  // check header less NULL
+            }
+
+            return nonEqual == 0;
+        }
+
+        Arrays.constantTimeAreEqual(expected, expected);  // maintain delay
+
+        return false;
     }
 }

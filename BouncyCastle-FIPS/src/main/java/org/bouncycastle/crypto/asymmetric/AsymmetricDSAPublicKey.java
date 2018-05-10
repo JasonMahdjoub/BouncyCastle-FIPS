@@ -87,14 +87,26 @@ public final class AsymmetricDSAPublicKey
 
         AsymmetricDSAPublicKey other = (AsymmetricDSAPublicKey)o;
 
-        return y.equals(other.y) && this.getDomainParameters().equals(other.getDomainParameters());
+        if (this.getDomainParameters() != null)
+        {
+            return y.equals(other.y) && this.getDomainParameters().equals(other.getDomainParameters());
+        }
+        else
+        {
+            return y.equals(other.y) && this.getDomainParameters() == other.getDomainParameters();
+        }
     }
 
     @Override
     public int hashCode()
     {
         int result = y.hashCode();
-        result = 31 * result + this.getDomainParameters().hashCode();
+
+        if (this.getDomainParameters() != null)
+        {
+            result = 31 * result + this.getDomainParameters().hashCode();
+        }
+
         return result;
     }
 }

@@ -2,6 +2,7 @@ package org.bouncycastle.jcajce.provider;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -27,7 +28,10 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.SecretKeyFactorySpi;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
@@ -88,9 +92,12 @@ import org.bouncycastle.crypto.general.RSA;
 import org.bouncycastle.crypto.general.SecureHash;
 import org.bouncycastle.jcajce.AgreedKeyWithMacKey;
 import org.bouncycastle.jcajce.KTSKeyWithEncapsulation;
+import org.bouncycastle.jcajce.ZeroizableSecretKey;
 import org.bouncycastle.jcajce.spec.KTSExtractKeySpec;
 import org.bouncycastle.jcajce.spec.KTSGenerateKeySpec;
+import org.bouncycastle.jcajce.spec.KTSKeySpec;
 import org.bouncycastle.jcajce.spec.KTSParameterSpec;
+import org.bouncycastle.jcajce.spec.KTSWithKEMKWSKeySpec;
 import org.bouncycastle.jcajce.util.MessageDigestUtils;
 import org.bouncycastle.util.Arrays;
 
@@ -106,6 +113,9 @@ class ProvRSA
     private KeyWrapOperatorFactory generalKeyWrapFactory;
 
     private static final String PREFIX = "org.bouncycastle.jcajce.provider.asymmetric" + ".rsa.";
+
+    private final FipsAlgorithm[] fipsAlgorithms = new FipsAlgorithm[]{FipsRSA.WRAP_PKCS1v1_5.getAlgorithm(), FipsRSA.WRAP_OAEP.getAlgorithm()};
+    private final GeneralAlgorithm[] generalAlgorithms = new GeneralAlgorithm[]{RSA.ALGORITHM, RSA.WRAP_PKCS1v1_5.getAlgorithm(), RSA.WRAP_OAEP.getAlgorithm()};
 
     private static final PublicKeyConverter<AsymmetricRSAPublicKey> publicKeyConverter = new PublicKeyConverter<AsymmetricRSAPublicKey>()
     {
@@ -282,20 +292,20 @@ class ProvRSA
         {
             public Object createInstance(Object constructorParameter)
             {
-                final boolean inApprovedOnlyMode = CryptoServicesRegistrar.isInApprovedOnlyMode();
-
                 // use of ternary operation here breaks Android.
-                Algorithm[] algorithms;
-                if (inApprovedOnlyMode)
+                if (CryptoServicesRegistrar.isInApprovedOnlyMode())
                 {
-                    algorithms = new FipsAlgorithm[]{FipsRSA.WRAP_PKCS1v1_5.getAlgorithm(), FipsRSA.WRAP_OAEP.getAlgorithm()};
+                    return build(fipsAlgorithms);
                 }
-                else
-                {
-                    algorithms = new GeneralAlgorithm[]{RSA.ALGORITHM, RSA.WRAP_PKCS1v1_5.getAlgorithm(), RSA.WRAP_OAEP.getAlgorithm()};
-                }
+
+                return build(generalAlgorithms);
+            }
+
+            private BaseSingleBlockCipher build(Algorithm[] algorithms)
+            {
+
                 return new BaseSingleBlockCipher.Builder(provider, algorithms)
-                    .setWrapModeOnly(inApprovedOnlyMode)
+                    .setWrapModeOnly(CryptoServicesRegistrar.isInApprovedOnlyMode())
                     .withFipsOperators(null, new FipsRSA.KeyWrapOperatorFactory())
                     .withGeneralOperators(getGeneralEncryptionFactory(), getGeneralWrappingFactory())
                     .withPublicKeyConverter(publicKeyConverter)
@@ -309,7 +319,7 @@ class ProvRSA
 
                                 public Parameters createParameters(boolean forEncryption, AlgorithmParameterSpec spec, SecureRandom random)
                                 {
-                                    if (inApprovedOnlyMode)
+                                    if (CryptoServicesRegistrar.isInApprovedOnlyMode())
                                     {
                                         if (parameters.getAlgorithm() == FipsRSA.WRAP_OAEP.getAlgorithm())
                                         {
@@ -534,7 +544,7 @@ class ProvRSA
         registerOid(provider, PKCSObjectIdentifiers.id_RSASSA_PSS, "RSA", keyFact);
         registerOid(provider, PKCSObjectIdentifiers.id_rsa_KEM, "RSA", keyFact);
 
-        provider.addAlgorithmImplementation("SecretKeyFactory.RSA-KTS-KEM-KWS", PREFIX + "RSAKTSKEM", new EngineCreator()
+        provider.addAlgorithmImplementation("SecretKeyFactory.RSA-KAS-KEM", PREFIX + "RSAKTSKEM", new EngineCreator()
         {
             public Object createInstance(Object constructorParameter)
             {
@@ -547,15 +557,22 @@ class ProvRSA
 
                         if (ktsSpec.parameterSpec != null)
                         {
-                            throw new InvalidAlgorithmParameterException("KTS-KEM-KWS does not accept an AlgorithmParameterSpec");
+                            throw new InvalidAlgorithmParameterException("RSA-KAS-KEM does not accept an AlgorithmParameterSpec");
                         }
 
-                        return new FipsRSA.SVEKTSParameters();
+                        return FipsRSA.KTS_SVE;
                     }
                 }, provider, publicKeyConverter, privateKeyConverter);
             }
         });
-        provider.addAlias("SecretKeyFactory", "RSA-KTS-KEM-KWS", PKCSObjectIdentifiers.id_rsa_KEM);
+
+        provider.addAlgorithmImplementation("SecretKeyFactory.RSA-KTS-KEM-KWS", PREFIX + "RSAKTSKEMKWS", new EngineCreator()
+        {
+            public Object createInstance(Object constructorParameter)
+            {
+                return new KEMKTSSKeyFactory(provider);
+            }
+        });
 
         provider.addAlgorithmImplementation("Cipher.RSA-KTS-KEM-KWS", PREFIX + "CipherRSAKTSKEM", new EngineCreator()
         {
@@ -685,8 +702,8 @@ class ProvRSA
         addDigestSignature(provider, FipsRSA.PKCS1v1_5.withDigestAlgorithm(FipsSHS.Algorithm.SHA256), "SHA256", PREFIX + "DigestSignatureSpi$SHA256", PKCSObjectIdentifiers.sha256WithRSAEncryption);
         addDigestSignature(provider, FipsRSA.PKCS1v1_5.withDigestAlgorithm(FipsSHS.Algorithm.SHA384), "SHA384", PREFIX + "DigestSignatureSpi$SHA384", PKCSObjectIdentifiers.sha384WithRSAEncryption);
         addDigestSignature(provider, FipsRSA.PKCS1v1_5.withDigestAlgorithm(FipsSHS.Algorithm.SHA512), "SHA512", PREFIX + "DigestSignatureSpi$SHA512", PKCSObjectIdentifiers.sha512WithRSAEncryption);
-        addDigestSignature(provider, FipsRSA.PKCS1v1_5.withDigestAlgorithm(FipsSHS.Algorithm.SHA512_224), "SHA512(224)", PREFIX + "DigestSignatureSpi$SHA512_224", null);
-        addDigestSignature(provider, FipsRSA.PKCS1v1_5.withDigestAlgorithm(FipsSHS.Algorithm.SHA512_256), "SHA512(256)", PREFIX + "DigestSignatureSpi$SHA512_256", null);
+        addDigestSignature(provider, FipsRSA.PKCS1v1_5.withDigestAlgorithm(FipsSHS.Algorithm.SHA512_224), "SHA512(224)", PREFIX + "DigestSignatureSpi$SHA512_224", PKCSObjectIdentifiers.sha512_224WithRSAEncryption);
+        addDigestSignature(provider, FipsRSA.PKCS1v1_5.withDigestAlgorithm(FipsSHS.Algorithm.SHA512_256), "SHA512(256)", PREFIX + "DigestSignatureSpi$SHA512_256", PKCSObjectIdentifiers.sha512_256WithRSAEncryption);
 
         if (!CryptoServicesRegistrar.isInApprovedOnlyMode())
         {
@@ -1074,6 +1091,118 @@ class ProvRSA
         }
     }
 
+    static class KEMKTSSKeyFactory
+        extends SecretKeyFactorySpi
+    {
+        private final BouncyCastleFipsProvider fipsProvider;
+
+        public KEMKTSSKeyFactory(BouncyCastleFipsProvider fipsProvider)
+        {
+            this.fipsProvider = fipsProvider;
+        }
+
+        @Override
+        protected SecretKey engineGenerateSecret(KeySpec keySpec)
+            throws InvalidKeySpecException
+        {
+            try
+            {
+                if (keySpec instanceof KTSWithKEMKWSKeySpec)
+                {
+                    KTSWithKEMKWSKeySpec kemSpec = (KTSWithKEMKWSKeySpec)keySpec;
+                    KTSKeySpec ktsSpec = kemSpec.getKTSKeySpec();
+                    SecretKeyFactory keyFact = SecretKeyFactory.getInstance("RSA-KAS-KEM", fipsProvider);
+
+                    if (ktsSpec instanceof KTSGenerateKeySpec)
+                    {
+                        KTSKeyWithEncapsulation ktsKey = (KTSKeyWithEncapsulation)keyFact.generateSecret(ktsSpec);
+                        KeyGenerator keyGenerator = KeyGenerator.getInstance(kemSpec.getTransportedKeyAlgorithm(), fipsProvider);
+
+                        keyGenerator.init(kemSpec.getTransportedKeySize(), ((KTSGenerateKeySpec)ktsSpec).getSecureRandom());
+
+                        Cipher wrapCipher = Cipher.getInstance(ktsSpec.getKeyAlgorithmName(), fipsProvider);
+
+                        wrapCipher.init(Cipher.WRAP_MODE, ktsKey, ((KTSGenerateKeySpec)ktsSpec).getSecureRandom());
+
+                        SecretKey genKey = keyGenerator.generateKey();
+                        ZeroizableSecretKey macKey = ktsKey.getMacKey();
+
+                        byte[] encapsulation = Arrays.concatenate(ktsKey.getEncapsulation(), wrapCipher.wrap(genKey));
+                        if (macKey != null)
+                        {
+                            return new KTSKeyWithEncapsulation(new AgreedKeyWithMacKey(genKey, macKey.getAlgorithm(), macKey.getEncoded()), encapsulation);
+                        }
+                        return new KTSKeyWithEncapsulation(genKey, encapsulation);
+                    }
+                    else
+                    {
+                        KTSExtractKeySpec extractKeySpec = (KTSExtractKeySpec)ktsSpec;
+                        byte[] encapsulationPlusKey = extractKeySpec.getEncapsulation();
+                        byte[] encapsulation = new byte[(((RSAPrivateKey)extractKeySpec.getPrivateKey()).getModulus().bitLength() + 7) / 8];
+
+                        System.arraycopy(encapsulationPlusKey, 0, encapsulation, 0, encapsulation.length);
+
+                        KTSExtractKeySpec internalSpec = new KTSExtractKeySpec.Builder(extractKeySpec.getPrivateKey(), encapsulation,
+                                    extractKeySpec.getKeyAlgorithmName(), extractKeySpec.getKeySize(), extractKeySpec.getOtherInfo())
+                            .withKdfAlgorithm(extractKeySpec.getKdfAlgorithmId())
+                            .withMac(extractKeySpec.getMacAlgorithmName(), extractKeySpec.getMacKeySize())
+                            .build();
+
+                        KTSKeyWithEncapsulation ktsKey = (KTSKeyWithEncapsulation)keyFact.generateSecret(internalSpec);
+
+                        Cipher wrapCipher = Cipher.getInstance(extractKeySpec.getKeyAlgorithmName(), fipsProvider);
+
+                        wrapCipher.init(Cipher.UNWRAP_MODE, ktsKey);
+
+                        byte[] encodedKey = new byte[encapsulationPlusKey.length - encapsulation.length];
+                        System.arraycopy(encapsulationPlusKey, encapsulation.length, encodedKey, 0, encodedKey.length);
+
+                        SecretKey transportedKey = (SecretKey)wrapCipher.unwrap(encodedKey, kemSpec.getTransportedKeyAlgorithm(), Cipher.SECRET_KEY);
+                        ZeroizableSecretKey macKey = ktsKey.getMacKey();
+
+                        int transportedKeyLength = transportedKey.getEncoded().length;
+                        if (transportedKeyLength != (kemSpec.getTransportedKeySize() + 7) / 8)
+                        {
+                            throw new InvalidKeySpecException("KEM transported key the incorrect size: found " + transportedKeyLength + " bytes");
+                        }
+                        if (macKey != null)
+                        {
+                            return new KTSKeyWithEncapsulation(new AgreedKeyWithMacKey(transportedKey, macKey.getAlgorithm(), macKey.getEncoded()), encapsulation);
+                        }
+                        return new KTSKeyWithEncapsulation(transportedKey, encapsulation);
+                    }
+                }
+            }
+            catch (InvalidKeySpecException e)
+            {
+                throw e;
+            }
+            catch (GeneralSecurityException e)
+            {
+                throw new InvalidKeySpecException("Unable to process RSA key: " + e.getMessage(), e);
+            }
+            catch (IllegalArgumentException e)
+            {
+                throw new InvalidKeySpecException("Unable to process KDF AlgorithmIdentifier: " + e.getMessage(), e);
+            }
+            throw new InvalidKeySpecException("Unknown KeySpec passed");
+        }
+
+        @Override
+        protected KeySpec engineGetKeySpec(SecretKey secretKey, Class aClass)
+            throws InvalidKeySpecException
+        {
+            throw new InvalidKeySpecException("Operation not supported");
+        }
+
+        @Override
+        protected SecretKey engineTranslateKey(SecretKey secretKey)
+            throws InvalidKeyException
+        {
+            throw new InvalidKeyException("Operation not supported");
+        }
+    }
+
     static class RSAKeyFactory
         extends BaseKeyFactory
     {
@@ -1089,6 +1218,11 @@ class ProvRSA
             Class spec)
             throws InvalidKeySpecException
         {
+            if (spec == null)
+            {
+                throw new InvalidKeySpecException("null spec is invalid");
+            }
+
             if (spec.isAssignableFrom(RSAPublicKeySpec.class) && key instanceof RSAPublicKey)
             {
                 RSAPublicKey k = (RSAPublicKey)key;
@@ -1129,7 +1263,12 @@ class ProvRSA
                 return toProviderKey(privateKeyConverter.convertKey(getAlgorithmType(), (PrivateKey)key));
             }
 
-            throw new InvalidKeyException("Key type unrecognized: " + key.getClass().getName());
+            if (key != null)
+            {
+                throw new InvalidKeyException("Key type unrecognized: " + key.getClass().getName());
+            }
+
+            throw new InvalidKeyException("Key is null");
         }
 
         protected PrivateKey engineGeneratePrivate(
@@ -1156,8 +1295,14 @@ class ProvRSA
             {
                 return new ProvRSAPrivateKey(getAlgorithmType(), (RSAPrivateKeySpec)keySpec);
             }
-
-            throw new InvalidKeySpecException("Unknown KeySpec type: " + keySpec.getClass().getName());
+            else if (keySpec != null)
+            {
+                throw new InvalidKeySpecException("Unknown KeySpec type: " + keySpec.getClass().getName());
+            }
+            else
+            {
+                throw new InvalidKeySpecException("null keySpec passed for PrivateKey");
+            }
         }
 
         protected PublicKey engineGeneratePublic(
