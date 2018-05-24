@@ -13,6 +13,8 @@ apply plugin: 'java'
 apply plugin: 'java-library'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
+apply plugin: 'idea'
+
 
 
 def Properties props = new Properties()
@@ -69,6 +71,13 @@ def javaVersion=7
 sourceCompatibility = javaVersion
 targetCompatibility= javaVersion
 version='1.0.1-DMRECOMPILE'
+
+idea {
+    project {
+        jdkName = javaVersion
+        languageLevel = javaVersion
+    }
+}
 
 allprojects {
 	group='org.bouncycastle'
