@@ -49,7 +49,7 @@ public final class GeneralSecureRandom
 
     public void nextBytes(byte[] bytes)
     {
-        this.nextBytes(bytes, null);
+        this.nextBytes(bytes, (byte[])null);
     }
 
     public void nextBytes(byte[] bytes, byte[] additionalInput)
