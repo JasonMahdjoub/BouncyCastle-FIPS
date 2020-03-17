@@ -8,13 +8,14 @@ import java.security.interfaces.ECPrivateKey;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPrivateKeySpec;
 
+import javax.security.auth.Destroyable;
+
 import org.bouncycastle.crypto.Algorithm;
 import org.bouncycastle.crypto.asymmetric.AsymmetricECPrivateKey;
 import org.bouncycastle.crypto.asymmetric.ECDomainParameters;
-import org.bouncycastle.util.Strings;
 
 class ProvECPrivateKey
-    implements ECPrivateKey, ProvKey<AsymmetricECPrivateKey>
+    implements Destroyable, ECPrivateKey, ProvKey<AsymmetricECPrivateKey>
 {
     static final long serialVersionUID = 994553197664784084L;
 
@@ -23,11 +24,11 @@ class ProvECPrivateKey
     ProvECPrivateKey(
         Algorithm algorithm,
         ECPrivateKey key)
-     {
-         ECDomainParameters domainParameters = ECUtil.convertFromSpec(key.getParams());
+    {
+        ECDomainParameters domainParameters = ECUtil.convertFromSpec(key.getParams());
 
-         this.baseKey = new AsymmetricECPrivateKey(algorithm, domainParameters, key.getS());
-     }
+        this.baseKey = new AsymmetricECPrivateKey(algorithm, domainParameters, key.getS());
+    }
 
     ProvECPrivateKey(
         Algorithm algorithm,
@@ -44,11 +45,15 @@ class ProvECPrivateKey
 
     public AsymmetricECPrivateKey getBaseKey()
     {
+        KeyUtil.checkDestroyed(this);
+        
         return baseKey;
     }
 
     public String getAlgorithm()
     {
+        KeyUtil.checkDestroyed(this);
+
         return "EC";
     }
 
@@ -59,6 +64,8 @@ class ProvECPrivateKey
      */
     public String getFormat()
     {
+        KeyUtil.checkDestroyed(this);
+
         return "PKCS#8";
     }
 
@@ -81,6 +88,16 @@ class ProvECPrivateKey
     public BigInteger getS()
     {
         return baseKey.getS();
+    }
+
+    public void destroy()
+    {
+        baseKey.destroy();
+    }
+
+    public boolean isDestroyed()
+    {
+        return baseKey.isDestroyed();
     }
 
     public boolean equals(Object o)
@@ -107,21 +124,19 @@ class ProvECPrivateKey
 
     public String toString()
     {
-        StringBuilder   buf = new StringBuilder();
-        String          nl = Strings.lineSeparator();
+        if (isDestroyed())
+        {
+            return KeyUtil.destroyedPrivateKeyToString("EC");
+        }
 
-        buf.append("EC Private Key").append(nl);
         try
         {
-            buf.append("    S: ").append(this.getS().toString(16)).append(nl);
+            return KeyUtil.privateKeyToString("EC", baseKey.getS(), baseKey.getDomainParameters());
         }
         catch (Exception e)
         {
-            buf.append("RESTRICTED").append(nl);
+            return KeyUtil.restrictedToString("EC");
         }
-
-        return buf.toString();
-
     }
 
     private void readObject(
@@ -141,6 +156,11 @@ class ProvECPrivateKey
         ObjectOutputStream out)
         throws IOException
     {
+        if (isDestroyed())
+        {
+            throw new IOException("key has been destroyed");
+        }
+        
         out.defaultWriteObject();
 
         out.writeObject(baseKey.getAlgorithm());

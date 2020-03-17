@@ -3,7 +3,6 @@ package org.bouncycastle.crypto.general;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.SecureRandom;
 
 import org.bouncycastle.crypto.AEADOperatorFactory;
 import org.bouncycastle.crypto.CipherOutputStream;
@@ -40,7 +39,7 @@ abstract class GuardedAEADOperatorFactory<T extends Parameters>
             throw new FipsUnapprovedOperationError("Attempt to create unapproved algorithm in approved only mode", parameters.getAlgorithm());
         }
 
-        return new OutEncryptor(key, parameters, null);
+        return new OutEncryptor(key, parameters);
     }
 
     public InputAEADDecryptor<T> createInputAEADDecryptor(SymmetricKey key, final T parameters)
@@ -125,15 +124,11 @@ abstract class GuardedAEADOperatorFactory<T extends Parameters>
         implements OutputAEADEncryptor<T>
     {
         private final T parameters;
-        private final SymmetricKey key;
         private final AEADBlockCipher cipher;
-        private final SecureRandom random;
 
-        public OutEncryptor(SymmetricKey key, T parameters, SecureRandom random)
+        OutEncryptor(SymmetricKey key, T parameters)
         {
-            this.key = key;
             this.parameters = parameters;
-            this.random = random;
             this.cipher = createAEADCipher(true, key, parameters);
         }
 
@@ -173,7 +168,7 @@ abstract class GuardedAEADOperatorFactory<T extends Parameters>
     {
         private AEADBlockCipher cipher;
 
-        public AADStream(AEADBlockCipher cipher)
+        AADStream(AEADBlockCipher cipher)
         {
             this.cipher = cipher;
         }

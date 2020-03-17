@@ -25,7 +25,15 @@ class ECUtil
     public static ECDomainParameters convertFromSpec(
         ECParameterSpec ecSpec)
     {
-        ECDomainParameters domainParameters = new ECDomainParameterSpec(ecSpec).getDomainParameters();
+        ECDomainParameters domainParameters;
+        if (ecSpec instanceof ECDomainParameterSpec)
+        {
+            domainParameters = ((ECDomainParameterSpec)ecSpec).getDomainParameters();
+        }
+        else
+        {
+            domainParameters = new ECDomainParameterSpec(ecSpec).getDomainParameters();
+        }
 
         if (ecSpec instanceof ECImplicitDomainParameterSpec)
         {

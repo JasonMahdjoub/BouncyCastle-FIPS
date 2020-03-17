@@ -22,8 +22,8 @@ import org.bouncycastle.math.ec.ECCurve;
 public abstract class AsymmetricDSTU4145Key
     implements AsymmetricKey
 {
-    private final Algorithm algorithm;
-    private final DSTU4145Parameters parameters;
+    private Algorithm algorithm;
+    private DSTU4145Parameters parameters;
 
     protected final AlgorithmIdentifier dstu4145Identifier;
 
@@ -84,7 +84,7 @@ public abstract class AsymmetricDSTU4145Key
      *
      * @return the key's algorithm.
      */
-    public final Algorithm getAlgorithm()
+    public Algorithm getAlgorithm()
     {
         return algorithm;
     }
@@ -94,7 +94,7 @@ public abstract class AsymmetricDSTU4145Key
      *
      * @return the DSTU4145 domain parameters.
      */
-    public final DSTU4145Parameters getParameters()
+    public DSTU4145Parameters getParameters()
     {
         return parameters;
     }
@@ -105,6 +105,12 @@ public abstract class AsymmetricDSTU4145Key
         {
             throw new FipsUnapprovedOperationError("No access to key in current thread.");
         }
+    }
+
+    protected void zeroize()
+    {
+        this.algorithm = null;
+        this.parameters = null;
     }
 
     protected static void reverseBytes(byte[] bytes)

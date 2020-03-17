@@ -146,7 +146,7 @@ public class DisplayText
       }
       else
       {
-         throw new IllegalArgumentException("Unknown STRING type in DisplayText");
+         throw new IllegalArgumentException("unknown STRING type in DisplayText");
       }
    }
 
@@ -161,7 +161,7 @@ public class DisplayText
           return (DisplayText)obj;
       }
 
-      throw new IllegalArgumentException("Illegal object in getInstance: " + obj.getClass().getName());
+      throw new IllegalArgumentException("illegal object in getInstance: " + obj.getClass().getName());
    }
 
    public static DisplayText getInstance(
@@ -176,6 +176,11 @@ public class DisplayText
       return (ASN1Primitive)contents;
    }
 
+   /**
+    * Returns the contentType value.
+    *
+    * @return the contentType
+    */
    public int getContentType()
    {
       return contentType;

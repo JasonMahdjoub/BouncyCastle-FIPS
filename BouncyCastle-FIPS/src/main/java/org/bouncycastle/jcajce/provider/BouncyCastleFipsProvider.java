@@ -11,7 +11,7 @@ import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,40 +36,39 @@ import org.bouncycastle.util.Strings;
 /**
  * The BC FIPS provider.
  * <p>
- *     If no SecureRandom has been specified using CryptoServicesRegistrar.setSecureRandom() the provider class will generate a
- *     FIPS compliant DRBG based on SHA-512. It is also possible to configure the DRBG by passing a string as a constructor
- *     argument to the provider via code, or the java.security configuration file.
+ * If no SecureRandom has been specified using CryptoServicesRegistrar.setSecureRandom() the provider class will generate a
+ * FIPS compliant DRBG based on SHA-512. It is also possible to configure the DRBG by passing a string as a constructor
+ * argument to the provider via code, or the java.security configuration file.
  * </p>
  * <p>
- *     At the moment the configuration string is limited to setting the DRBG.The configuration string must always start
- *     with "C:" and finish with "ENABLE{ALL};". The command for setting the actual DRBG type is DEFRND so a configuration
- *     string requesting the use of a SHA1 DRBG would look like:
- *     <pre>
+ * At the moment the configuration string is limited to setting the DRBG.The configuration string must always start
+ * with "C:" and finish with "ENABLE{ALL};". The command for setting the actual DRBG type is DEFRND so a configuration
+ * string requesting the use of a SHA1 DRBG would look like:
+ * <pre>
  *         C:DEFRND[SHA1];ENABLE{All};
  *     </pre>
- *     Possible values for the DRBG type are "SHA1", "SHA224", "SHA256", "SHA384", "SHA512", "SHA512(224)", "SHA512(256)",
- *     "HMACrovRandSHA1", "HMACSHA224", "HMACSHA256", "HMACSHA384", "HMACSHA512", "HMACSHA512(224)", "HMACSHA512(256)", "CTRAES128",
- *     "CTRAES192", CTRAES256", and "CTRDESEDE".
+ * Possible values for the DRBG type are "SHA1", "SHA224", "SHA256", "SHA384", "SHA512", "SHA512(224)", "SHA512(256)",
+ * "HMACrovRandSHA1", "HMACSHA224", "HMACSHA256", "HMACSHA384", "HMACSHA512", "HMACSHA512(224)", "HMACSHA512(256)", "CTRAES128",
+ * "CTRAES192", CTRAES256", and "CTRDESEDE".
  * </p>
  * <p>
- *     The default DRBG is configured to be prediction resistant. In situations where the amount of entropy is constrained
- *     the default DRBG can be configured to use an entropy pool based on a SHA-512 SP 800-90A DRBG. To configure this use:
- *     <pre>
+ * The default DRBG is configured to be prediction resistant. In situations where the amount of entropy is constrained
+ * the default DRBG can be configured to use an entropy pool based on a SHA-512 SP 800-90A DRBG. To configure this use:
+ * <pre>
  *         C:HYBRID;ENABLE{All};
  *     </pre>
- *     or include the string "HYBRID;" in the previous command string setting the DRBG. After initial seeding the entropy pool will
- *     start a reseeding thread which it will begin polling once 20 samples have been taken since the last seeding and will do a reseed
- *     as soon as new entropy bytes are returned.
+ * or include the string "HYBRID;" in the previous command string setting the DRBG. After initial seeding the entropy pool will
+ * start a reseeding thread which it will begin polling once 20 samples have been taken since the last seeding and will do a reseed
+ * as soon as new entropy bytes are returned.
  * </p>
  * <p>
- *     <b>Note</b>: if the provider is created by an "approved mode" thread, only FIPS approved algorithms will be available from it.
+ * <b>Note</b>: if the provider is created by an "approved mode" thread, only FIPS approved algorithms will be available from it.
  * </p>
- *
  */
 public final class BouncyCastleFipsProvider
     extends Provider
 {
-    private static final String info = "BouncyCastle Security Provider (FIPS edition) v1.0.1";
+    private static final String info = "BouncyCastle Security Provider (FIPS edition) v1.0.2";
 
     public static final String PROVIDER_NAME = "BCFIPS";
 
@@ -162,7 +161,7 @@ public final class BouncyCastleFipsProvider
      */
     public BouncyCastleFipsProvider(String config, SecureRandom entropySource)
     {
-        super(PROVIDER_NAME, 1.01, info);
+        super(PROVIDER_NAME, 1.0002, info);
 
         // TODO: add support for file parsing, selective disable.
 
@@ -180,6 +179,8 @@ public final class BouncyCastleFipsProvider
 
         this.entropySource = entropySource;
 
+        new ProvRandom().configure(this);
+        
         new ProvSHS.SHA1().configure(this);
         new ProvSHS.SHA224().configure(this);
         new ProvSHS.SHA256().configure(this);
@@ -205,7 +206,11 @@ public final class BouncyCastleFipsProvider
 
         new ProvDH().configure(this);
         new ProvDSA().configure(this);
-        new ProvEC().configure(this);
+
+        if (!Properties.isOverrideSet("org.bouncycastle.ec.disable"))
+        {
+            new ProvEC().configure(this);
+        }
 
         new ProvRSA().configure(this);
 
@@ -223,14 +228,15 @@ public final class BouncyCastleFipsProvider
 
         new ProvX509().configure(this);
         new ProvBCFKS().configure(this);
+        new ProvFipsKS().configure(this);
 
         if (!CryptoServicesRegistrar.isInApprovedOnlyMode())
         {
+            new ProvEdEC().configure(this);
             new ProvDSTU4145().configure(this);
             new ProvElgamal().configure(this);
             new ProvGOST3410().configure(this);
             new ProvECGOST3410().configure(this);
-
 
             new ProvBlowfish().configure(this);
             new ProvCAST5().configure(this);
@@ -238,6 +244,7 @@ public final class BouncyCastleFipsProvider
             new ProvGOST28147().configure(this);
             new ProvSEED().configure(this);
             new ProvCamellia().configure(this);
+            new ProvChaCha20().configure(this);
             new ProvDES().configure(this);
             new ProvIDEA().configure(this);
             new ProvSerpent().configure(this);
@@ -245,6 +252,7 @@ public final class BouncyCastleFipsProvider
             new ProvTwofish().configure(this);
             new ProvARC4().configure(this);
             new ProvSipHash().configure(this);
+            new ProvPoly1305().configure(this);
         }
 
         if (!Properties.isOverrideSet("org.bouncycastle.jsse.disable_kdf"))
@@ -275,8 +283,12 @@ public final class BouncyCastleFipsProvider
         {
             new ProvJKS().configure(this);
         }
+    }
 
-        new ProvRandom().configure(this);
+    // for Java 11
+    public Provider configure(String configArg)
+    {
+        return new BouncyCastleFipsProvider(configArg);
     }
 
     private void processConfigString(String config)
@@ -406,12 +418,54 @@ public final class BouncyCastleFipsProvider
                         return new HybridSecureRandom();
                     }
 
-                    return new CoreSecureRandom();
+                    return getCoreSecureRandom();
                 }
             });
         }
 
         return entropySource;
+    }
+
+    private static SecureRandom getCoreSecureRandom()
+    {
+        boolean hasGetInstanceStrong = AccessController.doPrivileged(new PrivilegedAction<Boolean>()
+        {
+            public Boolean run()
+            {
+                try
+                {
+                    Class def = SecureRandom.class;
+
+                    return def.getMethod("getInstanceStrong") != null;
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+            }
+        });
+
+        if (hasGetInstanceStrong)
+        {
+            return AccessController.doPrivileged(new PrivilegedAction<SecureRandom>()
+            {
+                public SecureRandom run()
+                {
+                    try
+                    {
+                        return (SecureRandom)SecureRandom.class.getMethod("getInstanceStrong").invoke(null);
+                    }
+                    catch (Exception e)
+                    {
+                        return new CoreSecureRandom();  // fallback
+                    }
+                }
+            });
+        }
+        else
+        {
+            return new CoreSecureRandom();
+        }
     }
 
     /**
@@ -451,17 +505,17 @@ public final class BouncyCastleFipsProvider
 
     void addAttributes(String key, Map<String, String> attributes)
     {
-        for (String attrName: attributes.keySet())
+        for (Map.Entry<String, String> attrEntry : attributes.entrySet())
         {
-            addAttribute(key, attrName, attributes.get(attrName));
+            addAttribute(key, attrEntry.getKey(), attrEntry.getValue());
         }
     }
 
     void addAttributes(String type, ASN1ObjectIdentifier oid, Map<String, String> attributes)
     {
-        for (String attrName: attributes.keySet())
+        for (Map.Entry<String, String> attrEntry : attributes.entrySet())
         {
-            addAttribute(type, oid, attrName, attributes.get(attrName));
+            addAttribute(type, oid, attrEntry.getKey(), attrEntry.getValue());
         }
     }
 
@@ -508,7 +562,7 @@ public final class BouncyCastleFipsProvider
         addAlias(type, oid.getId(), "OID." + oid.getId());
     }
 
-    void addAlgorithmImplementation(String type, ASN1ObjectIdentifier oid, String className,  Map<String, String> attributes, EngineCreator creator)
+    void addAlgorithmImplementation(String type, ASN1ObjectIdentifier oid, String className, Map<String, String> attributes, EngineCreator creator)
     {
         String key1 = type + "." + oid;
         if (containsKey(key1))
@@ -600,19 +654,19 @@ public final class BouncyCastleFipsProvider
             List<String> aliases = new ArrayList<String>();
             Map<String, String> attributes = new HashMap<String, String>();
 
-            for (Object key : this.keySet())
+            for (Map.Entry<Object, Object> entry : this.entrySet())
             {
-                String sKey = (String)key;
+                String sKey = (String)entry.getKey();
                 if (sKey.startsWith(aliasString))
                 {
-                    if (this.get(key).equals(algorithm))
+                    if (entry.getValue().equals(algorithm))
                     {
                         aliases.add(sKey.substring(aliasString.length()));
                     }
                 }
                 if (sKey.startsWith(attributeKeyStart))
                 {
-                    attributes.put(sKey.substring(attributeKeyStart.length()), (String)this.get(sKey));
+                    attributes.put(sKey.substring(attributeKeyStart.length()), (String)entry.getValue());
                 }
             }
 
@@ -627,9 +681,9 @@ public final class BouncyCastleFipsProvider
     public synchronized final Set<Service> getServices()
     {
         Set<Service> serviceSet = super.getServices();
-        Set<Service> bcServiceSet = new HashSet<Service>();
+        Set<Service> bcServiceSet = new LinkedHashSet<Service>();
 
-        for (Service service: serviceSet)
+        for (Service service : serviceSet)
         {
             bcServiceSet.add(getService(service.getType(), service.getAlgorithm()));
         }
@@ -647,7 +701,7 @@ public final class BouncyCastleFipsProvider
         return Arrays.concatenate(Pack.longToBigEndian(Thread.currentThread().getId()), Pack.longToBigEndian(System.currentTimeMillis()));
     }
 
-    private final Map<Map<String, String>, Map<String, String> > attributeMaps = new HashMap<Map<String, String>, Map<String, String>>();
+    private final Map<Map<String, String>, Map<String, String>> attributeMaps = new HashMap<Map<String, String>, Map<String, String>>();
 
     private Map<String, String> getAttributeMap(Map<String, String> attributeMap)
     {
@@ -778,25 +832,34 @@ public final class BouncyCastleFipsProvider
         }
     }
 
+    private static class HybridRandomProvider
+        extends Provider
+    {
+        protected HybridRandomProvider()
+        {
+            super("BCFHEP", 1.0, "Bouncy Castle FIPS Hybrid Entropy Provider");
+        }
+    }
+
     private static class HybridSecureRandom
         extends SecureRandom
     {
         private final AtomicBoolean seedAvailable = new AtomicBoolean(false);
         private final AtomicInteger samples = new AtomicInteger(0);
-        private final SecureRandom baseRandom = new CoreSecureRandom();
+        private final SecureRandom baseRandom = getCoreSecureRandom();
         private final FipsSecureRandom drbg;
 
         HybridSecureRandom()
         {
-            super(null, null);         // stop getDefaultRNG() call
-            
+            super(null, new HybridRandomProvider());         // stop getDefaultRNG() call
+
             drbg = FipsDRBG.SHA512.fromEntropySource(new EntropySourceProvider()
+            {
+                public EntropySource get(final int bitsRequired)
                 {
-                    public EntropySource get(final int bitsRequired)
-                    {
-                        return new SignallingEntropySource(bitsRequired);
-                    }
-                })
+                    return new SignallingEntropySource(bitsRequired);
+                }
+            })
                 .setPersonalizationString(Strings.toByteArray("Bouncy Castle Hybrid Entropy Source"))
                 .build(baseRandom.generateSeed(32), false, null);     // 32 byte nonce
         }
@@ -816,7 +879,7 @@ public final class BouncyCastleFipsProvider
                 drbg.setSeed(seed);
             }
         }
-        
+
         public byte[] generateSeed(int numBytes)
         {
             byte[] data = new byte[numBytes];

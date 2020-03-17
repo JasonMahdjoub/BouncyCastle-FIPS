@@ -14,6 +14,7 @@ import org.bouncycastle.crypto.SymmetricSecretKey;
 import org.bouncycastle.crypto.UpdateOutputStream;
 import org.bouncycastle.crypto.fips.FipsSHS;
 import org.bouncycastle.crypto.fips.FipsStatus;
+import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
 import org.bouncycastle.util.encoders.Hex;
 
 /**
@@ -50,6 +51,7 @@ public class DumpInfo
         }
         else
         {
+            System.out.println("Version Info: " + new BouncyCastleFipsProvider().getInfo());
             System.out.println("FIPS Ready Status: " + FipsStatus.getStatusMessage());
             System.out.println("Module SHA-256 HMAC: " + Strings.fromByteArray(Hex.encode(FipsStatus.getModuleHMAC())));
         }
@@ -82,9 +84,9 @@ public class DumpInfo
             }
 
             byte[] buf = new byte[8192];
-            for (String name : index.keySet())
+            for (Map.Entry<String, JarEntry> entry : index.entrySet())
             {
-                JarEntry jarEntry = index.get(name);
+                JarEntry jarEntry = entry.getValue();
                 InputStream is = jarFile.getInputStream(jarEntry);
 
                 // Read in each jar entry. A SecurityException will

@@ -26,7 +26,7 @@ public final class AsymmetricECGOST3410PublicKey
     {
         super(algorithm, params);
 
-        this.w = KeyUtils.validated(w);
+        this.w = KeyUtils.validated(getParameters().getDomainParameters().getCurve(), w);
     }
 
     public AsymmetricECGOST3410PublicKey(Algorithm algorithm, byte[] enc)
@@ -38,7 +38,7 @@ public final class AsymmetricECGOST3410PublicKey
     {
         super(algorithm, CryptoProObjectIdentifiers.gostR3410_2001, publicKeyInfo.getAlgorithm());
 
-        this.w = KeyUtils.validated(parsePublicKey(publicKeyInfo));
+        this.w = KeyUtils.validated(getParameters().getDomainParameters().getCurve(), parsePublicKey(publicKeyInfo));
     }
 
     private ECPoint parsePublicKey(SubjectPublicKeyInfo publicKeyInfo)

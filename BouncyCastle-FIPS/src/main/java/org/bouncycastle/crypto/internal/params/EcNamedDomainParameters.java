@@ -1,11 +1,9 @@
-/***************************************************************/
-/******    DO NOT EDIT THIS CLASS bc-java SOURCE FILE     ******/
-/***************************************************************/
 package org.bouncycastle.crypto.internal.params;
 
 import java.math.BigInteger;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.crypto.asymmetric.NamedECDomainParameters;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
 
@@ -14,11 +12,18 @@ public class EcNamedDomainParameters
 {
     private final ASN1ObjectIdentifier name;
 
-    public EcNamedDomainParameters(ASN1ObjectIdentifier name, ECCurve curve, ECPoint G, BigInteger n, BigInteger h, byte[] seed)
+    public EcNamedDomainParameters(NamedECDomainParameters namedParams)
     {
-        super(curve, G, n, h, seed);
+        super(namedParams);
 
-        this.name = name;
+        this.name = namedParams.getID();
+    }
+
+    public EcNamedDomainParameters(NamedECDomainParameters namedParams, BigInteger hInv)
+    {
+        super(namedParams, hInv);
+
+        this.name = namedParams.getID();
     }
 
     public ASN1ObjectIdentifier getName()

@@ -653,7 +653,10 @@ class ProvRSA
         addPSSSignature(provider, "SHA512", FipsSHS.Algorithm.SHA512, new PSSParameterSpec("SHA-512", "MGF1", new MGF1ParameterSpec("SHA-512"), 64, 1));
         addPSSSignature(provider, "SHA512(224)", FipsSHS.Algorithm.SHA512_224, new PSSParameterSpec("SHA-512(224)", "MGF1", new MGF1ParameterSpec("SHA-512(224)"), 28, 1));
         addPSSSignature(provider, "SHA512(256)", FipsSHS.Algorithm.SHA512_256, new PSSParameterSpec("SHA-512(256)", "MGF1", new MGF1ParameterSpec("SHA-512(256)"), 32, 1));
-
+        addPSSSignature(provider, "SHA3-224", FipsSHS.Algorithm.SHA3_224, new PSSParameterSpec("SHA3-224", "MGF1", new MGF1ParameterSpec("SHA3-224"), 28, 1));
+        addPSSSignature(provider, "SHA3-256", FipsSHS.Algorithm.SHA3_256, new PSSParameterSpec("SHA3-256", "MGF1", new MGF1ParameterSpec("SHA3-256"), 32, 1));
+        addPSSSignature(provider, "SHA3-384", FipsSHS.Algorithm.SHA3_384, new PSSParameterSpec("SHA3-384", "MGF1", new MGF1ParameterSpec("SHA3-384"), 48, 1));
+        addPSSSignature(provider, "SHA3-512", FipsSHS.Algorithm.SHA3_512, new PSSParameterSpec("SHA3-512", "MGF1", new MGF1ParameterSpec("SHA3-512"), 64, 1));
 
         addX931Signature(provider, "SHA1", FipsSHS.Algorithm.SHA1);
         addX931Signature(provider, "SHA224", FipsSHS.Algorithm.SHA224);
@@ -704,6 +707,11 @@ class ProvRSA
         addDigestSignature(provider, FipsRSA.PKCS1v1_5.withDigestAlgorithm(FipsSHS.Algorithm.SHA512), "SHA512", PREFIX + "DigestSignatureSpi$SHA512", PKCSObjectIdentifiers.sha512WithRSAEncryption);
         addDigestSignature(provider, FipsRSA.PKCS1v1_5.withDigestAlgorithm(FipsSHS.Algorithm.SHA512_224), "SHA512(224)", PREFIX + "DigestSignatureSpi$SHA512_224", PKCSObjectIdentifiers.sha512_224WithRSAEncryption);
         addDigestSignature(provider, FipsRSA.PKCS1v1_5.withDigestAlgorithm(FipsSHS.Algorithm.SHA512_256), "SHA512(256)", PREFIX + "DigestSignatureSpi$SHA512_256", PKCSObjectIdentifiers.sha512_256WithRSAEncryption);
+
+        addDigestSignature(provider, FipsRSA.PKCS1v1_5.withDigestAlgorithm(FipsSHS.Algorithm.SHA3_224), "SHA3-224", PREFIX + "DigestSignatureSpi$SHA3_224", NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_224);
+        addDigestSignature(provider, FipsRSA.PKCS1v1_5.withDigestAlgorithm(FipsSHS.Algorithm.SHA3_256), "SHA3-256", PREFIX + "DigestSignatureSpi$SHA3_256", NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_256);
+        addDigestSignature(provider, FipsRSA.PKCS1v1_5.withDigestAlgorithm(FipsSHS.Algorithm.SHA3_384), "SHA3-384", PREFIX + "DigestSignatureSpi$SHA3_384", NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_384);
+        addDigestSignature(provider, FipsRSA.PKCS1v1_5.withDigestAlgorithm(FipsSHS.Algorithm.SHA3_512), "SHA3-512", PREFIX + "DigestSignatureSpi$SHA3_512", NISTObjectIdentifiers.id_rsassa_pkcs1_v1_5_with_sha3_512);
 
         if (!CryptoServicesRegistrar.isInApprovedOnlyMode())
         {

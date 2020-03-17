@@ -49,7 +49,7 @@ class X509SignatureUtil
                     signature.setParameter(sigParams.getParameterSpec(PSSParameterSpec.class));
                 }
                 catch (GeneralSecurityException e)
-                {
+                {                          
                     throw new SignatureException("Exception extracting parameters: " + e.getMessage());
                 }
             }
@@ -86,7 +86,7 @@ class X509SignatureUtil
         String name = MessageDigestUtils.getDigestName(oid);
 
         int dIndex = name.indexOf('-');
-        if (dIndex > 0)
+        if (dIndex > 0 && !name.startsWith("SHA3"))
         {
             return name.substring(0, dIndex) + name.substring(dIndex + 1);
         }

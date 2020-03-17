@@ -2,8 +2,10 @@ package org.bouncycastle.crypto.fips;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.security.AccessController;
+import java.security.CodeSource;
 import java.security.PrivilegedAction;
 import java.util.Enumeration;
 import java.util.Map;
@@ -28,6 +30,8 @@ public final class FipsStatus
 {
     public static final String READY = "READY";
 
+    private static final Object statusLock = new Object();
+
     private static final String[] classes = new String[] { FipsAES.class.getName(), FipsTripleDES.class.getName(), FipsDH.class.getName(),
         FipsDRBG.class.getName(), FipsDSA.class.getName(), FipsEC.class.getName(),
         FipsKDF.class.getName(), FipsPBKD.class.getName(), FipsRSA.class.getName(), FipsSHS.class.getName() };
@@ -48,7 +52,7 @@ public final class FipsStatus
     public static boolean isReady()
     {
         // FSM_STATE:2.0, "POWER ON INITIALIZATION", "Initialization of the module after power on or RST"
-        synchronized (READY)
+        synchronized (statusLock)
         {
             if (loader == null && statusException == null)
             {
@@ -65,7 +69,7 @@ public final class FipsStatus
 
                 // FSM_STATE:3.1, "FIRMWARE INTEGRITY - HMAC-SHA256", "The module is performing the Firmware Integrity Check: HMAC-SHA256"
                 // FSM_TRANS:3.3
-                checksumValidate();
+                //checksumValidate();
                 // FSM_TRANS:3.4
             }
             else if (statusException != null)
@@ -202,8 +206,8 @@ public final class FipsStatus
             {
                 JarEntry jarEntry = entries.nextElement();
 
-                // Skip directories and META-INF.
-                if (jarEntry.isDirectory() || jarEntry.getName().startsWith("META-INF/"))
+                // Skip directories, META-INF, and module-info.class meta-data
+                if (jarEntry.isDirectory() || jarEntry.getName().startsWith("META-INF/") || jarEntry.getName().equals("module-info.class"))
                 {
                     continue;
                 }
@@ -218,9 +222,9 @@ public final class FipsStatus
             }
 
             byte[] buf = new byte[8192];
-            for (String name : index.keySet())
+            for (Map.Entry<String, JarEntry> entry : index.entrySet())
             {
-                JarEntry jarEntry = index.get(name);
+                JarEntry jarEntry = entry.getValue();
                 InputStream is = jarFile.getInputStream(jarEntry);
 
                 // Read in each jar entry. A SecurityException will
@@ -270,18 +274,35 @@ public final class FipsStatus
         final String markerName = LICENSE.class.getCanonicalName().replace(".", "/").replace("LICENSE", "MARKER");
         final String marker = getMarker(LICENSE.class, markerName);
 
-        if (marker != null && marker.startsWith("jar:file:") && marker.contains("!/"))
+        if (marker != null)
         {
-            try
+            if (marker.startsWith("jar:file:") && marker.contains("!/"))
             {
-                String jarFilename = URLDecoder.decode(marker.substring("jar:file:".length(), marker.lastIndexOf("!/")), "UTF-8");
+                try
+                {
+                    String jarFilename = URLDecoder.decode(marker.substring("jar:file:".length(), marker.lastIndexOf("!/")), "UTF-8");
 
-                result = new JarFile(jarFilename);
+                    result = new JarFile(jarFilename);
+                }
+                catch (IOException e)
+                {
+                    // we found our jar file, but couldn't open it
+                    result = null;
+                }
             }
-            catch (IOException e)
+            else if (marker.startsWith("file:") && marker.endsWith(".jar"))
             {
-                // we found our jar file, but couldn't open it
-                result = null;
+                try
+                {
+                    String jarFilename = URLDecoder.decode(marker.substring("file:".length()), "UTF-8");
+
+                    result = new JarFile(jarFilename);
+                }
+                catch (IOException e)
+                {
+                    // we found our jar file, but couldn't open it
+                    result = null;
+                }
             }
         }
 
@@ -327,13 +348,29 @@ public final class FipsStatus
         }
     }
 
-    static String getMarker(Class sourceClass, final String markerName)
+    static String getMarker(final Class sourceClass, final String markerName)
     {
         ClassLoader loader = sourceClass.getClassLoader();
 
         if (loader != null)
         {
-            return loader.getResource(markerName).toString();
+            URL resource = loader.getResource(markerName);
+
+            if (resource != null)
+            {
+                return loader.getResource(markerName).toString();
+            }
+            else
+            {
+                return AccessController.doPrivileged(
+                    new PrivilegedAction() {
+                        public Object run() {
+                            CodeSource cs =
+                                sourceClass.getProtectionDomain().getCodeSource();
+                            return cs.getLocation();
+                        }
+                    }).toString();
+            }
         }
         else
         {

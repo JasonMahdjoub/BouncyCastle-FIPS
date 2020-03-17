@@ -1,3 +1,6 @@
+/***************************************************************/
+/******    DO NOT EDIT THIS CLASS bc-java SOURCE FILE     ******/
+/***************************************************************/
 package org.bouncycastle.crypto.fips;
 
 import java.math.BigInteger;
@@ -5,8 +8,11 @@ import java.math.BigInteger;
 import org.bouncycastle.crypto.IllegalKeyException;
 import org.bouncycastle.crypto.internal.BasicAgreement;
 import org.bouncycastle.crypto.internal.CipherParameters;
+import org.bouncycastle.crypto.internal.params.EcDomainParameters;
 import org.bouncycastle.crypto.internal.params.EcPrivateKeyParameters;
 import org.bouncycastle.crypto.internal.params.EcPublicKeyParameters;
+import org.bouncycastle.math.ec.ECAlgorithms;
+import org.bouncycastle.math.ec.ECConstants;
 import org.bouncycastle.math.ec.ECPoint;
 
 /**
@@ -43,14 +49,29 @@ class EcDhBasicAgreement
         CipherParameters pubKey)
     {
         EcPublicKeyParameters pub = (EcPublicKeyParameters)pubKey;
-
-        if (!pub.getParameters().equals(key.getParameters()))
+        EcDomainParameters params = key.getParameters();
+        if (!params.equals(pub.getParameters()))
         {
             throw new IllegalKeyException("ECDH public key has wrong domain parameters");
         }
 
-        ECPoint P = pub.getQ().multiply(key.getD()).normalize();
+        BigInteger d = key.getD();
 
+        // Always perform calculations on the exact curve specified by our private key's parameters
+        ECPoint Q = ECAlgorithms.cleanPoint(params.getCurve(), pub.getQ());
+        if (Q.isInfinity())
+        {
+            throw new IllegalStateException("Infinity is not a valid public key for ECDHC");
+        }
+
+        BigInteger h = params.getH();
+        if (!h.equals(ECConstants.ONE))
+        {
+            d = params.getHInv().multiply(d).mod(params.getN());
+            Q = ECAlgorithms.referenceMultiply(Q, h);
+        }
+
+        ECPoint P = Q.multiply(d).normalize();
         if (P.isInfinity())
         {
             throw new IllegalStateException("Infinity is not a valid agreement value for ECDH");

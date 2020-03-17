@@ -28,9 +28,9 @@ class DRBGPseudoRandom
         synchronized (this)
         {
             lazyInitDRBG();
-        }
 
-        return drbg.getBlockSize();
+            return drbg.getBlockSize();
+        }
     }
 
     public int getSecurityStrength()
@@ -38,9 +38,9 @@ class DRBGPseudoRandom
         synchronized (this)
         {
             lazyInitDRBG();
-        }
 
-        return drbg.getSecurityStrength();
+            return drbg.getSecurityStrength();
+        }
     }
 
     private void lazyInitDRBG()
@@ -105,127 +105,21 @@ class DRBGPseudoRandom
 
     public VariantInternalKatTest createSelfTest(FipsAlgorithm algorithm)
     {
-        return drbg.createSelfTest(algorithm);
+        synchronized (this)
+        {
+            lazyInitDRBG();
+
+            return drbg.createSelfTest(algorithm);
+        }
     }
 
     public VariantInternalKatTest createReseedSelfTest(FipsAlgorithm algorithm)
     {
-        return drbg.createReseedSelfTest(algorithm);
-    }
-
-    /*
-    // Test for use of reseed self tests and basic self test.
-    private static void check(String msg, boolean condition)
-    {
-        if (!condition)
+        synchronized (this)
         {
-            System.err.println(msg);
+            lazyInitDRBG();
+
+            return drbg.createReseedSelfTest(algorithm);
         }
     }
-
-    public static void main(String[] args)
-    {
-        final java.util.concurrent.atomic.AtomicInteger selfTestCount = new java.util.concurrent.atomic.AtomicInteger(0);
-        final java.util.concurrent.atomic.AtomicInteger reseedTestCount = new java.util.concurrent.atomic.AtomicInteger(0);
-
-        DRBG testDrbg = new DRBGPseudoRandom(FipsDRBG.SHA1.getAlgorithm(),
-            new EntropySource()
-            {
-                public boolean isPredictionResistant()
-                {
-                    return false;
-                }
-
-                public byte[] getEntropy()
-                {
-                    return new byte[0];
-                }
-
-                public int entropySize()
-                {
-                    return 0;
-                }
-            },
-            new DRBGProvider()
-            {
-                public DRBG get(EntropySource entropySource)
-                {
-                    return new DRBG()
-                    {
-                        boolean isFirst = true;
-
-                        public int getBlockSize()
-                        {
-                            return 20;
-                        }
-
-                        public int getSecurityStrength()
-                        {
-                            return 128;
-                        }
-
-                        public int generate(byte[] output, byte[] additionalInput, boolean predictionResistant)
-                        {
-                            if (isFirst)
-                            {
-                                isFirst = false;
-                            }
-                            else
-                            {
-                                // second call with false should trigger reseed
-                                if (!predictionResistant)
-                                {
-                                    return -1;
-                                }
-                            }
-                            return 0;
-                        }
-
-                        public void reseed(byte[] additionalInput)
-                        {
-
-                        }
-
-                        public VariantInternalKatTest createSelfTest(FipsAlgorithm algorithm)
-                        {
-                            return new VariantInternalKatTest(FipsDRBG.SHA1.getAlgorithm())
-                            {
-                                @Override
-                                void evaluate()
-                                    throws Exception
-                                {
-                                    selfTestCount.incrementAndGet();
-                                }
-                            };
-                        }
-
-                        public VariantInternalKatTest createReseedSelfTest(FipsAlgorithm algorithm)
-                        {
-                            return new VariantInternalKatTest(FipsDRBG.SHA1.getAlgorithm())
-                            {
-                                @Override
-                                void evaluate()
-                                    throws Exception
-                                {
-                                    reseedTestCount.incrementAndGet();
-                                }
-                            };
-                        }
-                    };
-                }
-            });
-
-        testDrbg.generate(new byte[20], null, false);
-        check("selfTestCount should be 1", selfTestCount.get() == 1);
-        check("reseedTestCount should be 0", reseedTestCount.get() == 0);
-
-        testDrbg.generate(new byte[20], null, true);
-        check("selfTestCount should be 1", selfTestCount.get() == 1);
-        check("reseedTestCount should be 1", reseedTestCount.get() == 1);
-        // isFirst will be false
-        testDrbg.generate(new byte[20], null, false);
-        check("selfTestCount should be 1", selfTestCount.get() == 1);
-        check("reseedTestCount should be 2", reseedTestCount.get() == 2);
-    }
-    */
 }

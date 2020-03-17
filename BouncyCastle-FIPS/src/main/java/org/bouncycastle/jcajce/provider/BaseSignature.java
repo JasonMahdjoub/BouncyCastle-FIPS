@@ -162,6 +162,18 @@ class BaseSignature
         AlgorithmParameterSpec params)
         throws InvalidAlgorithmParameterException
     {
+        if (params == null)
+        {
+            if (originalSpec != null)
+            {
+                params = originalSpec;
+            }
+            else
+            {
+                return;
+            }
+        }
+
         if (params instanceof PSSParameterSpec)
         {
             PSSParameterSpec newParamSpec = (PSSParameterSpec)params;

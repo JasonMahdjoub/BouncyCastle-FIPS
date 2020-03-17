@@ -1,3 +1,6 @@
+/***************************************************************/
+/******    DO NOT EDIT THIS CLASS bc-java SOURCE FILE     ******/
+/***************************************************************/
 package org.bouncycastle.asn1.iso;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -14,6 +17,7 @@ public interface ISOIECObjectIdentifiers
     ASN1ObjectIdentifier ripemd160 = hash_algorithms.branch("49");
     ASN1ObjectIdentifier ripemd128 = hash_algorithms.branch("50");
     ASN1ObjectIdentifier whirlpool = hash_algorithms.branch("55");
+
 
 
     /**

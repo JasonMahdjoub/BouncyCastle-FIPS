@@ -46,8 +46,9 @@ public class Extensions
 
     /**
      * Constructor from ASN1Sequence.
-     * <p/>
-     * the extensions are a list of constructed sequences, either with (OID, OctetString) or (OID, Boolean, OctetString)
+     * <p>
+     * The extensions are a list of constructed sequences, either with (OID, OctetString) or (OID, Boolean, OctetString)
+     * </p>
      */
     private Extensions(
         ASN1Sequence seq)
@@ -58,6 +59,11 @@ public class Extensions
         {
             Extension ext = Extension.getInstance(e.nextElement());
 
+            if (extensions.containsKey(ext.getExtnId()))
+            {
+                throw new IllegalArgumentException("repeated extension found: " + ext.getExtnId());
+            }
+            
             extensions.put(ext.getExtnId(), ext);
             ordering.addElement(ext.getExtnId());
         }

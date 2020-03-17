@@ -77,14 +77,7 @@ class ProvECGOST3410PublicKey
 
     public String toString()
     {
-        StringBuilder   buf = new StringBuilder();
-        String          nl = Strings.lineSeparator();
-
-        buf.append("ECGOST3410 Public Key").append(nl);
-        buf.append("    X: ").append(baseKey.getW().getAffineXCoord().toBigInteger().toString(16)).append(nl);
-        buf.append("    Y: ").append(baseKey.getW().getAffineYCoord().toBigInteger().toString(16)).append(nl);
-
-        return buf.toString();
+        return KeyUtil.publicKeyToString("ECGOST3410", baseKey.getW(), baseKey.getParameters().getDomainParameters());
     }
 
     public boolean equals(Object o)

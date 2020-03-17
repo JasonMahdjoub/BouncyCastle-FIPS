@@ -2,14 +2,15 @@ package org.bouncycastle.crypto.asymmetric;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.bouncycastle.asn1.ASN1OctetString;
+import javax.security.auth.Destroyable;
+
 import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.sec.ECPrivateKey;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x9.X962Parameters;
-import org.bouncycastle.asn1.x9.X9ECPoint;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.crypto.Algorithm;
 import org.bouncycastle.crypto.AsymmetricPrivateKey;
@@ -21,11 +22,13 @@ import org.bouncycastle.math.ec.ECPoint;
  */
 public final class AsymmetricECPrivateKey
     extends AsymmetricECKey
-    implements AsymmetricPrivateKey
+    implements Destroyable, AsymmetricPrivateKey
 {
-    private final int        hashCode;
+    private final AtomicBoolean hasBeenDestroyed = new AtomicBoolean(false);
+
     private final byte[]     publicKey;
 
+    private int        hashCode;
     private BigInteger d;
 
     public AsymmetricECPrivateKey(Algorithm ecAlg, ECDomainParametersID domainParametersID, BigInteger s)
@@ -93,12 +96,14 @@ public final class AsymmetricECPrivateKey
     {
         checkApprovedOnlyModeStatus();
 
+        KeyUtils.checkDestroyed(this);
+
         if (w == null)
         {
             return null;
         }
 
-        return ASN1OctetString.getInstance(new X9ECPoint(w).toASN1Primitive()).getOctets();
+        return w.getEncoded(false);
     }
 
     public final byte[] getEncoded()
@@ -106,6 +111,8 @@ public final class AsymmetricECPrivateKey
         checkApprovedOnlyModeStatus();
 
         KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
+
+        KeyUtils.checkDestroyed(this);
 
         X962Parameters params = KeyUtils.buildCurveParameters(this.getDomainParameters());
         int            orderBitLength = KeyUtils.getOrderBitLength(this.getDomainParameters());
@@ -124,13 +131,62 @@ public final class AsymmetricECPrivateKey
         return KeyUtils.getEncodedPrivateKeyInfo(new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, params), keyStructure);
     }
 
+    /**
+      * Return the algorithm this Elliptic Curve key is for.
+      *
+      * @return the key's algorithm.
+      */
+    public final Algorithm getAlgorithm()
+    {
+        checkApprovedOnlyModeStatus();
+
+        KeyUtils.checkDestroyed(this);
+
+        return super.getAlgorithm();
+    }
+
+    /**
+     * Return the Elliptic Curve domain parameters associated with this key.
+     *
+     * @return the EC domain parameters for the key.
+     */
+    public final ECDomainParameters getDomainParameters()
+    {
+        checkApprovedOnlyModeStatus();
+
+        KeyUtils.checkDestroyed(this);
+
+        return super.getDomainParameters();
+    }
+
     public BigInteger getS()
     {
         checkApprovedOnlyModeStatus();
 
         KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
 
+        KeyUtils.checkDestroyed(this);
+
         return d;
+    }
+
+    public void destroy()
+    {
+        checkApprovedOnlyModeStatus();
+
+        if (!hasBeenDestroyed.getAndSet(true))
+        {
+            this.d = null;
+            this.hashCode = -1;
+            super.zeroize();
+        }
+    }
+
+    public boolean isDestroyed()
+    {
+        checkApprovedOnlyModeStatus();
+
+        return hasBeenDestroyed.get();
     }
 
     @Override
@@ -149,6 +205,11 @@ public final class AsymmetricECPrivateKey
         }
 
         AsymmetricECPrivateKey other = (AsymmetricECPrivateKey)o;
+
+        if (this.isDestroyed() || other.isDestroyed())
+        {
+            return false;
+        }
 
         if (!d.equals(other.d))
         {
@@ -181,11 +242,6 @@ public final class AsymmetricECPrivateKey
     {
         super.finalize();
 
-        zeroize();
-    }
-
-    private void zeroize()
-    {
-        this.d = null;
+        destroy();
     }
 }

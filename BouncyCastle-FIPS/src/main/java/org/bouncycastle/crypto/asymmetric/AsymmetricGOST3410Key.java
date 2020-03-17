@@ -16,8 +16,8 @@ import org.bouncycastle.crypto.fips.FipsUnapprovedOperationError;
 public abstract class AsymmetricGOST3410Key<T>
     implements AsymmetricKey
 {
-    private final Algorithm algorithm;
-    private final GOST3410Parameters<T> domainParameters;
+    private Algorithm algorithm;
+    private GOST3410Parameters<T> domainParameters;
 
     AsymmetricGOST3410Key(Algorithm algorithm, GOST3410Parameters<T> domainParameters)
     {
@@ -49,11 +49,11 @@ public abstract class AsymmetricGOST3410Key<T>
     }
 
     /**
-      * Return the algorithm this DSA key is for.
+      * Return the algorithm this GOST R 34.10 key is for.
       *
       * @return the key's algorithm.
       */
-    public final Algorithm getAlgorithm()
+    public Algorithm getAlgorithm()
     {
         return algorithm;
     }
@@ -64,7 +64,7 @@ public abstract class AsymmetricGOST3410Key<T>
      *
      * @return the GOST3410 domain parameters.
      */
-    public final GOST3410Parameters<T> getParameters()
+    public GOST3410Parameters<T> getParameters()
     {
         return domainParameters;
     }
@@ -75,5 +75,11 @@ public abstract class AsymmetricGOST3410Key<T>
         {
             throw new FipsUnapprovedOperationError("No access to key in current thread.");
         }
+    }
+
+    protected void zeroize()
+    {
+        this.algorithm = null;
+        this.domainParameters = null;
     }
 }

@@ -34,16 +34,16 @@ public class BaseISO9796d2Signer
     private byte[]      preBlock;
 
     /**
-     * Generate a signer for the with either implicit or explicit trailers
-     * for ISO9796-2.
+     * Generate a signer with either implicit or explicit trailers for ISO9796-2.
      * 
      * @param cipher base cipher to use for signature creation/verification
      * @param digest digest to use.
+     * @param implicit whether or not the trailer is implicit or gives the hash.
      */
     public BaseISO9796d2Signer(
-        AsymmetricBlockCipher cipher,
-        Digest digest,
-        boolean implicit)
+        AsymmetricBlockCipher   cipher,
+        Digest                  digest,
+        boolean                 implicit)
     {
         this.cipher = cipher;
         this.digest = digest;
@@ -62,10 +62,9 @@ public class BaseISO9796d2Signer
             }
             else
             {
-                throw new IllegalArgumentException("no valid trailer for digest");
+                throw new IllegalArgumentException("no valid trailer for digest: " + digest.getAlgorithmName());
             }
         }
-
     }
     
     public void init(
@@ -183,9 +182,13 @@ public class BaseISO9796d2Signer
 
             if (trailerObj != null)
             {
-                if (sigTrail != trailerObj)
+                int trailer = trailerObj.intValue();
+                if (sigTrail != trailer)
                 {
-                    throw new IllegalStateException("signer initialised with wrong digest for trailer " + sigTrail);
+                    if (!(trailer == ISOTrailers.TRAILER_SHA512_256 && sigTrail == 0x40CC))
+                    {
+                        throw new IllegalStateException("signer initialized with wrong digest for trailer " + sigTrail);
+                    }
                 }
             }
             else
@@ -384,7 +387,7 @@ public class BaseISO9796d2Signer
         clearBlock(block);
 
         messageLength = 0;
-        
+
         return b;
     }
 
@@ -444,14 +447,18 @@ public class BaseISO9796d2Signer
 
             if (trailerObj != null)
             {
-                if (sigTrail != trailerObj.intValue())
+                int trailer = trailerObj.intValue();
+                if (sigTrail != trailer)
                 {
-                    throw new IllegalStateException("signer initialised with wrong digest for trailer " + sigTrail);
+                    if (!(trailer == ISOTrailers.TRAILER_SHA512_256 && sigTrail == 0x40CC))
+                    {
+                        throw new IllegalStateException("signer initialised with wrong digest for trailer " + sigTrail);
+                    }
                 }
             }
             else
             {
-                throw new IllegalArgumentException("unrecognized hash in signature");
+                throw new IllegalArgumentException("unrecognised hash in signature");
             }
 
             delta = 2;
@@ -565,7 +572,7 @@ public class BaseISO9796d2Signer
         clearBlock(block);
 
         messageLength = 0;
-        
+
         return true;
     }
 

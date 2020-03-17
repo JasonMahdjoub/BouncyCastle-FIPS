@@ -263,6 +263,11 @@ class ProvECGOST3410
             GOST3410ParameterSpec gParams,
             SecureRandom random)
         {
+            if (!(gParams.getDomainParametersSpec() instanceof ECDomainParameterSpec))
+            {
+                throw new InvalidParameterException("GOST3410 KeyPairGenerator needs to be initialized with a GOST3410ParameterSpec<ECDomainParameterSpec>");
+            }
+
             params = GOST3410Util.convertToECParams((GOST3410ParameterSpec<ECDomainParameterSpec>)gParams);
             engine = new ECGOST3410.KeyPairGenerator(new ECGOST3410.KeyGenParameters(params), random);
             initialised = true;

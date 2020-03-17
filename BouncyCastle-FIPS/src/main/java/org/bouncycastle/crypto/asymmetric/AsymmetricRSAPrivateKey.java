@@ -2,6 +2,9 @@ package org.bouncycastle.crypto.asymmetric;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.security.auth.Destroyable;
 
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -16,8 +19,10 @@ import org.bouncycastle.crypto.internal.Permissions;
  */
 public final class AsymmetricRSAPrivateKey
     extends AsymmetricRSAKey
-    implements AsymmetricPrivateKey
+    implements Destroyable, AsymmetricPrivateKey
 {
+    private final AtomicBoolean hasBeenDestroyed = new AtomicBoolean(false);
+
     private BigInteger publicExponent;
     private BigInteger privateExponent;
     private BigInteger p;
@@ -26,7 +31,7 @@ public final class AsymmetricRSAPrivateKey
     private BigInteger dq;
     private BigInteger qInv;
 
-    private final int hashCode;
+    private int hashCode;
 
     public AsymmetricRSAPrivateKey(Algorithm algorithm, BigInteger modulus, BigInteger publicExponent, BigInteger privateExponent, BigInteger p, BigInteger q, BigInteger dp, BigInteger dq, BigInteger qInv)
     {
@@ -113,8 +118,34 @@ public final class AsymmetricRSAPrivateKey
         this.hashCode = calculateHashCode();
     }
 
+    /**
+     * Return the algorithm this RSA key is for.
+     *
+     * @return the key's algorithm.
+     */
+    public Algorithm getAlgorithm()
+    {
+        KeyUtils.checkDestroyed(this);
+
+        return super.getAlgorithm();
+    }
+
+    /**
+     * Return the modulus for this RSA key.
+     *
+     * @return the key's modulus.
+     */
+    public BigInteger getModulus()
+    {
+        KeyUtils.checkDestroyed(this);
+
+        return super.getModulus();
+    }
+
     public BigInteger getPublicExponent()
     {
+        KeyUtils.checkDestroyed(this);
+
         return publicExponent;
     }
 
@@ -164,9 +195,34 @@ public final class AsymmetricRSAPrivateKey
     {
         checkApprovedOnlyModeStatus();
 
+        KeyUtils.checkDestroyed(this);
+
         KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
 
         return KeyUtils.getEncodedPrivateKeyInfo(rsaAlgIdentifier, new RSAPrivateKey(getModulus(), publicExponent, getPrivateExponent(), getP(), getQ(), getDP(), getDQ(), getQInv()));
+    }
+
+    public void destroy()
+    {
+        checkApprovedOnlyModeStatus();
+
+        KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
+        
+        if (!hasBeenDestroyed.getAndSet(true))
+        {
+            this.privateExponent = this.publicExponent = null;
+            this.p = this.q = this.dp = this.dq = this.qInv = null;
+            this.hashCode = -1;
+
+            super.zeroize();
+        }
+    }
+
+    public boolean isDestroyed()
+    {
+        checkApprovedOnlyModeStatus();
+
+        return hasBeenDestroyed.get();
     }
 
     @Override
@@ -184,6 +240,11 @@ public final class AsymmetricRSAPrivateKey
         }
 
         AsymmetricRSAPrivateKey other = (AsymmetricRSAPrivateKey)o;
+
+        if (this.isDestroyed() || other.isDestroyed())
+        {
+            return false;
+        }
 
         return getModulus().equals(other.getModulus())
             && privateExponent.equals(other.privateExponent) && getPublicExponent().equals(other.getPublicExponent())
@@ -212,20 +273,13 @@ public final class AsymmetricRSAPrivateKey
         return result;
     }
 
-    protected void zeroize()
-    {
-        this.privateExponent = null;
-        this.p = this.q = this.dp = this.dq = this.qInv = null;
-        super.zeroize();
-    }
-
     @Override
     protected void finalize()
         throws Throwable
     {
         super.finalize();
 
-        zeroize();
+        destroy();
     }
 
     private void checkCanRead()
@@ -233,5 +287,7 @@ public final class AsymmetricRSAPrivateKey
         checkApprovedOnlyModeStatus();
 
         KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
+
+        KeyUtils.checkDestroyed(this);
     }
 }

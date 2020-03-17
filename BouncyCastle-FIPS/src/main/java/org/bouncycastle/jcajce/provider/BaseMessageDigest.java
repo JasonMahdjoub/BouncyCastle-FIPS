@@ -14,7 +14,7 @@ final class BaseMessageDigest
 {
     private static FipsDigestOperatorFactory<FipsSHS.Parameters> fipsFactory = new FipsSHS.OperatorFactory<FipsSHS.Parameters>();
 
-    protected final OutputDigestCalculator  digestCalculator;
+    private final OutputDigestCalculator  digestCalculator;
     private final UpdateOutputStream digestStream;
 
     protected BaseMessageDigest(

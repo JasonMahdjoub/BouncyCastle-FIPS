@@ -26,13 +26,16 @@ import org.bouncycastle.jcajce.interfaces.DSTU4145PrivateKey;
 import org.bouncycastle.jcajce.interfaces.DSTU4145PublicKey;
 import org.bouncycastle.jcajce.interfaces.ECGOST3410PrivateKey;
 import org.bouncycastle.jcajce.interfaces.ECGOST3410PublicKey;
+import org.bouncycastle.jcajce.interfaces.EdDSAKey;
 import org.bouncycastle.jcajce.interfaces.GOST3410Key;
 import org.bouncycastle.jcajce.interfaces.GOST3410PrivateKey;
 import org.bouncycastle.jcajce.interfaces.GOST3410PublicKey;
+import org.bouncycastle.jcajce.interfaces.XDHKey;
 import org.bouncycastle.jcajce.spec.DSTU4145ParameterSpec;
 import org.bouncycastle.jcajce.spec.ECDomainParameterSpec;
 import org.bouncycastle.jcajce.spec.GOST3410DomainParameterSpec;
 import org.bouncycastle.jcajce.spec.GOST3410ParameterSpec;
+import org.bouncycastle.util.Arrays;
 
 /**
  * Carrier class for a key pair which validates the consistency of the keys at construction time.
@@ -189,6 +192,36 @@ public class ConsistentKeyPair
                 spec.getDomainParameters().getCurve().createPoint(pub.getW().getAffineX(), pub.getW().getAffineY())))
             {
                 throw new IllegalArgumentException("DSTU4145 public key not consistent with DSTU4145 private key");
+            }
+        }
+        else if (publicKey instanceof EdDSAKey && privateKey instanceof EdDSAKey)
+        {
+            EdDSAKey priv = (EdDSAKey)privateKey;
+            EdDSAKey pub = (EdDSAKey)publicKey;
+
+            if (!priv.getAlgorithm().equals(pub.getAlgorithm()))
+            {
+                throw new IllegalArgumentException("EdDSA keys do not have the same domain parameters");
+            }
+
+            if (!Arrays.areEqual(priv.getPublicData(), pub.getPublicData()))
+            {
+                throw new IllegalArgumentException("EdDSA public key not consistent with EdDSA private key");
+            }
+        }
+        else if (publicKey instanceof XDHKey && privateKey instanceof XDHKey)
+        {
+            XDHKey priv = (XDHKey)privateKey;
+            XDHKey pub = (XDHKey)publicKey;
+
+            if (!priv.getAlgorithm().equals(pub.getAlgorithm()))
+            {
+                throw new IllegalArgumentException("XDH keys do not have the same domain parameters");
+            }
+
+            if (!Arrays.areEqual(priv.getPublicData(), pub.getPublicData()))
+            {
+                throw new IllegalArgumentException("XDH public key not consistent with XDH private key");
             }
         }
         else

@@ -118,9 +118,7 @@ class ARC4Engine
     private void setKey(byte[] keyBytes)
     {
         workingKey = keyBytes;
-
-        // System.out.println("the key length is ; "+ workingKey.length);
-
+        
         x = 0;
         y = 0;
 

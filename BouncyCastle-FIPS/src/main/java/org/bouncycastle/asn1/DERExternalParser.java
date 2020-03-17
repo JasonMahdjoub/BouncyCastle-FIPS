@@ -40,7 +40,7 @@ public class DERExternalParser
     {
         try
         {
-            return new DERExternal(_parser.readVector());
+            return new DLExternal(_parser.readVector());
         }
         catch (IllegalArgumentException e)
         {
@@ -55,15 +55,15 @@ public class DERExternalParser
      */
     public ASN1Primitive toASN1Primitive()
     {
-        try 
+        try
         {
             return getLoadedObject();
         }
-        catch (IOException ioe) 
+        catch (IOException ioe)
         {
             throw new ASN1ParsingException("unable to get DER object", ioe);
         }
-        catch (IllegalArgumentException ioe) 
+        catch (IllegalArgumentException ioe)
         {
             throw new ASN1ParsingException("unable to get DER object", ioe);
         }

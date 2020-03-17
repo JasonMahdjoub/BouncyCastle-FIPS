@@ -741,23 +741,25 @@ public final class FipsTripleDES
     private static final class EngineProvider
         extends FipsEngineProvider<BlockCipher>
     {
+        private static byte[] input = Hex.decode("4e6f772069732074");
+        private static byte[] output = Hex.decode("f7cfbe5e6c38b35a");
+
+        private static final byte[] keyBytes = Hex.decode("0102020404070708080b0b0d0d0e0e101013131515161619");
+
         public BlockCipher createEngine()
         {
             return SelfTestExecutor.validate(ALGORITHM, new DesEdeEngine(), new VariantKatTest<DesEdeEngine>()
             {
                 public void evaluate(DesEdeEngine tripleDesEngine)
                 {
-                    byte[] input = Hex.decode("4e6f77206973207468652074696d6520666f7220616c6c20");
-                    byte[] output = Hex.decode("f7cfbe5e6c38b35a62815c962fcaf7a863af5450ec85fdab");
+
                     byte[] tmp = new byte[input.length];
 
-                    KeyParameter key = new KeyParameterImpl(Hex.decode("0102020404070708080b0b0d0d0e0e101013131515161619"));
+                    KeyParameter key = new KeyParameterImpl(keyBytes);
 
                     tripleDesEngine.init(true, key);
 
                     tripleDesEngine.processBlock(input, 0, tmp, 0);
-                    tripleDesEngine.processBlock(input, 8, tmp, 8);
-                    tripleDesEngine.processBlock(input, 16, tmp, 16);
 
                     if (!Arrays.areEqual(output, tmp))
                     {
@@ -767,8 +769,6 @@ public final class FipsTripleDES
                     tripleDesEngine.init(false, key);
 
                     tripleDesEngine.processBlock(tmp, 0, tmp, 0);
-                    tripleDesEngine.processBlock(tmp, 8, tmp, 8);
-                    tripleDesEngine.processBlock(tmp, 16, tmp, 16);
 
                     if (!Arrays.areEqual(input, tmp))
                     {

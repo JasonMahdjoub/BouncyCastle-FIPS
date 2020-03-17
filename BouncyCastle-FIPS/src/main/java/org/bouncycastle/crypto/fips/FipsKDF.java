@@ -119,6 +119,42 @@ public final class FipsKDF
         }
     }
 
+    static
+    {
+        // FSM_STATE:3.KBKDF.0,"KBKDF GENERATE KAT", "The module is performing KBKDF generate KAT self-test"
+        // FSM_TRANS:3.KBKDF.0,"POWER ON SELF-TEST", "PBKDF GENERATE KAT",	"Invoke KBKDF Generate KAT self-test"
+        new CounterModeProvider(PRF.AES_CMAC).createEngine();
+        new CounterModeProvider(PRF.TRIPLEDES_CMAC).createEngine();
+        new CounterModeProvider(PRF.SHA1_HMAC).createEngine();
+        new CounterModeProvider(PRF.SHA224_HMAC).createEngine();
+        new CounterModeProvider(PRF.SHA256_HMAC).createEngine();
+        new CounterModeProvider(PRF.SHA384_HMAC).createEngine();
+        new CounterModeProvider(PRF.SHA512_HMAC).createEngine();
+        new CounterModeProvider(PRF.SHA512_224_HMAC).createEngine();
+        new CounterModeProvider(PRF.SHA512_256_HMAC).createEngine();
+
+        new FeedbackModeProvider(PRF.AES_CMAC).createEngine();
+        new FeedbackModeProvider(PRF.TRIPLEDES_CMAC).createEngine();
+        new FeedbackModeProvider(PRF.SHA1_HMAC).createEngine();
+        new FeedbackModeProvider(PRF.SHA224_HMAC).createEngine();
+        new FeedbackModeProvider(PRF.SHA256_HMAC).createEngine();
+        new FeedbackModeProvider(PRF.SHA384_HMAC).createEngine();
+        new FeedbackModeProvider(PRF.SHA512_HMAC).createEngine();
+        new FeedbackModeProvider(PRF.SHA512_224_HMAC).createEngine();
+        new FeedbackModeProvider(PRF.SHA512_256_HMAC).createEngine();
+
+        new DoublePipelineModeProvider(PRF.AES_CMAC).createEngine();
+        new DoublePipelineModeProvider(PRF.TRIPLEDES_CMAC).createEngine();
+        new DoublePipelineModeProvider(PRF.SHA1_HMAC).createEngine();
+        new DoublePipelineModeProvider(PRF.SHA224_HMAC).createEngine();
+        new DoublePipelineModeProvider(PRF.SHA256_HMAC).createEngine();
+        new DoublePipelineModeProvider(PRF.SHA384_HMAC).createEngine();
+        new DoublePipelineModeProvider(PRF.SHA512_HMAC).createEngine();
+        new DoublePipelineModeProvider(PRF.SHA512_224_HMAC).createEngine();
+        new DoublePipelineModeProvider(PRF.SHA512_256_HMAC).createEngine();
+        // FSM_TRANS:3.KBKDF.1, "KBKDF GENERATE KAT", "POWER ON SELF-TEST", "KBKDF Generate KAT self-test successful completion"
+    }
+
     /**
      * Parameters for the Counter Mode parameters builder.
      */
@@ -230,9 +266,7 @@ public final class FipsKDF
         {
             Utils.approvedModeCheck(approvedModeOnly, params.getAlgorithm());
 
-            PRF prf = (PRF)params.getAlgorithm().basicVariation();
-            FipsEngineProvider<Mac>  macProvider = createPRF(prf);
-            final KDFCounterBytesGenerator kdfGenerator = new KDFCounterBytesGenerator(macProvider.createEngine());
+            final KDFCounterBytesGenerator kdfGenerator = new CounterModeProvider(params.getAlgorithm()).createEngine();
 
             kdfGenerator.init(new KDFCounterParameters(params.ki, params.fixedInputPrefix, params.fixedInputSuffix, params.r));
 
@@ -392,14 +426,11 @@ public final class FipsKDF
 
         public KDFCalculator<FeedbackModeParameters> createKDFCalculator(final FeedbackModeParameters params)
         {
-            PRF prfAlgorithm = (PRF)params.getAlgorithm().basicVariation();
-            FipsEngineProvider<Mac> macProvider = createPRF(prfAlgorithm);
-            int r = params.r;
-            CounterLocation counterLocation = params.counterLocation;
-
             Utils.approvedModeCheck(approvedModeOnly, params.getAlgorithm());
 
-            final KDFFeedbackBytesGenerator kdfGenerator = new KDFFeedbackBytesGenerator(macProvider.createEngine());
+            final KDFFeedbackBytesGenerator kdfGenerator = new FeedbackModeProvider(params.getAlgorithm()).createEngine();
+            CounterLocation counterLocation = params.counterLocation;
+            int r = params.r;
 
             if (r > 0)
             {
@@ -548,12 +579,9 @@ public final class FipsKDF
         {
             Utils.approvedModeCheck(approvedModeOnly, params.getAlgorithm());
 
-            PRF prfAlgorithm = (PRF)params.getAlgorithm().basicVariation();
-            int r = params.r;
+            final KDFDoublePipelineIterationBytesGenerator kdfGenerator = new DoublePipelineModeProvider(params.getAlgorithm()).createEngine();
             CounterLocation counterLocation = params.counterLocation;
-            FipsEngineProvider<Mac> macProvider = createPRF(prfAlgorithm);
-
-            final KDFDoublePipelineIterationBytesGenerator kdfGenerator = new KDFDoublePipelineIterationBytesGenerator(macProvider.createEngine());
+            int r = params.r;
 
             if (r > 0)
             {
@@ -718,6 +746,7 @@ public final class FipsKDF
 
         public static final String MASTER_SECRET = "master secret";
         public static final String KEY_EXPANSION = "key expansion";
+        public static final String EXTENDED_MASTER_SECRET = "extended master secret";
     }
 
     /**
@@ -1095,7 +1124,11 @@ public final class FipsKDF
         SHA384(FipsSHS.Algorithm.SHA384),
         SHA512(FipsSHS.Algorithm.SHA512),
         SHA512_224(FipsSHS.Algorithm.SHA512_224),
-        SHA512_256(FipsSHS.Algorithm.SHA512_256);
+        SHA512_256(FipsSHS.Algorithm.SHA512_256),
+        SHA3_224(FipsSHS.Algorithm.SHA3_224),
+        SHA3_256(FipsSHS.Algorithm.SHA3_256),
+        SHA3_384(FipsSHS.Algorithm.SHA3_384),
+        SHA3_512(FipsSHS.Algorithm.SHA3_512);
 
         private final FipsAlgorithm algorithm;
 
@@ -1634,6 +1667,245 @@ public final class FipsKDF
             digest.doFinal(result, 0);
 
             return Arrays.areEqual(result, kat);
+        }
+    }
+
+    private static final class CounterModeProvider
+        extends FipsEngineProvider<KDFCounterBytesGenerator>
+    {
+        private static final byte[] KI = Hex.decode("dff1e50ac0b69dc40f1051d46c2b069c");
+        private static final byte[] FIP = new byte[] { 0x01 };
+        private static final byte[] FIS = new byte[] { 0x02 };
+
+        private static final byte[] aes_cmac_vec = Hex.decode("53023e21d00cc5046b15");
+        private static final byte[] tripleDes_vec = Hex.decode("d4e062f13b0baefa4943");
+        private static final byte[] sha1_vec = Hex.decode("76f881b780e4939d485a");
+        private static final byte[] sha224_vec = Hex.decode("66db824abdf2b4e85de2");
+        private static final byte[] sha256_vec = Hex.decode("3a46d9be7ab8ea092558");
+        private static final byte[] sha384_vec = Hex.decode("d209b2f985ff77301fd1");
+        private static final byte[] sha512_vec = Hex.decode("0c51da7c89503acc0050");
+        private static final byte[] sha512_224_vec = Hex.decode("86e14446abd90b94c828");
+        private static final byte[] sha512_256_vec = Hex.decode("26593c9ef9b39d94bafc");
+
+        private final FipsAlgorithm algorithm;
+
+        public CounterModeProvider(FipsAlgorithm algorithm)
+        {
+            this.algorithm = algorithm;
+        }
+
+        public CounterModeProvider(PRF prf)
+        {
+            this.algorithm = new FipsAlgorithm(COUNTER_MODE.getAlgorithm(), prf);
+        }
+
+        public KDFCounterBytesGenerator createEngine()
+        {
+            final PRF prf = (PRF)algorithm.basicVariation();
+            FipsEngineProvider<Mac>  macProvider = createPRF(prf);
+
+            return SelfTestExecutor.validate(algorithm, new KDFCounterBytesGenerator(macProvider.createEngine()), new VariantKatTest<KDFCounterBytesGenerator>()
+            {
+                public void evaluate(KDFCounterBytesGenerator kdfGenerator)
+                {
+                    kdfGenerator.init(new KDFCounterParameters(KI, FIP, FIS, 8));
+
+                    byte[] out = new byte[10];
+
+                    kdfGenerator.generateBytes(out, 0, out.length);
+
+                    if (!Arrays.areEqual(expectedOutput(prf), out))
+                    {
+                        fail("failed self test on generation: " + Hex.toHexString(out));
+                    }
+                }
+            });
+        }
+
+        private static byte[] expectedOutput(PRF prf)
+        {
+            switch (prf)
+            {
+            case AES_CMAC:
+                return aes_cmac_vec;
+            case TRIPLEDES_CMAC:
+                return tripleDes_vec;
+            case SHA1_HMAC:
+                return sha1_vec;
+            case SHA224_HMAC:
+                return sha224_vec;
+            case SHA256_HMAC:
+                return sha256_vec;
+            case SHA384_HMAC:
+                return sha384_vec;
+            case SHA512_HMAC:
+                return sha512_vec;
+            case SHA512_224_HMAC:
+                return sha512_224_vec;
+            case SHA512_256_HMAC:
+                return sha512_256_vec;
+            default:
+                throw new SelfTestExecutor.TestFailedException("unknown PRF");
+            }
+        }
+    }
+
+    private static final class FeedbackModeProvider
+        extends FipsEngineProvider<KDFFeedbackBytesGenerator>
+    {
+        private static final byte[] KI = Hex.decode("dff1e50ac0b69dc40f1051d46c2b069c");
+        private static final byte[] IV = new byte[]{0x01};
+        private static final byte[] FID = new byte[]{0x02};
+
+        private static final byte[] aes_cmac_vec = Hex.decode("af7eb5b9a3eb72a1a0cb");
+        private static final byte[] tripleDes_vec = Hex.decode("cf65681ac0d3c4f65ce0");
+        private static final byte[] sha1_vec = Hex.decode("bfe9d9a6cd8b7befe0fb");
+        private static final byte[] sha224_vec = Hex.decode("71d5790138202ab1edc9");
+        private static final byte[] sha256_vec = Hex.decode("650d3f9da0f4a8bcf602");
+        private static final byte[] sha384_vec = Hex.decode("2a9375ae10e75a9a5ba2");
+        private static final byte[] sha512_vec = Hex.decode("e0f3f35c27358f3d0dda");
+        private static final byte[] sha512_224_vec = Hex.decode("5fd1372077522505be4a");
+        private static final byte[] sha512_256_vec = Hex.decode("ae930bec79b81ee15c67");
+
+        private final FipsAlgorithm algorithm;
+
+        public FeedbackModeProvider(FipsAlgorithm algorithm)
+        {
+            this.algorithm = algorithm;
+        }
+
+        public FeedbackModeProvider(PRF prf)
+        {
+            this.algorithm = new FipsAlgorithm(FEEDBACK_MODE.getAlgorithm(), prf);
+        }
+
+        public KDFFeedbackBytesGenerator createEngine()
+        {
+            final PRF prf = (PRF)algorithm.basicVariation();
+            FipsEngineProvider<Mac> macProvider = createPRF(prf);
+
+            return SelfTestExecutor.validate(algorithm, new KDFFeedbackBytesGenerator(macProvider.createEngine()), new VariantKatTest<KDFFeedbackBytesGenerator>()
+            {
+                public void evaluate(KDFFeedbackBytesGenerator kdfGenerator)
+                {
+                    kdfGenerator.init(KDFFeedbackParameters.createWithCounter(KDFFeedbackParameters.AFTER_FIXED, KI, IV, FID, 8));
+
+                    byte[] out = new byte[10];
+
+                    kdfGenerator.generateBytes(out, 0, out.length);
+
+                    if (!Arrays.areEqual(expectedOutput(prf), out))
+                    {
+                        fail("failed self test on generation: " + Hex.toHexString(out));
+                    }
+                }
+            });
+        }
+
+        private static byte[] expectedOutput(PRF prf)
+        {
+            switch (prf)
+            {
+            case AES_CMAC:
+                return aes_cmac_vec;
+            case TRIPLEDES_CMAC:
+                return tripleDes_vec;
+            case SHA1_HMAC:
+                return sha1_vec;
+            case SHA224_HMAC:
+                return sha224_vec;
+            case SHA256_HMAC:
+                return sha256_vec;
+            case SHA384_HMAC:
+                return sha384_vec;
+            case SHA512_HMAC:
+                return sha512_vec;
+            case SHA512_224_HMAC:
+                return sha512_224_vec;
+            case SHA512_256_HMAC:
+                return sha512_256_vec;
+            default:
+                throw new SelfTestExecutor.TestFailedException("unknown PRF");
+            }
+        }
+    }
+
+    private static final class DoublePipelineModeProvider
+        extends FipsEngineProvider<KDFDoublePipelineIterationBytesGenerator>
+    {
+        private static final byte[] KI = Hex.decode("dff1e50ac0b69dc40f1051d46c2b069c");
+        private static final byte[] FID = new byte[]{0x02};
+
+        private static final byte[] aes_cmac_vec = Hex.decode("ace76ed103e31681ed03");
+        private static final byte[] tripleDes_vec = Hex.decode("41d79be29b5c34ffa40d");
+        private static final byte[] sha1_vec = Hex.decode("e5e5666cb2a73b8ce638");
+        private static final byte[] sha224_vec = Hex.decode("c4c12b540e51d106abd8");
+        private static final byte[] sha256_vec = Hex.decode("b6c232a28b4b450210ee");
+        private static final byte[] sha384_vec = Hex.decode("48268b8bf87297a5ce8f");
+        private static final byte[] sha512_vec = Hex.decode("52d86063e22a84188285");
+        private static final byte[] sha512_224_vec = Hex.decode("d1f521fbc7e736685709");
+        private static final byte[] sha512_256_vec = Hex.decode("dca0e9d25e22ca54c0ca");
+
+        private final FipsAlgorithm algorithm;
+
+        public DoublePipelineModeProvider(FipsAlgorithm algorithm)
+        {
+            this.algorithm = algorithm;
+        }
+
+        public DoublePipelineModeProvider(PRF prf)
+        {
+            this.algorithm = new FipsAlgorithm(DOUBLE_PIPELINE_ITERATION_MODE.getAlgorithm(), prf);
+        }
+
+        public KDFDoublePipelineIterationBytesGenerator createEngine()
+        {
+            final PRF prf = (PRF)algorithm.basicVariation();
+            FipsEngineProvider<Mac> macProvider = createPRF(prf);
+
+            return SelfTestExecutor.validate(algorithm, new KDFDoublePipelineIterationBytesGenerator(macProvider.createEngine()), new VariantKatTest<KDFDoublePipelineIterationBytesGenerator>()
+            {
+                public void evaluate(KDFDoublePipelineIterationBytesGenerator kdfGenerator)
+                {
+                    kdfGenerator.init(KDFDoublePipelineIterationParameters.createWithCounter(KDFFeedbackParameters.BEFORE_ITER, KI, FID, 8));
+
+                    byte[] out = new byte[10];
+
+                    kdfGenerator.generateBytes(out, 0, out.length);
+
+                    if (!Arrays.areEqual(expectedOutput(prf), out))
+                    {
+                        fail("failed self test on generation: " + Hex.toHexString(out));
+                    }
+                }
+            });
+        }
+
+        private static byte[] expectedOutput(PRF prf)
+        {
+            switch (prf)
+            {
+            case AES_CMAC:
+                return aes_cmac_vec;
+            case TRIPLEDES_CMAC:
+                return tripleDes_vec;
+            case SHA1_HMAC:
+                return sha1_vec;
+            case SHA224_HMAC:
+                return sha224_vec;
+            case SHA256_HMAC:
+                return sha256_vec;
+            case SHA384_HMAC:
+                return sha384_vec;
+            case SHA512_HMAC:
+                return sha512_vec;
+            case SHA512_224_HMAC:
+                return sha512_224_vec;
+            case SHA512_256_HMAC:
+                return sha512_256_vec;
+            default:
+                throw new SelfTestExecutor.TestFailedException("unknown PRF");
+            }
         }
     }
 }

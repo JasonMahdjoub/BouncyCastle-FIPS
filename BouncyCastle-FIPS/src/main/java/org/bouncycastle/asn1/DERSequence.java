@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.util.Enumeration;
 
 /**
- * A DER encoded SEQUENCE object
+ * Definite length SEQUENCE, encoding tells explicit number of bytes
+ * that the content of this sequence occupies.
+ * <p>
+ * For X.690 syntax rules, see {@link ASN1Sequence}.
  */
 public class DERSequence
     extends ASN1Sequence
@@ -15,14 +18,14 @@ public class DERSequence
     private int bodyLength = -1;
 
     /**
-     * create an empty sequence
+     * Create an empty sequence
      */
     public DERSequence()
     {
     }
 
     /**
-     * create a sequence containing one object
+     * Create a sequence containing one object
      * @param obj the object to go in the sequence.
      */
     public DERSequence(
@@ -32,7 +35,7 @@ public class DERSequence
     }
 
     /**
-     * create a sequence containing a vector of objects.
+     * Create a sequence containing a vector of objects.
      * @param v the vector of objects to make up the sequence.
      */
     public DERSequence(
@@ -42,7 +45,7 @@ public class DERSequence
     }
 
     /**
-     * create a sequence containing an array of objects.
+     * Create a sequence containing an array of objects.
      * @param array the array of objects to make up the sequence.
      */
     public DERSequence(

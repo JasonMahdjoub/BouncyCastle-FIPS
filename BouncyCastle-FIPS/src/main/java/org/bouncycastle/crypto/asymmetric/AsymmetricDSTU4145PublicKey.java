@@ -29,7 +29,7 @@ public final class AsymmetricDSTU4145PublicKey
     {
         super(algorithm, params);
 
-        this.w = KeyUtils.validated(w);
+        this.w = KeyUtils.validated(getParameters().getDomainParameters().getCurve(), w);
     }
 
     public AsymmetricDSTU4145PublicKey(Algorithm algorithm, byte[] enc)
@@ -41,7 +41,9 @@ public final class AsymmetricDSTU4145PublicKey
     {
         super(algorithm, publicKeyInfo.getAlgorithm());
 
-        this.w = KeyUtils.validated(parsePublicKey(getParameters(), publicKeyInfo));
+        DSTU4145Parameters params = getParameters();
+
+        this.w = KeyUtils.validated(params.getDomainParameters().getCurve(), parsePublicKey(params, publicKeyInfo));
     }
 
     private static ECPoint parsePublicKey(DSTU4145Parameters dstu4145Parameters, SubjectPublicKeyInfo publicKeyInfo)

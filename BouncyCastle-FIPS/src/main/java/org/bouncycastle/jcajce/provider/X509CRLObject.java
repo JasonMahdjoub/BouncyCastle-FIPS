@@ -265,6 +265,19 @@ class X509CRLObject
         {
             throw new CRLException("Signature algorithm on CertificateList does not match TBSCertList.");
         }
+        
+        if (sigAlgParams != null)
+        {
+            try
+            {
+                // this needs to be called before initVerify
+                X509SignatureUtil.setSignatureParameters(sig, ASN1Primitive.fromByteArray(sigAlgParams));
+            }
+            catch (IOException e)
+            {
+                throw new SignatureException("cannot decode signature parameters: " + e.getMessage());
+            }
+        }
 
         sig.initVerify(key);
         sig.update(this.getTBSCertList());

@@ -20,7 +20,7 @@ public class BERSequenceGenerator
      * @throws IOException if the target stream cannot be written to.
      */
     public BERSequenceGenerator(
-        OutputStream out) 
+        OutputStream out)
         throws IOException
     {
         super(out);
@@ -40,11 +40,11 @@ public class BERSequenceGenerator
     public BERSequenceGenerator(
         OutputStream out,
         int tagNo,
-        boolean isExplicit) 
+        boolean isExplicit)
         throws IOException
     {
         super(out, tagNo, isExplicit);
-        
+
         writeBERHeader(BERTags.CONSTRUCTED | BERTags.SEQUENCE);
     }
 
@@ -66,7 +66,7 @@ public class BERSequenceGenerator
      *
      * @throws IOException if the target stream cannot be written.
      */
-    public void close() 
+    public void close()
         throws IOException
     {
         writeBEREnd();

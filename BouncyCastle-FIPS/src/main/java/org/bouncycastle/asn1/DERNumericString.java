@@ -10,15 +10,22 @@ import org.bouncycastle.util.Strings;
 
 /**
  * DER NumericString object - this is an ascii string of characters {0,1,2,3,4,5,6,7,8,9, }.
+ * ASN.1 NUMERIC-STRING object.
+ * <p>
+ * This is an ASCII string of characters {0,1,2,3,4,5,6,7,8,9} + space.
+ * <p>
+ * See X.680 section 37.2.
+ * <p>
+ * Explicit character set escape sequences are not allowed.
  */
 public class DERNumericString
     extends ASN1Primitive
     implements ASN1String
 {
-    private byte[]  string;
+    private final byte[]  string;
 
     /**
-     * return a Numeric string from the passed in object
+     * Return a Numeric string from the passed in object
      *
      * @param obj a DERNumericString or an object that can be converted into one.
      * @exception IllegalArgumentException if the object cannot be converted.
@@ -44,11 +51,11 @@ public class DERNumericString
             }
         }
 
-        throw new IllegalArgumentException("Illegal object in getInstance: " + obj.getClass().getName());
+        throw new IllegalArgumentException("illegal object in getInstance: " + obj.getClass().getName());
     }
 
     /**
-     * return an Numeric String from a tagged object.
+     * Return an Numeric String from a tagged object.
      *
      * @param obj the tagged object holding the object we want
      * @param explicit true if the object is meant to be explicitly
@@ -74,7 +81,7 @@ public class DERNumericString
     }
 
     /**
-     * basic constructor - with bytes.
+     * Basic constructor - with bytes.
      */
     DERNumericString(
         byte[]   string)
@@ -83,7 +90,7 @@ public class DERNumericString
     }
 
     /**
-     * basic constructor -  without validation..
+     * Basic constructor -  without validation..
      */
     public DERNumericString(
         String   string)

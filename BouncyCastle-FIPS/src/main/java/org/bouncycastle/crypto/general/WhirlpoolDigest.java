@@ -280,8 +280,6 @@ final class WhirlpoolDigest
     {
         _buffer[_bufferPos] = in;
 
-        //System.out.println("adding to buffer = "+_buffer[_bufferPos]);
-        
         ++_bufferPos;
         
         if (_bufferPos == _buffer.length)

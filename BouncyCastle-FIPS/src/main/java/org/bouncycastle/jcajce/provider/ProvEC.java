@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
 import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
@@ -52,6 +53,7 @@ import org.bouncycastle.crypto.fips.FipsKDF;
 import org.bouncycastle.crypto.fips.FipsSHS;
 import org.bouncycastle.crypto.general.EC;
 import org.bouncycastle.crypto.general.SecureHash;
+import org.bouncycastle.jcajce.spec.DHUParameterSpec;
 import org.bouncycastle.jcajce.spec.ECDomainParameterSpec;
 import org.bouncycastle.jcajce.spec.MQVParameterSpec;
 import org.bouncycastle.jcajce.spec.UserKeyingMaterialSpec;
@@ -61,9 +63,10 @@ import org.bouncycastle.util.Properties;
 class ProvEC
     extends AsymmetricAlgorithmProvider
 {
-    private static final AgreementFactory fipsDHFactory = new FipsEC.DHAgreementFactory();
-    private static final AgreementFactory fipsMQVFactory = Properties.isOverrideSet("org.bouncycastle.ec.disable_mqv") ? null : new FipsEC.MQVAgreementFactory();
-    private static final SignatureOperatorFactory fipsDsaFactory = new FipsEC.DSAOperatorFactory();
+    private static final AgreementFactory fipsDHFactory;
+    private static final AgreementFactory fipsDHUFactory;
+    private static final AgreementFactory fipsMQVFactory;
+    private static final SignatureOperatorFactory fipsDsaFactory;
 
     private static final Map<String, String> generalEcAttributes = new HashMap<String, String>();
 
@@ -75,6 +78,21 @@ class ProvEC
     {
         generalEcAttributes.put("SupportedKeyClasses", "java.security.interfaces.ECPublicKey|java.security.interfaces.ECPrivateKey");
         generalEcAttributes.put("SupportedKeyFormats", "PKCS#8|X.509");
+
+        if (Properties.isOverrideSet("org.bouncycastle.ec.disable"))
+        {
+            fipsDHFactory = null;
+            fipsDHUFactory = null;
+            fipsMQVFactory = null;
+            fipsDsaFactory = null;
+        }
+        else
+        {
+            fipsDHFactory = new FipsEC.DHAgreementFactory();
+            fipsDHUFactory = new FipsEC.DHUAgreementFactory();
+            fipsMQVFactory = Properties.isOverrideSet("org.bouncycastle.ec.disable_mqv") ? null : new FipsEC.MQVAgreementFactory();
+            fipsDsaFactory = new FipsEC.DSAOperatorFactory();
+        }
     }
 
     private static SignatureOperatorFactory getGeneralDSAFactory()
@@ -183,6 +201,41 @@ class ProvEC
                     throw new InvalidAlgorithmParameterException("ECCDH can only take a UserKeyingMaterialSpec");
                 }
                 return FipsEC.CDH;
+            }
+        };
+
+        final ParametersCreator cdhuParametersCreator = new ParametersCreator()
+        {
+
+            public Parameters createParameters(boolean forEncryption, AlgorithmParameterSpec spec, SecureRandom random)
+                throws InvalidAlgorithmParameterException
+            {
+                try
+                {
+                    if (!(spec instanceof DHUParameterSpec))
+                    {
+                        throw new InvalidAlgorithmParameterException("ECCDHU can only take an MQVParameterSpec");
+                    }
+
+                    DHUParameterSpec dhuSpec = (DHUParameterSpec)spec;
+
+                    if (dhuSpec.getEphemeralPublicKey() != null)
+                    {
+                        return FipsEC.CDHU.using(publicKeyConverter.convertKey(FipsEC.CDHU.getAlgorithm(), dhuSpec.getEphemeralPublicKey()),
+                            privateKeyConverter.convertKey(FipsEC.CDHU.getAlgorithm(), dhuSpec.getEphemeralPrivateKey()),
+                            publicKeyConverter.convertKey(FipsEC.CDHU.getAlgorithm(), dhuSpec.getOtherPartyEphemeralKey()));
+                    }
+                    else
+                    {
+                        return FipsEC.CDHU.using(
+                            privateKeyConverter.convertKey(FipsEC.CDHU.getAlgorithm(), dhuSpec.getEphemeralPrivateKey()),
+                            publicKeyConverter.convertKey(FipsEC.CDHU.getAlgorithm(), dhuSpec.getOtherPartyEphemeralKey()));
+                    }
+                }
+                catch (InvalidKeyException e)
+                {
+                    throw new InvalidAlgorithmParameterException("Unable to convert keys in MQVParameterSpec: " + e.getMessage(), e);
+                }
             }
         };
 
@@ -301,6 +354,30 @@ class ProvEC
         addConcatCDHAlgorithm(provider, "SHA512", FipsKDF.AgreementKDFPRF.SHA512, cdhParametersCreator);
         addConcatCDHAlgorithm(provider, "SHA512(224)", FipsKDF.AgreementKDFPRF.SHA512_224, cdhParametersCreator);
         addConcatCDHAlgorithm(provider, "SHA512(256)", FipsKDF.AgreementKDFPRF.SHA512_256, cdhParametersCreator);
+        addConcatCDHAlgorithm(provider, "SHA3-224", FipsKDF.AgreementKDFPRF.SHA3_224, cdhParametersCreator);
+        addConcatCDHAlgorithm(provider, "SHA3-256", FipsKDF.AgreementKDFPRF.SHA3_256, cdhParametersCreator);
+        addConcatCDHAlgorithm(provider, "SHA3-384", FipsKDF.AgreementKDFPRF.SHA3_384, cdhParametersCreator);
+        addConcatCDHAlgorithm(provider, "SHA3-512", FipsKDF.AgreementKDFPRF.SHA3_512, cdhParametersCreator);
+
+        addCDHUAlgorithm(provider, "SHA1", FipsKDF.AgreementKDFPRF.SHA1, cdhuParametersCreator);
+        addCDHUAlgorithm(provider, "SHA224", FipsKDF.AgreementKDFPRF.SHA224, cdhuParametersCreator);
+        addCDHUAlgorithm(provider, "SHA256", FipsKDF.AgreementKDFPRF.SHA256, cdhuParametersCreator);
+        addCDHUAlgorithm(provider, "SHA384", FipsKDF.AgreementKDFPRF.SHA384, cdhuParametersCreator);
+        addCDHUAlgorithm(provider, "SHA512", FipsKDF.AgreementKDFPRF.SHA512, cdhuParametersCreator);
+        addCDHUAlgorithm(provider, "SHA512(224)", FipsKDF.AgreementKDFPRF.SHA512_224, cdhuParametersCreator);
+        addCDHUAlgorithm(provider, "SHA512(256)", FipsKDF.AgreementKDFPRF.SHA512_256, cdhuParametersCreator);
+
+        addConcatCDHUAlgorithm(provider, "SHA1", FipsKDF.AgreementKDFPRF.SHA1, cdhuParametersCreator);
+        addConcatCDHUAlgorithm(provider, "SHA224", FipsKDF.AgreementKDFPRF.SHA224, cdhuParametersCreator);
+        addConcatCDHUAlgorithm(provider, "SHA256", FipsKDF.AgreementKDFPRF.SHA256, cdhuParametersCreator);
+        addConcatCDHUAlgorithm(provider, "SHA384", FipsKDF.AgreementKDFPRF.SHA384, cdhuParametersCreator);
+        addConcatCDHUAlgorithm(provider, "SHA512", FipsKDF.AgreementKDFPRF.SHA512, cdhuParametersCreator);
+        addConcatCDHUAlgorithm(provider, "SHA512(224)", FipsKDF.AgreementKDFPRF.SHA512_224, cdhuParametersCreator);
+        addConcatCDHUAlgorithm(provider, "SHA512(256)", FipsKDF.AgreementKDFPRF.SHA512_256, cdhuParametersCreator);
+        addConcatCDHUAlgorithm(provider, "SHA3-224", FipsKDF.AgreementKDFPRF.SHA3_224, cdhuParametersCreator);
+        addConcatCDHUAlgorithm(provider, "SHA3-256", FipsKDF.AgreementKDFPRF.SHA3_256, cdhuParametersCreator);
+        addConcatCDHUAlgorithm(provider, "SHA3-384", FipsKDF.AgreementKDFPRF.SHA3_384, cdhuParametersCreator);
+        addConcatCDHUAlgorithm(provider, "SHA3-512", FipsKDF.AgreementKDFPRF.SHA3_512, cdhuParametersCreator);
 
         provider.addAlgorithmImplementation("Signature.NONEWITHECDSA", PREFIX + "SignatureSpi$ecDSAwithNONE", generalEcAttributes, new EngineCreator()
         {
@@ -362,6 +439,34 @@ class ProvEC
                     return new BaseSignature(provider, getGeneralDSAFactory(), publicKeyConverter, privateKeyConverter, EC.DDSA.withDigestAlgorithm(FipsSHS.Algorithm.SHA512_256));
                 }
             }));
+            provider.addAlgorithmImplementation("Signature.SHA3-224WITHECDDSA", PREFIX + "SignatureSpi$ecDetDSA3_224", generalEcAttributes, new GuardedEngineCreator(new EngineCreator()
+            {
+                public Object createInstance(Object constructorParameter)
+                {
+                    return new BaseSignature(provider, getGeneralDSAFactory(), publicKeyConverter, privateKeyConverter, EC.DDSA.withDigestAlgorithm(FipsSHS.Algorithm.SHA3_224));
+                }
+            }));
+            provider.addAlgorithmImplementation("Signature.SHA3-256WITHECDDSA", PREFIX + "SignatureSpi$ecDetDSA3_256", generalEcAttributes, new GuardedEngineCreator(new EngineCreator()
+            {
+                public Object createInstance(Object constructorParameter)
+                {
+                    return new BaseSignature(provider, getGeneralDSAFactory(), publicKeyConverter, privateKeyConverter, EC.DDSA.withDigestAlgorithm(FipsSHS.Algorithm.SHA3_256));
+                }
+            }));
+            provider.addAlgorithmImplementation("Signature.SHA3-384WITHECDDSA", PREFIX + "SignatureSpi$ecDetDSA3_384", generalEcAttributes, new GuardedEngineCreator(new EngineCreator()
+            {
+                public Object createInstance(Object constructorParameter)
+                {
+                    return new BaseSignature(provider, getGeneralDSAFactory(), publicKeyConverter, privateKeyConverter, EC.DDSA.withDigestAlgorithm(FipsSHS.Algorithm.SHA3_384));
+                }
+            }));
+            provider.addAlgorithmImplementation("Signature.SHA3-512WITHECDDSA", PREFIX + "SignatureSpi$ecDetDSA3_512", generalEcAttributes, new GuardedEngineCreator(new EngineCreator()
+            {
+                public Object createInstance(Object constructorParameter)
+                {
+                    return new BaseSignature(provider, getGeneralDSAFactory(), publicKeyConverter, privateKeyConverter, EC.DDSA.withDigestAlgorithm(FipsSHS.Algorithm.SHA3_512));
+                }
+            }));
 
             provider.addAlias("Alg.Alias.Signature.ECDDSA", "SHA1WITHECDDSA");
             provider.addAlias("Alg.Alias.Signature.DETECDSA", "SHA1WITHECDDSA");
@@ -372,6 +477,10 @@ class ProvEC
             provider.addAlias("Alg.Alias.Signature.SHA512WITHDETECDSA", "SHA512WITHECDDSA");
             provider.addAlias("Alg.Alias.Signature.SHA512(224)WITHDETECDSA", "SHA512(224)WITHECDDSA");
             provider.addAlias("Alg.Alias.Signature.SHA512(256)WITHDETECDSA", "SHA512(256)WITHECDDSA");
+            provider.addAlias("Alg.Alias.Signature.SHA3-224WITHDETECDSA", "SHA3-224WITHECDDSA");
+            provider.addAlias("Alg.Alias.Signature.SHA3-256WITHDETECDSA", "SHA3-256WITHECDDSA");
+            provider.addAlias("Alg.Alias.Signature.SHA3-384WITHDETECDSA", "SHA3-384WITHECDDSA");
+            provider.addAlias("Alg.Alias.Signature.SHA3-512WITHDETECDSA", "SHA3-512WITHECDDSA");
         }
 
         addSignatureAlgorithm(provider, "SHA1", "ECDSA", PREFIX + "SignatureSpi$ecDSA1", X9ObjectIdentifiers.ecdsa_with_SHA1, generalEcAttributes, new EngineCreator()
@@ -424,6 +533,34 @@ class ProvEC
             public Object createInstance(Object constructorParameter)
             {
                 return new BaseSignature(provider, fipsDsaFactory, publicKeyConverter, privateKeyConverter, FipsEC.DSA.withDigestAlgorithm(FipsSHS.Algorithm.SHA512_256));
+            }
+        });
+        addSignatureAlgorithm(provider, "SHA3-224", "ECDSA", PREFIX + "SignatureSpi$ecDSA3_224", NISTObjectIdentifiers.id_ecdsa_with_sha3_224, generalEcAttributes, new EngineCreator()
+        {
+            public Object createInstance(Object constructorParameter)
+            {
+                return new BaseSignature(provider, fipsDsaFactory, publicKeyConverter, privateKeyConverter, FipsEC.DSA.withDigestAlgorithm(FipsSHS.Algorithm.SHA3_224));
+            }
+        });
+        addSignatureAlgorithm(provider, "SHA3-256", "ECDSA", PREFIX + "SignatureSpi$ecDSA3_256", NISTObjectIdentifiers.id_ecdsa_with_sha3_256, generalEcAttributes, new EngineCreator()
+        {
+            public Object createInstance(Object constructorParameter)
+            {
+                return new BaseSignature(provider, fipsDsaFactory, publicKeyConverter, privateKeyConverter, FipsEC.DSA.withDigestAlgorithm(FipsSHS.Algorithm.SHA3_256));
+            }
+        });
+        addSignatureAlgorithm(provider, "SHA3-384", "ECDSA", PREFIX + "SignatureSpi$ecDSA3_384", NISTObjectIdentifiers.id_ecdsa_with_sha3_384, generalEcAttributes, new EngineCreator()
+        {
+            public Object createInstance(Object constructorParameter)
+            {
+                return new BaseSignature(provider, fipsDsaFactory, publicKeyConverter, privateKeyConverter, FipsEC.DSA.withDigestAlgorithm(FipsSHS.Algorithm.SHA3_384));
+            }
+        });
+        addSignatureAlgorithm(provider, "SHA3-512", "ECDSA", PREFIX + "SignatureSpi$ecDSA3_512", NISTObjectIdentifiers.id_ecdsa_with_sha3_512, generalEcAttributes, new EngineCreator()
+        {
+            public Object createInstance(Object constructorParameter)
+            {
+                return new BaseSignature(provider, fipsDsaFactory, publicKeyConverter, privateKeyConverter, FipsEC.DSA.withDigestAlgorithm(FipsSHS.Algorithm.SHA3_512));
             }
         });
 
@@ -545,6 +682,30 @@ class ProvEC
             public Object createInstance(Object constructorParameter)
             {
                 return new BaseAgreement(fipsDHFactory, publicKeyConverter, privateKeyConverter, cdhParametersCreator, FipsKDF.CONCATENATION.withPRF(prf));
+            }
+        });
+    }
+
+    private void addCDHUAlgorithm(BouncyCastleFipsProvider provider, String digestName, final FipsKDF.AgreementKDFPRF prf, final ParametersCreator cdhParametersCreator)
+    {
+        String algorithm = "ECCDHUWITH" + digestName + "KDF";
+        addKeyAgreementAlgorithm(provider, algorithm, PREFIX + "KeyAgreementSpi$" + algorithm, generalEcAttributes, new EngineCreator()
+        {
+            public Object createInstance(Object constructorParameter)
+            {
+                return new BaseAgreement(fipsDHUFactory, publicKeyConverter, privateKeyConverter, cdhParametersCreator, FipsKDF.X963.withPRF(prf));
+            }
+        });
+    }
+
+    private void addConcatCDHUAlgorithm(BouncyCastleFipsProvider provider, String digestName, final FipsKDF.AgreementKDFPRF prf, final ParametersCreator cdhParametersCreator)
+    {
+        String algorithm = "ECCDHUWITH" + digestName + "CKDF";
+        addKeyAgreementAlgorithm(provider, algorithm, PREFIX + "KeyAgreementSpi$" + algorithm, generalEcAttributes, new EngineCreator()
+        {
+            public Object createInstance(Object constructorParameter)
+            {
+                return new BaseAgreement(fipsDHUFactory, publicKeyConverter, privateKeyConverter, cdhParametersCreator, FipsKDF.CONCATENATION.withPRF(prf));
             }
         });
     }
@@ -928,14 +1089,19 @@ class ProvEC
             {
                 // See if it's actually an OID string (SunJSSE ServerHandshaker setupEphemeralECDHKeys bug)
                 domainParameters = getDomainParametersFromGenSpec((ECGenParameterSpec)params);
+                if (domainParameters == null)
+                {
+                    throw new InvalidAlgorithmParameterException("unknown curve ID: " + ((ECGenParameterSpec)params).getName());
+                }
             }
             else if (params == null)
             {
-                domainParameters = new ECImplicitDomainParameters(CryptoServicesRegistrar.<ECDomainParameters>getProperty(CryptoServicesRegistrar.Property.EC_IMPLICITLY_CA));
+                domainParameters = CryptoServicesRegistrar.<ECDomainParameters>getProperty(CryptoServicesRegistrar.Property.EC_IMPLICITLY_CA);
                 if (domainParameters == null)
                 {
                     throw new InvalidAlgorithmParameterException("null AlgorithmParameterSpec passed but no implicit CA set");
                 }
+                domainParameters = new ECImplicitDomainParameters(domainParameters);
             }
             else
             {

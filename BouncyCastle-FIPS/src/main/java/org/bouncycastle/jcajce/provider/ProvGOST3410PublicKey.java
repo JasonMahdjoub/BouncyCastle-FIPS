@@ -117,12 +117,6 @@ class ProvGOST3410PublicKey
 
     public String toString()
     {
-        StringBuilder   buf = new StringBuilder();
-        String          nl = Strings.lineSeparator();
-
-        buf.append("GOST3410 Public Key").append(nl);
-        buf.append("    Y: ").append(this.getY().toString(16)).append(nl);
-
-        return buf.toString();
+        return KeyUtil.publicKeyToString("GOST3410", baseKey.getY(), baseKey.getParameters().getDomainParameters());
     }
 }

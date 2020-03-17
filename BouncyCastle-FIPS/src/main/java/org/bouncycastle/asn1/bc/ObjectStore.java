@@ -1,3 +1,6 @@
+/***************************************************************/
+/******    DO NOT EDIT THIS CLASS bc-java SOURCE FILE     ******/
+/***************************************************************/
 package org.bouncycastle.asn1.bc;
 
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -39,6 +42,11 @@ public class ObjectStore
 
     private ObjectStore(ASN1Sequence seq)
     {
+        if (seq.size() != 2)
+        {
+            throw new IllegalArgumentException("malformed sequence");
+        }
+        
         ASN1Encodable sData = seq.getObjectAt(0);
         if (sData instanceof EncryptedObjectStoreData)
         {

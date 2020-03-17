@@ -11,7 +11,7 @@ import java.security.spec.ECPublicKeySpec;
 import org.bouncycastle.crypto.Algorithm;
 import org.bouncycastle.crypto.asymmetric.AsymmetricECPublicKey;
 import org.bouncycastle.crypto.asymmetric.ECDomainParameters;
-import org.bouncycastle.util.Strings;
+import org.bouncycastle.util.Arrays;
 
 class ProvECPublicKey
     implements ECPublicKey, ProvKey<AsymmetricECPublicKey>
@@ -75,14 +75,7 @@ class ProvECPublicKey
 
     public String toString()
     {
-        StringBuilder   buf = new StringBuilder();
-        String          nl = Strings.lineSeparator();
-
-        buf.append("EC Public Key").append(nl);
-        buf.append("    X: ").append(baseKey.getW().getAffineXCoord().toBigInteger().toString(16)).append(nl);
-        buf.append("    Y: ").append(baseKey.getW().getAffineYCoord().toBigInteger().toString(16)).append(nl);
-
-        return buf.toString();
+        return KeyUtil.publicKeyToString("EC", baseKey.getW(), baseKey.getDomainParameters());
     }
 
     public boolean equals(Object o)
@@ -92,14 +85,23 @@ class ProvECPublicKey
             return true;
         }
 
-        if (!(o instanceof ProvECPublicKey))
+        if (!(o instanceof ECPublicKey))
         {
             return false;
         }
 
-        ProvECPublicKey other = (ProvECPublicKey)o;
+        if (o instanceof ProvECPublicKey)
+        {
+            ProvECPublicKey other = (ProvECPublicKey)o;
 
-        return this.baseKey.equals(other.baseKey);
+            return this.baseKey.equals(other.baseKey);
+        }
+        else
+        {
+            ECPublicKey other = (ECPublicKey)o;
+
+            return Arrays.areEqual(this.getEncoded(), other.getEncoded());
+        }
     }
 
     public int hashCode()

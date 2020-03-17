@@ -1,5 +1,6 @@
 package org.bouncycastle.jcajce.provider;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyFactory;
+import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.KeyStoreSpi;
 import java.security.NoSuchAlgorithmException;
@@ -38,6 +40,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.BERTags;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.bc.EncryptedObjectStoreData;
 import org.bouncycastle.asn1.bc.EncryptedPrivateKeyData;
@@ -50,7 +53,12 @@ import org.bouncycastle.asn1.bc.ObjectStoreIntegrityCheck;
 import org.bouncycastle.asn1.bc.PbkdMacIntegrityCheck;
 import org.bouncycastle.asn1.bc.SecretKeyData;
 import org.bouncycastle.asn1.cms.CCMParameters;
+import org.bouncycastle.asn1.kisa.KISAObjectIdentifiers;
+import org.bouncycastle.asn1.misc.MiscObjectIdentifiers;
+import org.bouncycastle.asn1.misc.ScryptParams;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
+import org.bouncycastle.asn1.nsri.NSRIObjectIdentifiers;
+import org.bouncycastle.asn1.ntt.NTTObjectIdentifiers;
 import org.bouncycastle.asn1.oiw.OIWObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.EncryptedPrivateKeyInfo;
 import org.bouncycastle.asn1.pkcs.EncryptionScheme;
@@ -60,8 +68,14 @@ import org.bouncycastle.asn1.pkcs.PBKDF2Params;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.crypto.CryptoServicesRegistrar;
+import org.bouncycastle.crypto.InvalidWrappingException;
+import org.bouncycastle.crypto.KDFCalculator;
+import org.bouncycastle.crypto.KDFOperatorFactory;
+import org.bouncycastle.crypto.KeyUnwrapper;
+import org.bouncycastle.crypto.KeyWrapper;
 import org.bouncycastle.crypto.OutputAEADDecryptor;
 import org.bouncycastle.crypto.OutputAEADEncryptor;
 import org.bouncycastle.crypto.PasswordBasedDeriver;
@@ -70,6 +84,12 @@ import org.bouncycastle.crypto.SymmetricSecretKey;
 import org.bouncycastle.crypto.fips.FipsAES;
 import org.bouncycastle.crypto.fips.FipsPBKD;
 import org.bouncycastle.crypto.fips.FipsSHS;
+import org.bouncycastle.crypto.fips.Scrypt;
+import org.bouncycastle.crypto.util.PBKDF2Config;
+import org.bouncycastle.crypto.util.PBKDFConfig;
+import org.bouncycastle.crypto.util.ScryptConfig;
+import org.bouncycastle.jcajce.BCFKSLoadStoreParameter;
+import org.bouncycastle.jcajce.BCLoadStoreParameter;
 import org.bouncycastle.jcajce.ConsistentKeyPair;
 import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.Strings;
@@ -91,6 +111,15 @@ class ProvBCFKS
         oidMap.put("HMACSHA256", PKCSObjectIdentifiers.id_hmacWithSHA256);
         oidMap.put("HMACSHA384", PKCSObjectIdentifiers.id_hmacWithSHA384);
         oidMap.put("HMACSHA512", PKCSObjectIdentifiers.id_hmacWithSHA512);
+        oidMap.put("SEED", KISAObjectIdentifiers.id_seedCBC);
+
+        oidMap.put("CAMELLIA.128", NTTObjectIdentifiers.id_camellia128_cbc);
+        oidMap.put("CAMELLIA.192", NTTObjectIdentifiers.id_camellia192_cbc);
+        oidMap.put("CAMELLIA.256", NTTObjectIdentifiers.id_camellia256_cbc);
+
+        oidMap.put("ARIA.128", NSRIObjectIdentifiers.id_aria128_cbc);
+        oidMap.put("ARIA.192", NSRIObjectIdentifiers.id_aria192_cbc);
+        oidMap.put("ARIA.256", NSRIObjectIdentifiers.id_aria256_cbc);
 
         publicAlgMap.put(PKCSObjectIdentifiers.rsaEncryption, "RSA");
         publicAlgMap.put(X9ObjectIdentifiers.id_ecPublicKey, "EC");
@@ -111,7 +140,7 @@ class ProvBCFKS
         return oid.getId();
     }
 
-    private static class BCFIPSKeyStoreSpi
+    static class BCFIPSKeyStoreSpi
         extends KeyStoreSpi
     {
         private final static BigInteger CERTIFICATE = BigInteger.valueOf(0);
@@ -120,18 +149,64 @@ class ProvBCFKS
         private final static BigInteger PROTECTED_PRIVATE_KEY = BigInteger.valueOf(3);
         private final static BigInteger PROTECTED_SECRET_KEY = BigInteger.valueOf(4);
 
+        private final boolean matchOnProbe;
         private final BouncyCastleFipsProvider fipsProvider;
         private final Map<String, ObjectData> entries = new HashMap<String, ObjectData>();
         private final Map<String, PrivateKey> privateKeyCache = new HashMap<String, PrivateKey>();
 
         private AlgorithmIdentifier hmacAlgorithm;
         private KeyDerivationFunc hmacPkbdAlgorithm;
-        private Date  creationDate;
-        private Date  lastModifiedDate;
+        private Date creationDate;
+        private Date lastModifiedDate;
+        private ASN1ObjectIdentifier storeEncryptionAlgorithm = NISTObjectIdentifiers.id_aes256_CCM;
 
-        BCFIPSKeyStoreSpi(BouncyCastleFipsProvider fipsProvider)
+        BCFIPSKeyStoreSpi(boolean matchOnProbe, BouncyCastleFipsProvider fipsProvider)
         {
+            this.matchOnProbe = matchOnProbe;
             this.fipsProvider = fipsProvider;
+        }
+
+        public boolean engineProbe(InputStream stream)
+            throws IOException
+        {
+            if (!matchOnProbe)
+            {
+                return false;
+            }
+
+            BufferedInputStream storeStream;
+            if (stream instanceof BufferedInputStream)
+            {
+                storeStream = (BufferedInputStream)stream;
+            }
+            else
+            {
+                storeStream = new BufferedInputStream(stream);
+            }
+
+            storeStream.mark(10);
+
+            int hdr = storeStream.read();
+
+            if (hdr != (BERTags.CONSTRUCTED | BERTags.SEQUENCE))
+            {
+                return false;
+            }
+
+            storeStream.reset();
+
+            ASN1InputStream asn1Stream = new ASN1InputStream(storeStream);
+
+            try
+            {
+                ObjectStore.getInstance(asn1Stream.readObject());
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+            return asn1Stream.available() == 0;
         }
 
         @Override
@@ -349,23 +424,37 @@ class ProvBCFKS
                     byte[] encodedKey = key.getEncoded();
 
                     KeyDerivationFunc pbkdAlgId = generatePkbdAlgorithmIdentifier(256 / 8);
-                    byte[] keyBytes = generateKey(pbkdAlgId, "PRIVATE_KEY_ENCRYPTION", ((password != null) ? password : new char[0]));
+                    byte[] keyBytes = generateKey(pbkdAlgId, "PRIVATE_KEY_ENCRYPTION", ((password != null) ? password : new char[0]), 256 / 8);
 
-                    FipsAES.AEADOperatorFactory opFact = new FipsAES.AEADOperatorFactory();
-                    FipsAES.AuthParameters      aeadParams = FipsAES.CCM.withIV(getDefaultSecureRandom());
-                    OutputAEADEncryptor         encryptor = opFact.createOutputAEADEncryptor(new SymmetricSecretKey(FipsAES.CCM, keyBytes), aeadParams);
+                    EncryptedPrivateKeyInfo keyInfo;
+                    if (storeEncryptionAlgorithm.equals(NISTObjectIdentifiers.id_aes256_CCM))
+                    {
+                        FipsAES.AEADOperatorFactory opFact = new FipsAES.AEADOperatorFactory();
+                        FipsAES.AuthParameters aeadParams = FipsAES.CCM.withIV(getDefaultSecureRandom());
+                        OutputAEADEncryptor encryptor = opFact.createOutputAEADEncryptor(new SymmetricSecretKey(FipsAES.CCM, keyBytes), aeadParams);
 
-                    ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+                        ByteArrayOutputStream bOut = new ByteArrayOutputStream();
 
-                    OutputStream encOut = encryptor.getEncryptingStream(bOut);
+                        OutputStream encOut = encryptor.getEncryptingStream(bOut);
 
-                    encOut.write(encodedKey);
+                        encOut.write(encodedKey);
 
-                    encOut.close();
+                        encOut.close();
 
-                    PBES2Parameters pbeParams = new PBES2Parameters(pbkdAlgId, new EncryptionScheme(NISTObjectIdentifiers.id_aes256_CCM, new CCMParameters(aeadParams.getIV(), aeadParams.getMACSizeInBits() / 8)));
+                        PBES2Parameters pbeParams = new PBES2Parameters(pbkdAlgId, new EncryptionScheme(NISTObjectIdentifiers.id_aes256_CCM, new CCMParameters(aeadParams.getIV(), aeadParams.getMACSizeInBits() / 8)));
 
-                    EncryptedPrivateKeyInfo keyInfo = new EncryptedPrivateKeyInfo(new AlgorithmIdentifier(PKCSObjectIdentifiers.id_PBES2, pbeParams), bOut.toByteArray());
+                        keyInfo = new EncryptedPrivateKeyInfo(new AlgorithmIdentifier(PKCSObjectIdentifiers.id_PBES2, pbeParams), bOut.toByteArray());
+                    }
+                    else
+                    {
+                        FipsAES.KeyWrapOperatorFactory opFact = new FipsAES.KeyWrapOperatorFactory();
+                        FipsAES.WrapParameters wrapParams = FipsAES.KWP;
+                        KeyWrapper wrapper = opFact.createKeyWrapper(new SymmetricSecretKey(FipsAES.KWP, keyBytes), wrapParams);
+
+                        PBES2Parameters pbeParams = new PBES2Parameters(pbkdAlgId, new EncryptionScheme(NISTObjectIdentifiers.id_aes256_wrap_pad));
+
+                        keyInfo = new EncryptedPrivateKeyInfo(new AlgorithmIdentifier(PKCSObjectIdentifiers.id_PBES2, pbeParams), wrapper.wrap(encodedKey, 0, encodedKey.length));
+                    }
 
                     EncryptedPrivateKeyData keySeq = createPrivateKeySequence(keyInfo, chain);
 
@@ -387,40 +476,66 @@ class ProvBCFKS
                 {
                     byte[] encodedKey = key.getEncoded();
 
-                    KeyDerivationFunc pbkdAlgId = generatePkbdAlgorithmIdentifier(256 / 8);
-                    byte[] keyBytes = generateKey(pbkdAlgId, "SECRET_KEY_ENCRYPTION", ((password != null) ? password : new char[0]));
+                    String keyAlg = Strings.toUpperCase(key.getAlgorithm());
+                    SecretKeyData secKeyData;
 
-                    FipsAES.AEADOperatorFactory opFact = new FipsAES.AEADOperatorFactory();
-                    FipsAES.AuthParameters      aeadParams = FipsAES.CCM.withIV(getDefaultSecureRandom());
-                    OutputAEADEncryptor         encryptor = opFact.createOutputAEADEncryptor(new SymmetricSecretKey(FipsAES.CCM, keyBytes), aeadParams);
-
-                    ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-
-                    OutputStream encOut = encryptor.getEncryptingStream(bOut);
-                    String       keyAlg = Strings.toUpperCase(key.getAlgorithm());
-
-                    if (keyAlg.contains("AES"))
+                    if (keyAlg.indexOf("AES") > -1)
                     {
-                        encOut.write(new SecretKeyData(NISTObjectIdentifiers.aes, encodedKey).getEncoded());
+                        secKeyData = new SecretKeyData(NISTObjectIdentifiers.aes, encodedKey);
                     }
                     else
                     {
                         ASN1ObjectIdentifier algOid = oidMap.get(keyAlg);
                         if (algOid != null)
                         {
-                            encOut.write(new SecretKeyData(algOid, encodedKey).getEncoded());
+                            secKeyData = new SecretKeyData(algOid, encodedKey);
                         }
                         else
                         {
-                            throw new KeyStoreException("BCFKS KeyStore cannot recognize secret key (" + keyAlg + ") for storage.");
+                            algOid = oidMap.get(keyAlg + "." + (encodedKey.length * 8));
+                            if (algOid != null)
+                            {
+                                secKeyData = new SecretKeyData(algOid, encodedKey);
+                            }
+                            else
+                            {
+                                throw new KeyStoreException("BCFKS KeyStore cannot recognize secret key (" + keyAlg + ") for storage.");
+                            }
                         }
                     }
 
-                    encOut.close();
+                    KeyDerivationFunc pbkdAlgId = generatePkbdAlgorithmIdentifier(256 / 8);
+                    byte[] keyBytes = generateKey(pbkdAlgId, "SECRET_KEY_ENCRYPTION", ((password != null) ? password : new char[0]), 256 / 8);
 
-                    PBES2Parameters pbeParams = new PBES2Parameters(pbkdAlgId, new EncryptionScheme(NISTObjectIdentifiers.id_aes256_CCM, new CCMParameters(aeadParams.getIV(), aeadParams.getMACSizeInBits() / 8)));
+                    EncryptedSecretKeyData keyData;
+                    if (storeEncryptionAlgorithm.equals(NISTObjectIdentifiers.id_aes256_CCM))
+                    {
+                        FipsAES.AEADOperatorFactory opFact = new FipsAES.AEADOperatorFactory();
+                        FipsAES.AuthParameters aeadParams = FipsAES.CCM.withIV(getDefaultSecureRandom());
+                        OutputAEADEncryptor encryptor = opFact.createOutputAEADEncryptor(new SymmetricSecretKey(FipsAES.CCM, keyBytes), aeadParams);
 
-                    EncryptedSecretKeyData keyData = new EncryptedSecretKeyData(new AlgorithmIdentifier(PKCSObjectIdentifiers.id_PBES2, pbeParams), bOut.toByteArray());
+                        ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+
+                        OutputStream encOut = encryptor.getEncryptingStream(bOut);
+
+                        encOut.write(secKeyData.getEncoded());
+
+                        encOut.close();
+
+                        PBES2Parameters pbeParams = new PBES2Parameters(pbkdAlgId, new EncryptionScheme(NISTObjectIdentifiers.id_aes256_CCM, new CCMParameters(aeadParams.getIV(), aeadParams.getMACSizeInBits() / 8)));
+
+                        keyData = new EncryptedSecretKeyData(new AlgorithmIdentifier(PKCSObjectIdentifiers.id_PBES2, pbeParams), bOut.toByteArray());
+                    }
+                    else
+                    {
+                        FipsAES.KeyWrapOperatorFactory opFact = new FipsAES.KeyWrapOperatorFactory();
+                        FipsAES.WrapParameters wrapParams = FipsAES.KWP;
+                        KeyWrapper wrapper = opFact.createKeyWrapper(new SymmetricSecretKey(FipsAES.KWP, keyBytes), wrapParams);
+
+                        PBES2Parameters pbeParams = new PBES2Parameters(pbkdAlgId, new EncryptionScheme(NISTObjectIdentifiers.id_aes256_wrap_pad));
+
+                        keyData = new EncryptedSecretKeyData(new AlgorithmIdentifier(PKCSObjectIdentifiers.id_PBES2, pbeParams), wrapper.wrap(encodedKey, 0, encodedKey.length));
+                    }
 
                     entries.put(alias, new ObjectData(SECRET_KEY, alias, creationDate, lastEditDate, keyData.getEncoded(), null));
                 }
@@ -516,9 +631,9 @@ class ProvBCFKS
         public void engineSetCertificateEntry(String alias, Certificate certificate)
             throws KeyStoreException
         {
-            ObjectData  entry =  entries.get(alias);
-            Date        creationDate = new Date();
-            Date        lastEditDate = creationDate;
+            ObjectData entry = entries.get(alias);
+            Date creationDate = new Date();
+            Date lastEditDate = creationDate;
 
             if (entry != null)
             {
@@ -559,7 +674,7 @@ class ProvBCFKS
         public void engineDeleteEntry(String alias)
             throws KeyStoreException
         {
-            ObjectData  entry = entries.get(alias);
+            ObjectData entry = entries.get(alias);
 
             if (entry == null)
             {
@@ -654,16 +769,16 @@ class ProvBCFKS
                 return null;
             }
 
-            for (Iterator<String> it = entries.keySet().iterator(); it.hasNext();)
+            for (Iterator<Map.Entry<String, ObjectData>> it = entries.entrySet().iterator(); it.hasNext(); )
             {
-                String alias = it.next();
-                ObjectData ent = entries.get(alias);
+                Map.Entry<String, ObjectData> entry = it.next();
+                ObjectData ent = entry.getValue();
 
                 if (ent.getType().equals(CERTIFICATE))
                 {
                     if (Arrays.areEqual(ent.getData(), encodedCert))
                     {
-                        return alias;
+                        return entry.getKey();
                     }
                 }
                 else if (ent.getType().equals(PRIVATE_KEY) || ent.getType().equals(PROTECTED_PRIVATE_KEY))
@@ -673,7 +788,7 @@ class ProvBCFKS
                         EncryptedPrivateKeyData encPrivData = EncryptedPrivateKeyData.getInstance(ent.getData());
                         if (Arrays.areEqual(encPrivData.getCertificateChain()[0].toASN1Primitive().getEncoded(), encodedCert))
                         {
-                            return alias;
+                            return entry.getKey();
                         }
                     }
                     catch (IOException e)
@@ -686,40 +801,138 @@ class ProvBCFKS
             return null;
         }
 
-        private byte[] generateKey(KeyDerivationFunc pbkdAlgorithm, String purpose, char[] password)
+        private KeyDerivationFunc generatePkbdAlgorithmIdentifier(PBKDFConfig pbkdfConfig, int keySizeInBytes)
+        {
+            if (MiscObjectIdentifiers.id_scrypt.equals(pbkdfConfig.getAlgorithm()))
+            {
+                ScryptConfig scryptConfig = (ScryptConfig)pbkdfConfig;
+
+                byte[] pbkdSalt = new byte[scryptConfig.getSaltLength()];
+                getDefaultSecureRandom().nextBytes(pbkdSalt);
+
+                ScryptParams params = new ScryptParams(
+                    pbkdSalt,
+                    scryptConfig.getCostParameter(), scryptConfig.getBlockSize(), scryptConfig.getParallelizationParameter(), keySizeInBytes);
+
+                return new KeyDerivationFunc(MiscObjectIdentifiers.id_scrypt, params);
+            }
+            else
+            {
+                PBKDF2Config pbkdf2Config = (PBKDF2Config)pbkdfConfig;
+
+                byte[] pbkdSalt = new byte[pbkdf2Config.getSaltLength()];
+                getDefaultSecureRandom().nextBytes(pbkdSalt);
+
+                return new KeyDerivationFunc(PKCSObjectIdentifiers.id_PBKDF2, new PBKDF2Params(pbkdSalt, pbkdf2Config.getIterationCount(), keySizeInBytes, pbkdf2Config.getPRF()));
+            }
+        }
+
+        private KeyDerivationFunc generatePkbdAlgorithmIdentifier(KeyDerivationFunc baseAlg, int keySizeInBytes)
+        {
+            if (MiscObjectIdentifiers.id_scrypt.equals(baseAlg.getAlgorithm()))
+            {
+                ScryptParams oldParams = ScryptParams.getInstance(baseAlg.getParameters());
+
+                byte[] pbkdSalt = new byte[oldParams.getSalt().length];
+                getDefaultSecureRandom().nextBytes(pbkdSalt);
+
+                ScryptParams params = new ScryptParams(
+                    pbkdSalt,
+                    oldParams.getCostParameter(), oldParams.getBlockSize(), oldParams.getParallelizationParameter(), BigInteger.valueOf(keySizeInBytes));
+
+                return new KeyDerivationFunc(MiscObjectIdentifiers.id_scrypt, params);
+            }
+            else
+            {
+                PBKDF2Params oldParams = PBKDF2Params.getInstance(baseAlg.getParameters());
+
+                byte[] pbkdSalt = new byte[oldParams.getSalt().length];
+                getDefaultSecureRandom().nextBytes(pbkdSalt);
+
+                PBKDF2Params params = new PBKDF2Params(pbkdSalt,
+                    oldParams.getIterationCount().intValue(), keySizeInBytes, oldParams.getPrf());
+                return new KeyDerivationFunc(PKCSObjectIdentifiers.id_PBKDF2, params);
+            }
+        }
+
+        private byte[] generateKey(KeyDerivationFunc pbkdAlgorithm, String purpose, char[] password, int defKeySize)
             throws IOException
         {
-            FipsPBKD.DeriverFactory pbeFact = new FipsPBKD.DeriverFactory();
-
             byte[] encPassword = PasswordConverter.PKCS12.convert(password);
             byte[] differentiator = PasswordConverter.PKCS12.convert(purpose.toCharArray());
 
-            FipsPBKD.Parameters parameters;
-            int                 keySizeInBytes;
-            if (pbkdAlgorithm.getAlgorithm().equals(PKCSObjectIdentifiers.id_PBKDF2))
+            int keySizeInBytes = defKeySize;
+
+            if (MiscObjectIdentifiers.id_scrypt.equals(pbkdAlgorithm.getAlgorithm()))
+            {
+                ScryptParams params = ScryptParams.getInstance(pbkdAlgorithm.getParameters());
+
+                if (params.getKeyLength() != null)
+                {
+                    keySizeInBytes = params.getKeyLength().intValue();
+                }
+                else if (keySizeInBytes == -1)
+                {
+                    throw new IOException("no keyLength found in ScryptParams");
+                }
+
+                KDFOperatorFactory scryptFact = new Scrypt.KDFFactory();
+
+                byte[] seed = Arrays.concatenate(encPassword, differentiator);
+
+                KDFCalculator calculator = scryptFact.createKDFCalculator(Scrypt.ALGORITHM.using(params.getSalt(),
+                    params.getCostParameter().intValue(), params.getBlockSize().intValue(),
+                    params.getBlockSize().intValue(), seed));
+
+                byte[] rv = new byte[keySizeInBytes];
+
+                calculator.generateBytes(rv);
+
+                Arrays.clear(seed);
+                Arrays.clear(encPassword);
+
+                return rv;
+            }
+            else if (pbkdAlgorithm.getAlgorithm().equals(PKCSObjectIdentifiers.id_PBKDF2))
             {
                 PBKDF2Params pbkdf2Params = PBKDF2Params.getInstance(pbkdAlgorithm.getParameters());
 
+                if (pbkdf2Params.getKeyLength() != null)
+                {
+                    keySizeInBytes = pbkdf2Params.getKeyLength().intValue();
+                }
+                else if (keySizeInBytes == -1)
+                {
+                    throw new IOException("no keyLength found in PBKDF2Params");
+                }
+
+                FipsPBKD.DeriverFactory pbeFact = new FipsPBKD.DeriverFactory();
+                FipsPBKD.Parameters parameters;
                 if (pbkdf2Params.getPrf().getAlgorithm().equals(PKCSObjectIdentifiers.id_hmacWithSHA512))
                 {
                     parameters = FipsPBKD.PBKDF2.using(FipsSHS.Algorithm.SHA512_HMAC, Arrays.concatenate(encPassword, differentiator))
                         .withIterationCount(pbkdf2Params.getIterationCount().intValue())
                         .withSalt(pbkdf2Params.getSalt());
-                    keySizeInBytes = pbkdf2Params.getKeyLength().intValue();
+                }
+                else if (pbkdf2Params.getPrf().getAlgorithm().equals(NISTObjectIdentifiers.id_hmacWithSHA3_512))
+                {
+                    parameters = FipsPBKD.PBKDF2.using(FipsSHS.Algorithm.SHA3_512_HMAC, Arrays.concatenate(encPassword, differentiator))
+                        .withIterationCount(pbkdf2Params.getIterationCount().intValue())
+                        .withSalt(pbkdf2Params.getSalt());
                 }
                 else
                 {
-                    throw new IOException("BCFKS KeyStore: unrecognized MAC PBKD PRF.");
+                    throw new IOException("BCFKS KeyStore: unrecognized MAC PBKD PRF: " + pbkdf2Params.getPrf().getAlgorithm());
                 }
+
+                PasswordBasedDeriver deriver = pbeFact.createDeriver(parameters);
+
+                return deriver.deriveKey(PasswordBasedDeriver.KeyType.CIPHER, keySizeInBytes);
             }
             else
             {
                 throw new IOException("BCFKS KeyStore: unrecognized MAC PBKD.");
             }
-
-            PasswordBasedDeriver deriver = pbeFact.createDeriver(parameters);
-
-            return deriver.deriveKey(PasswordBasedDeriver.KeyType.CIPHER, keySizeInBytes);
         }
 
         private void verifyMac(byte[] content, PbkdMacIntegrityCheck integrityCheck, char[] password)
@@ -750,7 +963,7 @@ class ProvBCFKS
 
             try
             {
-                mac.init(new SecretKeySpec(generateKey(pbkdAlgorithm, "INTEGRITY_CHECK", ((password != null) ? password : new char[0])), algorithmId));
+                mac.init(new SecretKeySpec(generateKey(pbkdAlgorithm, "INTEGRITY_CHECK", ((password != null) ? password : new char[0]), -1), algorithmId));
             }
             catch (InvalidKeyException e)
             {
@@ -760,40 +973,223 @@ class ProvBCFKS
             return mac.doFinal(content);
         }
 
+        public void engineLoad(KeyStore.LoadStoreParameter parameter)
+            throws CertificateException, NoSuchAlgorithmException, IOException
+        {
+            if (parameter == null)
+            {
+                throw new IllegalArgumentException("'param' arg cannot be null");
+            }
+
+            if (parameter instanceof BCFKSLoadStoreParameter)
+            {
+                BCFKSLoadStoreParameter bcParam = (BCFKSLoadStoreParameter)parameter;
+
+                char[] password = Utils.extractPassword(bcParam);
+
+                hmacPkbdAlgorithm = generatePkbdAlgorithmIdentifier(bcParam.getStorePBKDFConfig(), 512 / 8);
+
+                if (bcParam.getStoreEncryptionAlgorithm() == BCFKSLoadStoreParameter.EncryptionAlgorithm.AES256_CCM)
+                {
+                    storeEncryptionAlgorithm = NISTObjectIdentifiers.id_aes256_CCM;
+                }
+                else
+                {
+                    storeEncryptionAlgorithm = NISTObjectIdentifiers.id_aes256_wrap_pad;
+                }
+
+                if (bcParam.getStoreMacAlgorithm() == BCFKSLoadStoreParameter.MacAlgorithm.HmacSHA512)
+                {
+                    hmacAlgorithm = new AlgorithmIdentifier(PKCSObjectIdentifiers.id_hmacWithSHA512, DERNull.INSTANCE);
+                }
+                else
+                {
+                    hmacAlgorithm = new AlgorithmIdentifier(NISTObjectIdentifiers.id_hmacWithSHA3_512, DERNull.INSTANCE);
+                }
+
+                AlgorithmIdentifier presetHmacAlgorithm = hmacAlgorithm;
+                ASN1ObjectIdentifier presetStoreEncryptionAlgorithm = storeEncryptionAlgorithm;
+
+                InputStream inputStream = bcParam.getInputStream();
+                engineLoad(inputStream, password);
+
+                if (inputStream != null)
+                {
+                    if (!presetHmacAlgorithm.equals(hmacAlgorithm)
+                        || !isSimilarHmacPbkd(bcParam.getStorePBKDFConfig(), hmacPkbdAlgorithm)
+                        || !presetStoreEncryptionAlgorithm.equals(storeEncryptionAlgorithm))
+                    {
+                        throw new IOException("configuration parameters do not match existing store");
+                    }
+                }
+            }
+            else if (parameter instanceof BCLoadStoreParameter)
+            {
+                BCLoadStoreParameter bcParam = (BCLoadStoreParameter)parameter;
+
+                engineLoad(bcParam.getInputStream(), Utils.extractPassword(parameter));
+            }
+            else
+            {
+                throw new IllegalArgumentException(
+                    "no support for 'param' of type " + parameter.getClass().getName());
+            }
+        }
+
+        private boolean isSimilarHmacPbkd(PBKDFConfig storePBKDFConfig, KeyDerivationFunc hmacPkbdAlgorithm)
+        {
+            if (!storePBKDFConfig.getAlgorithm().equals(hmacPkbdAlgorithm.getAlgorithm()))
+            {
+                return false;
+            }
+
+            if (MiscObjectIdentifiers.id_scrypt.equals(hmacPkbdAlgorithm.getAlgorithm()))
+            {
+                if (!(storePBKDFConfig instanceof ScryptConfig))
+                {
+                    return false;
+                }
+                
+                ScryptConfig scryptConfig = (ScryptConfig)storePBKDFConfig;
+                ScryptParams sParams = ScryptParams.getInstance(hmacPkbdAlgorithm.getParameters());
+
+                if (scryptConfig.getSaltLength() != sParams.getSalt().length
+                    || scryptConfig.getBlockSize() != sParams.getBlockSize().intValue()
+                    || scryptConfig.getCostParameter() != sParams.getCostParameter().intValue()
+                    || scryptConfig.getParallelizationParameter() != sParams.getParallelizationParameter().intValue())
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (!(storePBKDFConfig instanceof PBKDF2Config))
+                {
+                    return false;
+                }
+
+                PBKDF2Config pbkdf2Config = (PBKDF2Config)storePBKDFConfig;
+                PBKDF2Params pbkdf2Params = PBKDF2Params.getInstance(hmacPkbdAlgorithm.getParameters());
+
+                if (pbkdf2Config.getSaltLength() != pbkdf2Params.getSalt().length
+                    || pbkdf2Config.getIterationCount() != pbkdf2Params.getIterationCount().intValue())
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public void engineStore(KeyStore.LoadStoreParameter parameter)
+            throws CertificateException, NoSuchAlgorithmException, IOException
+        {
+            if (parameter == null)
+            {
+                throw new IllegalArgumentException("'param' arg cannot be null");
+            }
+
+            if (parameter instanceof BCFKSLoadStoreParameter)
+            {
+                BCFKSLoadStoreParameter bcParam = (BCFKSLoadStoreParameter)parameter;
+
+                char[] password = Utils.extractPassword(bcParam);
+
+                hmacPkbdAlgorithm = generatePkbdAlgorithmIdentifier(bcParam.getStorePBKDFConfig(), 512 / 8);
+
+                if (bcParam.getStoreEncryptionAlgorithm() == BCFKSLoadStoreParameter.EncryptionAlgorithm.AES256_CCM)
+                {
+                    storeEncryptionAlgorithm = NISTObjectIdentifiers.id_aes256_CCM;
+                }
+                else
+                {
+                    storeEncryptionAlgorithm = NISTObjectIdentifiers.id_aes256_wrap_pad;
+                }
+
+                if (bcParam.getStoreMacAlgorithm() == BCFKSLoadStoreParameter.MacAlgorithm.HmacSHA512)
+                {
+                    hmacAlgorithm = new AlgorithmIdentifier(PKCSObjectIdentifiers.id_hmacWithSHA512, DERNull.INSTANCE);
+                }
+                else
+                {
+                    hmacAlgorithm = new AlgorithmIdentifier(NISTObjectIdentifiers.id_hmacWithSHA3_512, DERNull.INSTANCE);
+                }
+
+                engineStore(bcParam.getOutputStream(), password);
+            }
+            else if (parameter instanceof BCLoadStoreParameter)
+            {
+                BCLoadStoreParameter bcParam = (BCLoadStoreParameter)parameter;
+
+                engineStore(bcParam.getOutputStream(), Utils.extractPassword(parameter));
+            }
+            else
+            {
+                throw new IllegalArgumentException(
+                    "no support for 'param' of type " + parameter.getClass().getName());
+            }
+        }
+
         @Override
         public void engineStore(OutputStream outputStream, char[] password)
             throws IOException, NoSuchAlgorithmException, CertificateException
         {
+            if (creationDate == null)
+            {
+                throw new IOException("KeyStore not initialized");
+            }
+
             ObjectData[] dataArray = entries.values().toArray(new ObjectData[entries.size()]);
 
-            KeyDerivationFunc pbkdAlgId = generatePkbdAlgorithmIdentifier(256 / 8);
-            byte[] keyBytes = generateKey(pbkdAlgId, "STORE_ENCRYPTION", ((password != null) ? password : new char[0]));
+            KeyDerivationFunc pbkdAlgId = generatePkbdAlgorithmIdentifier(hmacPkbdAlgorithm, 256 / 8);
+            byte[] keyBytes = generateKey(pbkdAlgId, "STORE_ENCRYPTION", ((password != null) ? password : new char[0]), 256 / 8);
 
             ObjectStoreData storeData = new ObjectStoreData(hmacAlgorithm, creationDate, lastModifiedDate, new ObjectDataSequence(dataArray), null);
 
-            FipsAES.AEADOperatorFactory opFact = new FipsAES.AEADOperatorFactory();
-            FipsAES.AuthParameters      aeadParams = FipsAES.CCM.withIV(getDefaultSecureRandom());
-            OutputAEADEncryptor         encryptor = opFact.createOutputAEADEncryptor(new SymmetricSecretKey(FipsAES.CCM, keyBytes), aeadParams);
+            EncryptedObjectStoreData encStoreData;
+            if (storeEncryptionAlgorithm.equals(NISTObjectIdentifiers.id_aes256_CCM))
+            {
+                FipsAES.AEADOperatorFactory opFact = new FipsAES.AEADOperatorFactory();
+                FipsAES.AuthParameters aeadParams = FipsAES.CCM.withIV(getDefaultSecureRandom());
+                OutputAEADEncryptor encryptor = opFact.createOutputAEADEncryptor(new SymmetricSecretKey(FipsAES.CCM, keyBytes), aeadParams);
 
-            ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+                ByteArrayOutputStream bOut = new ByteArrayOutputStream();
 
-            OutputStream encOut = encryptor.getEncryptingStream(bOut);
+                OutputStream encOut = encryptor.getEncryptingStream(bOut);
 
-            encOut.write(storeData.getEncoded());
+                encOut.write(storeData.getEncoded());
 
-            encOut.close();
+                encOut.close();
 
-            PBES2Parameters pbeParams = new PBES2Parameters(pbkdAlgId, new EncryptionScheme(NISTObjectIdentifiers.id_aes256_CCM, new CCMParameters(aeadParams.getIV(), aeadParams.getMACSizeInBits() / 8)));
+                PBES2Parameters pbeParams = new PBES2Parameters(pbkdAlgId, new EncryptionScheme(NISTObjectIdentifiers.id_aes256_CCM, new CCMParameters(aeadParams.getIV(), aeadParams.getMACSizeInBits() / 8)));
 
-            EncryptedObjectStoreData encStoreData = new EncryptedObjectStoreData(new AlgorithmIdentifier(PKCSObjectIdentifiers.id_PBES2, pbeParams), bOut.toByteArray());
+                encStoreData = new EncryptedObjectStoreData(new AlgorithmIdentifier(PKCSObjectIdentifiers.id_PBES2, pbeParams), bOut.toByteArray());
+            }
+            else
+            {
+                FipsAES.KeyWrapOperatorFactory opFact = new FipsAES.KeyWrapOperatorFactory();
+                FipsAES.WrapParameters wrapParams = FipsAES.KWP;
+                KeyWrapper wrapper = opFact.createKeyWrapper(new SymmetricSecretKey(FipsAES.KWP, keyBytes), wrapParams);
+                PBES2Parameters pbeParams = new PBES2Parameters(pbkdAlgId, new EncryptionScheme(NISTObjectIdentifiers.id_aes256_wrap_pad));
+
+                byte[] data = storeData.getEncoded();
+
+                encStoreData = new EncryptedObjectStoreData(new AlgorithmIdentifier(PKCSObjectIdentifiers.id_PBES2, pbeParams), wrapper.wrap(data, 0, data.length));
+            }
 
             // update the salt
-            PBKDF2Params pbkdf2Params = PBKDF2Params.getInstance(hmacPkbdAlgorithm.getParameters());
+            if (MiscObjectIdentifiers.id_scrypt.equals(hmacPkbdAlgorithm.getAlgorithm()))
+            {
+                ScryptParams sParams = ScryptParams.getInstance(hmacPkbdAlgorithm.getParameters());
 
-            byte[] pbkdSalt = new byte[pbkdf2Params.getSalt().length];
-            getDefaultSecureRandom().nextBytes(pbkdSalt);
+                hmacPkbdAlgorithm = generatePkbdAlgorithmIdentifier(hmacPkbdAlgorithm, sParams.getKeyLength().intValue());
+            }
+            else
+            {
+                PBKDF2Params pbkdf2Params = PBKDF2Params.getInstance(hmacPkbdAlgorithm.getParameters());
 
-            hmacPkbdAlgorithm = new KeyDerivationFunc(hmacPkbdAlgorithm.getAlgorithm(), new PBKDF2Params(pbkdSalt, pbkdf2Params.getIterationCount().intValue(), pbkdf2Params.getKeyLength().intValue(), pbkdf2Params.getPrf()));
+                hmacPkbdAlgorithm = generatePkbdAlgorithmIdentifier(hmacPkbdAlgorithm, pbkdf2Params.getKeyLength().intValue());
+            }
 
             byte[] mac = calculateMac(encStoreData.getEncoded(), hmacAlgorithm, hmacPkbdAlgorithm, password);
 
@@ -813,7 +1209,6 @@ class ProvBCFKS
             privateKeyCache.clear();
 
             lastModifiedDate = creationDate = null;
-            hmacAlgorithm = null;
 
             if (inputStream == null)
             {
@@ -850,8 +1245,8 @@ class ProvBCFKS
             ObjectStoreData storeData;
             if (sData instanceof EncryptedObjectStoreData)
             {
-                EncryptedObjectStoreData    encryptedStoreData = (EncryptedObjectStoreData)sData;
-                AlgorithmIdentifier         protectAlgId = encryptedStoreData.getEncryptionAlgorithm();
+                EncryptedObjectStoreData encryptedStoreData = (EncryptedObjectStoreData)sData;
+                AlgorithmIdentifier protectAlgId = encryptedStoreData.getEncryptionAlgorithm();
 
                 storeData = ObjectStoreData.getInstance(decryptData("STORE_ENCRYPTION", protectAlgId, password, encryptedStoreData.getEncryptedContent().getOctets()));
             }
@@ -876,7 +1271,7 @@ class ProvBCFKS
                 throw new IOException("BCFKS KeyStore storeData integrity algorithm does not match store integrity algorithm.");
             }
 
-            for (Iterator it = storeData.getObjectDataSequence().iterator(); it.hasNext();)
+            for (Iterator it = storeData.getObjectDataSequence().iterator(); it.hasNext(); )
             {
                 ObjectData objData = ObjectData.getInstance(it.next());
 
@@ -895,34 +1290,190 @@ class ProvBCFKS
             PBES2Parameters pbes2Parameters = PBES2Parameters.getInstance(protectAlgId.getParameters());
             EncryptionScheme algId = pbes2Parameters.getEncryptionScheme();
 
-            if (!algId.getAlgorithm().equals(NISTObjectIdentifiers.id_aes256_CCM))
+            if (algId.getAlgorithm().equals(NISTObjectIdentifiers.id_aes256_CCM))
+            {
+                CCMParameters ccmParameters = CCMParameters.getInstance(algId.getParameters());
+                FipsAES.AuthParameters aeadParams = FipsAES.CCM.withIV(ccmParameters.getNonce()).withMACSize(ccmParameters.getIcvLen() * 8);
+                FipsAES.AEADOperatorFactory opFact = new FipsAES.AEADOperatorFactory();
+
+                byte[] keyBytes = generateKey(pbes2Parameters.getKeyDerivationFunc(), purpose, ((password != null) ? password : new char[0]), 32);
+
+                ByteArrayOutputStream bOut = new ByteArrayOutputStream();
+                OutputAEADDecryptor decryptor = opFact.createOutputAEADDecryptor(new SymmetricSecretKey(FipsAES.CCM, keyBytes), aeadParams);
+
+                OutputStream dOut = decryptor.getDecryptingStream(bOut);
+
+                dOut.write(encryptedData);
+
+                dOut.close();
+
+                return bOut.toByteArray();
+            }
+            else if (algId.getAlgorithm().equals(NISTObjectIdentifiers.id_aes256_wrap_pad))
+            {
+                FipsAES.WrapParameters kwpParams = FipsAES.KWP;
+                FipsAES.KeyWrapOperatorFactory opFact = new FipsAES.KeyWrapOperatorFactory();
+
+                byte[] keyBytes = generateKey(pbes2Parameters.getKeyDerivationFunc(), purpose, ((password != null) ? password : new char[0]), 32);
+
+                KeyUnwrapper decryptor = opFact.createKeyUnwrapper(new SymmetricSecretKey(FipsAES.KWP, keyBytes), kwpParams);
+
+                try
+                {
+                    return decryptor.unwrap(encryptedData, 0, encryptedData.length);
+                }
+                catch (InvalidWrappingException e)
+                {
+                    throw new IOException(e.getMessage());
+                }
+            }
+            else
             {
                 throw new IOException("BCFKS KeyStore cannot recognize protection encryption algorithm.");
             }
-
-            CCMParameters ccmParameters = CCMParameters.getInstance(algId.getParameters());
-            FipsAES.AuthParameters      aeadParams = FipsAES.CCM.withIV(ccmParameters.getNonce()).withMACSize(ccmParameters.getIcvLen() * 8);
-            FipsAES.AEADOperatorFactory opFact = new FipsAES.AEADOperatorFactory();
-
-            byte[] keyBytes = generateKey(pbes2Parameters.getKeyDerivationFunc(), purpose, ((password != null) ? password : new char[0]));
-
-            ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-            OutputAEADDecryptor decryptor = opFact.createOutputAEADDecryptor(new SymmetricSecretKey(FipsAES.CCM, keyBytes), aeadParams);
-
-            OutputStream dOut = decryptor.getDecryptingStream(bOut);
-
-            dOut.write(encryptedData);
-
-            dOut.close();
-
-            return bOut.toByteArray();
         }
 
         private KeyDerivationFunc generatePkbdAlgorithmIdentifier(int keySizeInBytes)
         {
             byte[] pbkdSalt = new byte[512 / 8];
             getDefaultSecureRandom().nextBytes(pbkdSalt);
-            return new KeyDerivationFunc(PKCSObjectIdentifiers.id_PBKDF2, new PBKDF2Params(pbkdSalt, 1024, keySizeInBytes, new AlgorithmIdentifier(PKCSObjectIdentifiers.id_hmacWithSHA512, DERNull.INSTANCE)));
+            return new KeyDerivationFunc(PKCSObjectIdentifiers.id_PBKDF2, new PBKDF2Params(pbkdSalt, 16384, keySizeInBytes, new AlgorithmIdentifier(PKCSObjectIdentifiers.id_hmacWithSHA512, DERNull.INSTANCE)));
+        }
+    }
+
+    static class BCFIPSImmutableKeyStoreSpi
+        extends BCFIPSKeyStoreSpi
+        implements PKCSObjectIdentifiers, X509ObjectIdentifiers
+    {
+        private final Map<String, byte[]> cache;
+        private final byte[] seedKey;
+
+        private boolean isLoaded;
+
+        public BCFIPSImmutableKeyStoreSpi(BouncyCastleFipsProvider provider)
+        {
+            super(false, provider);
+
+            try
+            {
+                this.seedKey = new byte[32];
+
+                if (provider != null)
+                {
+                    SecureRandom.getInstance("DEFAULT", provider).nextBytes(seedKey);
+                }
+                else
+                {
+                    SecureRandom.getInstance("DEFAULT").nextBytes(seedKey);
+                }
+            }
+            catch (NoSuchAlgorithmException e)
+            {
+                throw new IllegalArgumentException("can't create cert factory - " + e.toString());
+            }
+
+            this.cache = new HashMap<String, byte[]>();
+        }
+
+        public void engineDeleteEntry(
+            String alias)
+            throws KeyStoreException
+        {
+            throw new KeyStoreException("delete operation not supported in immutable mode");
+        }
+
+        public void engineSetKeyEntry(String alias, Key key, char[] password, Certificate[] chain)
+            throws KeyStoreException
+        {
+            throw new KeyStoreException("set operation not supported in immutable mode");
+        }
+
+        public void engineSetKeyEntry(String alias, byte[] keyEncoding, Certificate[] chain)
+            throws KeyStoreException
+        {
+            throw new KeyStoreException("set operation not supported in immutable mode");
+        }
+
+        public void engineSetCertificateEntry(String alias, Certificate cert)
+            throws KeyStoreException
+        {
+            throw new KeyStoreException("set operation not supported in immutable mode");
+        }
+
+        public void engineLoad(KeyStore.LoadStoreParameter loadStoreParameter)
+            throws IOException, NoSuchAlgorithmException, CertificateException
+        {
+            synchronized (this)
+            {
+                if (isLoaded)
+                {
+                    throw new IOException("immutable keystore already loaded");
+                }
+                this.isLoaded = true;
+            }
+            super.engineLoad(loadStoreParameter);
+        }
+
+        public void engineLoad(InputStream inputStream, char[] password)
+            throws IOException, NoSuchAlgorithmException, CertificateException
+        {
+            synchronized (this)
+            {
+                if (isLoaded)
+                {
+                    throw new IOException("immutable keystore already loaded");
+                }
+                this.isLoaded = true;
+            }
+            super.engineLoad(inputStream, password);
+        }
+
+        public Key engineGetKey(
+            String alias,
+            char[] password)
+            throws NoSuchAlgorithmException, UnrecoverableKeyException
+        {
+            byte[] mac = calculateMac(alias, password);
+
+            if (cache.containsKey(alias))
+            {
+                byte[] hash = cache.get(alias);
+
+                if (!Arrays.constantTimeAreEqual(hash, mac))
+                {
+                    throw new UnrecoverableKeyException("unable to recover key (" + alias + ")");
+                }
+            }
+
+            Key key = super.engineGetKey(alias, password);
+
+            if (key != null && !cache.containsKey(alias))
+            {
+                cache.put(alias, mac);
+            }
+
+            return key;
+        }
+
+        private byte[] calculateMac(String alias, char[] password)
+        {
+            byte[] encoding;
+            if (password != null)
+            {
+                encoding = Arrays.concatenate(Strings.toUTF8ByteArray(password), Strings.toUTF8ByteArray(alias));
+            }
+            else
+            {
+                encoding = Arrays.concatenate(seedKey, Strings.toUTF8ByteArray(alias));
+            }
+
+            byte[] rv = new byte[32];
+
+            new Scrypt.KDFFactory()
+                .createKDFCalculator(Scrypt.ALGORITHM.using(seedKey, 16384, 8, 1, encoding))
+                .generateBytes(rv);
+
+            return rv;
         }
     }
 
@@ -934,17 +1485,31 @@ class ProvBCFKS
         {
             public Object createInstance(Object constructorParameter)
             {
-                return new BCFIPSKeyStoreSpi(provider);
+                return new BCFIPSKeyStoreSpi(true, provider);
+            }
+        });
+        provider.addAlgorithmImplementation("KeyStore.IBCFKS", PREFIX + "IBCFKSKeyStore", new EngineCreator()
+        {
+            public Object createInstance(Object constructorParameter)
+            {
+                return new BCFIPSImmutableKeyStoreSpi(provider);
             }
         });
 
         if (!CryptoServicesRegistrar.isInApprovedOnlyMode())
         {
-            provider.addAlgorithmImplementation("KeyStore.BCFKS-DEF", PREFIX + "BCFKSDefKeyStore", new GuardedEngineCreator(new EngineCreator()
+            provider.addAlgorithmImplementation("KeyStore.BCFKS-DEF", PREFIX + "BCSFKSDefKeyStore", new GuardedEngineCreator(new EngineCreator()
             {
                 public Object createInstance(Object constructorParameter)
                 {
-                    return new BCFIPSKeyStoreSpi(null);
+                    return new BCFIPSKeyStoreSpi(false, null);
+                }
+            }));
+            provider.addAlgorithmImplementation("KeyStore.IBCFKS-DEF", PREFIX + "IBCFKSDefKeyStore", new GuardedEngineCreator(new EngineCreator()
+            {
+                public Object createInstance(Object constructorParameter)
+                {
+                    return new BCFIPSImmutableKeyStoreSpi(null);
                 }
             }));
         }

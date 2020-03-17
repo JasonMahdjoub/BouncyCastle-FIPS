@@ -189,7 +189,8 @@ public abstract class AsymmetricRSAKey
 
         public boolean canBeUsed(Usage usage)
         {
-            return keyUsage.compareAndSet(null, usage) || keyUsage.get().equals(usage);
+            // if usage is sign_verify we can move to encrypt (PKCS#10 usage allowed) otherwise reject SP 800-56B Section 6.1, paragraph 5
+            return keyUsage.compareAndSet(null, usage) || keyUsage.get().equals(usage) || keyUsage.compareAndSet(Usage.SIGN_OR_VERIFY, usage);
         }
     }
 }

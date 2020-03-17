@@ -27,6 +27,7 @@ import org.bouncycastle.crypto.fips.FipsPBKD;
 import org.bouncycastle.crypto.fips.FipsSHS;
 import org.bouncycastle.crypto.general.PBKD;
 import org.bouncycastle.crypto.general.SecureHash;
+import org.bouncycastle.jcajce.PBKDF2Key;
 import org.bouncycastle.jcajce.spec.PBKDF2KeySpec;
 import org.bouncycastle.jcajce.spec.PBKDF2ParameterSpec;
 
@@ -216,7 +217,7 @@ class ProvPBEPBKDF2
 
                 if (pbeSpec.getSalt() == null)
                 {
-                    throw new InvalidKeySpecException("Missing required salt");
+                    return new PBKDF2Key(((PBEKeySpec)keySpec).getPassword(), passwordConverter);
                 }
 
                 if (pbeSpec.getKeyLength() <= 0)

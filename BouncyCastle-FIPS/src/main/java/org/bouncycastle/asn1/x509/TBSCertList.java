@@ -5,7 +5,6 @@ package org.bouncycastle.asn1.x509;
 
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
-import java.util.Vector;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
@@ -310,14 +309,5 @@ public class TBSCertList
         }
 
         return new DERSequence(v);
-    }
-
-    public static void main(String[] args)
-    {
-        Vector v = new Vector();
-
-        Enumeration e = v.elements();
-
-        e.nextElement();
     }
 }

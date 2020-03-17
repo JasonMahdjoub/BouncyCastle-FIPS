@@ -20,6 +20,8 @@ import org.bouncycastle.crypto.asymmetric.NamedECDomainParameters;
 import org.bouncycastle.crypto.internal.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.internal.Digest;
 import org.bouncycastle.crypto.internal.Permissions;
+import org.bouncycastle.crypto.internal.params.EcDhuPrivateParameters;
+import org.bouncycastle.crypto.internal.params.EcDhuPublicParameters;
 import org.bouncycastle.crypto.internal.params.EcDomainParameters;
 import org.bouncycastle.crypto.internal.params.EcMqvPrivateParameters;
 import org.bouncycastle.crypto.internal.params.EcMqvPublicParameters;
@@ -30,6 +32,7 @@ import org.bouncycastle.crypto.internal.params.ParametersWithRandom;
 import org.bouncycastle.crypto.internal.test.ConsistencyTest;
 import org.bouncycastle.math.ec.ECConstants;
 import org.bouncycastle.math.ec.ECPoint;
+import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.Properties;
 import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.util.test.TestRandomBigInteger;
@@ -48,7 +51,8 @@ public final class FipsEC
         ECDSA,
         ECDH,
         ECCDH,
-        ECMQV
+        ECMQV,
+        ECCDHU
     }
 
     /**
@@ -57,6 +61,8 @@ public final class FipsEC
     public static final FipsAlgorithm ALGORITHM = new FipsAlgorithm("EC");
 
     private static final FipsAlgorithm ALGORITHM_MQV = new FipsAlgorithm("ECMQV", Variations.ECMQV);
+
+    private static final FipsAlgorithm ALGORITHM_DHU = new FipsAlgorithm("ECCDHU", Variations.ECCDHU);
 
     /**
      * Elliptic Curve DSA algorithm parameter source - default is SHA-1
@@ -74,13 +80,17 @@ public final class FipsEC
      * Elliptic Curve MQV algorithm parameter source.
      */
     public static final MQVAgreementParametersBuilder MQV = new MQVAgreementParametersBuilder();
-
+    /**
+     * Elliptic Curve cofactor Diffie-Hellman Unified algorithm parameter source.
+     */
+    public static final DHUAgreementParametersBuilder CDHU = new DHUAgreementParametersBuilder();
 
 
     private static final FipsEngineProvider<EcDsaSigner> DSA_PROVIDER;
     private static final FipsEngineProvider<EcDhBasicAgreement> DH_PROVIDER;
     private static final FipsEngineProvider<EcDhcBasicAgreement> CDH_PROVIDER;
     private static final FipsEngineProvider<EcMqvBasicAgreement> MQV_PROVIDER;
+    private static final FipsEngineProvider<EcDhcuBasicAgreement> DHU_PROVIDER;
 
     static
     {
@@ -88,6 +98,7 @@ public final class FipsEC
         DH_PROVIDER = new DhProvider();
         CDH_PROVIDER = new DhcProvider();
         MQV_PROVIDER = new MqvProvider();
+        DHU_PROVIDER = new DhuProvider();
 
         // FSM_STATE:3.EC.0,"ECDSA SIGN VERIFY KAT", "The module is performing ECDSA sign and verify KAT self-test"
         // FSM_TRANS:3.EC.0,"POWER ON SELF-TEST", "ECDSA SIGN VERIFY KAT", "Invoke ECDSA Sign/Verify  KAT self-test"
@@ -189,6 +200,17 @@ public final class FipsEC
         public KeyGenParameters(MQVAgreementParametersBuilder builder, ECDomainParameters domainParameters)
         {
             this(ALGORITHM_MQV, domainParameters);
+        }
+
+        /**
+         * Constructor for specifying the CDHU algorithm explicitly.
+         *
+         * @param builder the CDHU builder.
+         * @param domainParameters EC domain parameters representing the curve any generated keys will be for.
+         */
+        public KeyGenParameters(DHUAgreementParametersBuilder builder, ECDomainParameters domainParameters)
+        {
+            this(ALGORITHM_DHU, domainParameters);
         }
 
         /**
@@ -484,6 +506,159 @@ public final class FipsEC
     }
 
     /**
+     * Initial builder for DHU parameters.
+     */
+    public static final class DHUAgreementParametersBuilder
+        extends FipsParameters
+    {
+        DHUAgreementParametersBuilder()
+        {
+            super(ALGORITHM_DHU);
+        }
+
+        /**
+         * Constructor for EC DHU parameters from an ephemeral public/private key pair. This constructor
+         * will result in an agreement which returns the raw calculated agreement value, or shared secret.
+         *
+         * @param ephemeralKeyPair our ephemeral public/private key pair.
+         * @param otherPartyEphemeralKey the other party's ephemeral public key.
+         */
+        public DHUAgreementParameters using(AsymmetricKeyPair ephemeralKeyPair, AsymmetricECPublicKey otherPartyEphemeralKey)
+        {
+            return new DHUAgreementParameters((AsymmetricECPublicKey)ephemeralKeyPair.getPublicKey(), (AsymmetricECPrivateKey)ephemeralKeyPair.getPrivateKey(), otherPartyEphemeralKey, null);
+        }
+
+        /**
+         * Constructor for EC DHU parameters which assumes later calculation of our ephemeral public key. This constructor
+         * will result in an agreement which returns the raw calculated agreement value, or shared secret.
+         *
+         * @param ephemeralPrivateKey our ephemeral private key.
+         * @param otherPartyEphemeralKey the other party's ephemeral public key.
+         */
+        public DHUAgreementParameters using(AsymmetricECPrivateKey ephemeralPrivateKey, AsymmetricECPublicKey otherPartyEphemeralKey)
+        {
+            return new DHUAgreementParameters(null, ephemeralPrivateKey, otherPartyEphemeralKey, null);
+        }
+
+        /**
+         * Constructor for EC DHU parameters which results in an agreement returning the raw value.
+         *
+         * @param ephemeralPublicKey our ephemeral public key.
+         * @param ephemeralPrivateKey our ephemeral private key.
+         * @param otherPartyEphemeralKey the other party's ephemeral public key.
+         */
+        public DHUAgreementParameters using(AsymmetricECPublicKey ephemeralPublicKey, AsymmetricECPrivateKey ephemeralPrivateKey, AsymmetricECPublicKey otherPartyEphemeralKey)
+        {
+            return new DHUAgreementParameters(ephemeralPublicKey, ephemeralPrivateKey, otherPartyEphemeralKey, null);
+        }
+    }
+
+    /**
+     * Parameters for EC DHU key agreement.
+     */
+    public static final class DHUAgreementParameters
+        extends FipsAgreementParameters
+    {
+        private final AsymmetricECPublicKey ephemeralPublicKey;
+        private final AsymmetricECPrivateKey ephemeralPrivateKey;
+        private final AsymmetricECPublicKey otherPartyEphemeralKey;
+
+        private DHUAgreementParameters(AsymmetricECPublicKey ephemeralPublicKey, AsymmetricECPrivateKey ephemeralPrivateKey, AsymmetricECPublicKey otherPartyEphemeralKey, FipsAlgorithm digestAlgorithm)
+        {
+            super(ALGORITHM_DHU, digestAlgorithm);
+
+            this.ephemeralPublicKey = ephemeralPublicKey;
+            this.ephemeralPrivateKey = ephemeralPrivateKey;
+            this.otherPartyEphemeralKey = otherPartyEphemeralKey;
+        }
+
+        private DHUAgreementParameters(AsymmetricECPublicKey ephemeralPublicKey, AsymmetricECPrivateKey ephemeralPrivateKey, AsymmetricECPublicKey otherPartyEphemeralKey, FipsKDF.PRF prfAlgorithm, byte[] salt)
+        {
+            super(ALGORITHM_DHU, prfAlgorithm, salt);
+
+            this.ephemeralPublicKey = ephemeralPublicKey;
+            this.ephemeralPrivateKey = ephemeralPrivateKey;
+            this.otherPartyEphemeralKey = otherPartyEphemeralKey;
+        }
+
+        private DHUAgreementParameters(AsymmetricECPublicKey ephemeralPublicKey, AsymmetricECPrivateKey ephemeralPrivateKey, AsymmetricECPublicKey otherPartyEphemeralKey, FipsKDF.AgreementKDFParametersBuilder kdfType, byte[] iv, int outputSize)
+        {
+            super(ALGORITHM_DHU, kdfType, iv, outputSize);
+
+            this.ephemeralPublicKey = ephemeralPublicKey;
+            this.ephemeralPrivateKey = ephemeralPrivateKey;
+            this.otherPartyEphemeralKey = otherPartyEphemeralKey;
+        }
+
+        /**
+         * Return our ephemeral public key, if present.
+         *
+         * @return our ephemeral public key, or null.
+         */
+        public AsymmetricECPublicKey getEphemeralPublicKey()
+        {
+            return ephemeralPublicKey;
+        }
+
+        /**
+         * Return our ephemeral private key.
+         *
+         * @return our ephemeral private key.
+         */
+        public AsymmetricECPrivateKey getEphemeralPrivateKey()
+        {
+            return ephemeralPrivateKey;
+        }
+
+        /**
+         * Return the other party's ephemeral public key.
+         *
+         * @return the other party's ephemeral public key.
+         */
+        public AsymmetricECPublicKey getOtherPartyEphemeralKey()
+        {
+            return otherPartyEphemeralKey;
+        }
+
+        /**
+         * Add a digest algorithm to process the Z value with.
+         *
+         * @param digestAlgorithm digest algorithm to use.
+         * @return a new parameter set, including the digest algorithm
+         */
+        public DHUAgreementParameters withDigest(FipsAlgorithm digestAlgorithm)
+        {
+            return new DHUAgreementParameters(this.ephemeralPublicKey, this.ephemeralPrivateKey, this.otherPartyEphemeralKey, digestAlgorithm);
+        }
+
+        /**
+         * Add a PRF algorithm and salt to process the Z value with (as in SP 800-56C)
+         *
+         * @param prfAlgorithm PRF represent the MAC/HMAC algorithm to use.
+         * @param salt the salt to use to initialise the PRF
+         * @return a new parameter set, including the digest algorithm
+         */
+        public DHUAgreementParameters withPRF(FipsKDF.PRF prfAlgorithm, byte[] salt)
+        {
+            return new DHUAgreementParameters(this.ephemeralPublicKey, this.ephemeralPrivateKey, this.otherPartyEphemeralKey, prfAlgorithm, salt);
+        }
+
+        /**
+         * Add a KDF to process the Z value with. The outputSize parameter determines how many bytes
+         * will be generated.
+         *
+         * @param kdfType KDF builder type to use for parameter creation.
+         * @param iv the iv parameter for KDF initialization.
+         * @param outputSize the size of the output to be generated from the KDF.
+         * @return a new parameter set, the KDF definition.
+         */
+        public DHUAgreementParameters withKDF(FipsKDF.AgreementKDFParametersBuilder kdfType, byte[] iv, int outputSize)
+        {
+            return new DHUAgreementParameters(this.ephemeralPublicKey, this.ephemeralPrivateKey, this.otherPartyEphemeralKey, kdfType, iv, outputSize);
+        }
+    }
+    
+    /**
      * EC key pair generator class.
      */
     public static final class KeyPairGenerator
@@ -503,6 +678,8 @@ public final class FipsEC
         {
             super(keyGenParameters);
 
+            checkEnabled();
+
             if (CryptoServicesRegistrar.isInApprovedOnlyMode())
             {
                 validateCurveSize(keyGenParameters.getAlgorithm(), keyGenParameters.getDomainParameters());
@@ -510,7 +687,15 @@ public final class FipsEC
                 Utils.validateKeyPairGenRandom(random, Utils.getECCurveSecurityStrength(keyGenParameters.getDomainParameters().getCurve()), ALGORITHM);
             }
 
-            this.param = new EcKeyGenerationParameters(getDomainParams(keyGenParameters.getDomainParameters()), random);
+            if (this.getParameters().getAlgorithm().equals(FipsEC.DH.getAlgorithm()) && !ECConstants.ONE.equals(keyGenParameters.domainParameters.getH()))
+            {
+                this.param = new EcKeyGenerationParameters(getDomainParamsWithInv(keyGenParameters.getDomainParameters()), random);
+            }
+            else
+            {
+                this.param = new EcKeyGenerationParameters(getDomainParams(keyGenParameters.getDomainParameters()), random);
+            }
+
             this.domainParameters = keyGenParameters.getDomainParameters();
             this.engine.init(param);
         }
@@ -546,6 +731,11 @@ public final class FipsEC
     public static final class DHAgreementFactory
         extends FipsAgreementFactory<AgreementParameters>
     {
+        public DHAgreementFactory()
+        {
+            checkEnabled();
+        }
+
         /**
          * Return an Agreement operator based on Diffie-Hellman using EC keys.
          *
@@ -570,8 +760,17 @@ public final class FipsEC
                     validateCurveSize(key.getAlgorithm(), ecKey.getDomainParameters());
                 }
 
-                EcPrivateKeyParameters lwECKey = getLwKey(ecKey);
-
+                EcPrivateKeyParameters lwECKey;
+                if (!BigInteger.ONE.equals(ecKey.getDomainParameters().getH()))
+                {
+                    // pre-calculate HInv for co-factor clearing.
+                    lwECKey = getLwKeyWithInv(ecKey);
+                }
+                else
+                {
+                    lwECKey = getLwKey(ecKey);
+                }
+                
                 EcDhBasicAgreement ecdh = DH_PROVIDER.createEngine();
 
                 ecdh.init(lwECKey);
@@ -610,6 +809,7 @@ public final class FipsEC
     {
         public MQVAgreementFactory()
         {
+            checkEnabled();
             if (Properties.isOverrideSet("org.bouncycastle.ec.disable_mqv"))
             {
                 throw new UnsupportedOperationException("EC MQV has been disabled by setting \"org.bouncycastle.ec.disable_mqv\"");
@@ -644,11 +844,54 @@ public final class FipsEC
     }
 
     /**
+     * Factory for Agreement operators based on EC MQV
+     */
+    public static final class DHUAgreementFactory
+        extends FipsAgreementFactory<DHUAgreementParameters>
+    {
+        public DHUAgreementFactory()
+        {
+            checkEnabled();
+        }
+
+        /**
+         * Return an Agreement operator based on Diffie-Hellman Unified using EC keys.
+         *
+         * @param key the private key to initialize the Agreement with.
+         * @param parameters the parameters for configuring the agreement.
+         * @return a new Agreement operator for EC Diffie-Hellman Unified.
+         */
+        @Override
+        public FipsAgreement<DHUAgreementParameters> createAgreement(AsymmetricPrivateKey key, DHUAgreementParameters parameters)
+        {
+            AsymmetricECPrivateKey ecKey = (AsymmetricECPrivateKey)key;
+
+            if (CryptoServicesRegistrar.isInApprovedOnlyMode())
+            {
+                validateCurveSize(key.getAlgorithm(), ecKey.getDomainParameters());
+            }
+
+            EcPrivateKeyParameters lwECKey = getLwKey(ecKey);
+
+            EcDhcuBasicAgreement ecdh = DHU_PROVIDER.createEngine();
+
+            ecdh.init(new EcDhuPrivateParameters(lwECKey, parameters.ephemeralPrivateKey == null ? lwECKey : getLwKey(parameters.ephemeralPrivateKey)));
+
+            return new EcDHUAgreement<DHUAgreementParameters>(ecdh, parameters);
+        }
+    }
+
+    /**
      * Operator factory for creating EC DSA based signing and verification operators.
      */
     public static final class DSAOperatorFactory
         extends FipsSignatureOperatorFactory<DSAParameters>
     {
+        public DSAOperatorFactory()
+        {
+            checkEnabled();
+        }
+
         /**
          * Return a generator of EC DSA signatures. Note this operator needs to be associated with a SecureRandom to be
          * fully initialised.
@@ -701,6 +944,14 @@ public final class FipsEC
             ecdsaSigner.init(false, publicKeyParameters);
 
             return new DSAOutputVerifier<DSAParameters>(ecdsaSigner, digest, parameters);
+        }
+    }
+
+    private static void checkEnabled()
+    {
+        if (Properties.isOverrideSet("org.bouncycastle.ec.disable"))
+        {
+            throw new UnsupportedOperationException("EC has been disabled by setting \"org.bouncycastle.ec.disable\"");
         }
     }
 
@@ -817,6 +1068,33 @@ public final class FipsEC
                  }
              });
             break;
+        case ECCDHU:
+            SelfTestExecutor.validate(algorithm, kp, new ConsistencyTest<AsymmetricCipherKeyPair>()
+             {
+                 public boolean hasTestPassed(AsymmetricCipherKeyPair kp)
+                     throws Exception
+                 {
+                     EcDhcuBasicAgreement agreement = new EcDhcuBasicAgreement();
+
+                     agreement.init(new EcDhuPrivateParameters((EcPrivateKeyParameters)kp.getPrivate(), (EcPrivateKeyParameters)kp.getPrivate()));
+
+                     byte[] agree1 = agreement.calculateAgreement(new EcDhuPublicParameters((EcPublicKeyParameters)kp.getPublic(), (EcPublicKeyParameters)kp.getPublic()));
+
+                     AsymmetricCipherKeyPair testSKP = getTestKeyPair(kp);
+                     AsymmetricCipherKeyPair testEKP = getTestKeyPair(kp);
+
+                     agreement.init(new EcDhuPrivateParameters((EcPrivateKeyParameters)kp.getPrivate(), (EcPrivateKeyParameters)kp.getPrivate()));
+
+                     byte[] agree2 = agreement.calculateAgreement(new EcDhuPublicParameters((EcPublicKeyParameters)testSKP.getPublic(), (EcPublicKeyParameters)testEKP.getPublic()));
+
+                     agreement.init(new EcDhuPrivateParameters((EcPrivateKeyParameters)testSKP.getPrivate(), (EcPrivateKeyParameters)testEKP.getPrivate()));
+
+                     byte[] agree3 = agreement.calculateAgreement(new EcDhuPublicParameters((EcPublicKeyParameters)kp.getPublic(), (EcPublicKeyParameters)kp.getPublic()));
+
+                     return !Arrays.areEqual(agree1, agree2) && Arrays.areEqual(agree2, agree3);
+                 }
+             });
+            break;
         default:
             throw new IllegalStateException("Unhandled EC algorithm: " + algorithm.getName());
         }
@@ -825,7 +1103,7 @@ public final class FipsEC
     private static AsymmetricCipherKeyPair getKATKeyPair()
     {
         X9ECParameters p = NISTNamedCurves.getByName("P-256");
-        EcDomainParameters params = new EcDomainParameters(p.getCurve(), p.getG(), p.getN(), p.getH());
+        EcDomainParameters params = new EcDomainParameters(new ECDomainParameters(p.getCurve(), p.getG(), p.getN(), p.getH(), p.getSeed()));
         EcPrivateKeyParameters priKey = new EcPrivateKeyParameters(
             new BigInteger("20186677036482506117540275567393538695075300175221296989956723148347484984008"), // d
             params);
@@ -872,6 +1150,8 @@ public final class FipsEC
     private static class DhProvider
         extends FipsEngineProvider<EcDhBasicAgreement>
     {
+        static BigInteger expected = new BigInteger("cad5c428ea0645794bc5634549e08a3ed563bd0cf32e909862e08b41d4b6fc17", 16);
+
         public EcDhBasicAgreement createEngine()
         {
             return SelfTestExecutor.validate(ALGORITHM, new EcDhBasicAgreement(), new VariantKatTest<EcDhBasicAgreement>()
@@ -885,8 +1165,6 @@ public final class FipsEC
 
                     agreement.init(kp.getPrivate());
 
-                    BigInteger expected = new BigInteger("cad5c428ea0645794bc5634549e08a3ed563bd0cf32e909862e08b41d4b6fc17", 16);
-
                     if (!expected.equals(agreement.calculateAgreement(testOther.getPublic())))
                     {
                         fail("KAT ECDH agreement not verified");
@@ -899,6 +1177,8 @@ public final class FipsEC
     private static class DhcProvider
         extends FipsEngineProvider<EcDhcBasicAgreement>
     {
+        static final BigInteger expected = new BigInteger("cad5c428ea0645794bc5634549e08a3ed563bd0cf32e909862e08b41d4b6fc17", 16);
+
         public EcDhcBasicAgreement createEngine()
         {
             return SelfTestExecutor.validate(ALGORITHM, new EcDhcBasicAgreement(), new VariantKatTest<EcDhcBasicAgreement>()
@@ -912,8 +1192,6 @@ public final class FipsEC
 
                     agreement.init(kp.getPrivate());
 
-                    BigInteger expected = new BigInteger("cad5c428ea0645794bc5634549e08a3ed563bd0cf32e909862e08b41d4b6fc17", 16);
-
                     if (!expected.equals(agreement.calculateAgreement(testOther.getPublic())))
                     {
                         fail("KAT ECDH agreement not verified");
@@ -926,6 +1204,8 @@ public final class FipsEC
     private static class MqvProvider
         extends FipsEngineProvider<EcMqvBasicAgreement>
     {
+        static final BigInteger expected = new BigInteger("8cae3483c0d3dac87d1c1d32be8e7b7a3c1558bd01cb7e7bb37c1c81126b0f98", 16);
+
         public EcMqvBasicAgreement createEngine()
         {
             return SelfTestExecutor.validate(ALGORITHM, new EcMqvBasicAgreement(), new VariantKatTest<EcMqvBasicAgreement>()
@@ -942,11 +1222,40 @@ public final class FipsEC
 
                     BigInteger calculated = agreement.calculateAgreement(new EcMqvPublicParameters((EcPublicKeyParameters)testSKP.getPublic(), (EcPublicKeyParameters)testEKP.getPublic()));
 
-                    BigInteger expected = new BigInteger("8cae3483c0d3dac87d1c1d32be8e7b7a3c1558bd01cb7e7bb37c1c81126b0f98", 16);
-
                     if (!expected.equals(calculated))
                     {
                         fail("KAT ECMQV agreement not verified");
+                    }
+                }
+            });
+        }
+    }
+
+    private static class DhuProvider
+        extends FipsEngineProvider<EcDhcuBasicAgreement>
+    {
+        static final byte[] expected = Hex.decode("cad5c428ea0645794bc5634549e08a3ed563bd0cf32e909862e08b41d4b6fc17cad5c428ea0645794bc5634549e08a3ed563bd0cf32e909862e08b41d4b6fc17");
+
+        public EcDhcuBasicAgreement createEngine()
+        {
+            return SelfTestExecutor.validate(ALGORITHM, new EcDhcuBasicAgreement(), new VariantKatTest<EcDhcuBasicAgreement>()
+            {
+                void evaluate(EcDhcuBasicAgreement agreement)
+                    throws Exception
+                {
+                    AsymmetricCipherKeyPair kp = getKATKeyPair();
+
+                    AsymmetricCipherKeyPair testSKP = getTestKeyPair(kp);
+                    AsymmetricCipherKeyPair testEKP = getTestKeyPair(kp);
+
+                    agreement.init(new EcDhuPrivateParameters((EcPrivateKeyParameters)kp.getPrivate(), (EcPrivateKeyParameters)kp.getPrivate()));
+
+                    byte[] calculated = agreement.calculateAgreement(new EcDhuPublicParameters((EcPublicKeyParameters)testSKP.getPublic(), (EcPublicKeyParameters)testEKP.getPublic()));
+
+
+                    if (!Arrays.areEqual(expected, calculated))
+                    {                                   
+                        fail("KAT ECCDHU agreement not verified");
                     }
                 }
             });
@@ -962,7 +1271,7 @@ public final class FipsEC
                 throws Exception
             {
                 X9ECParameters p = NISTNamedCurves.getByName("P-256");
-                EcDomainParameters params = new EcDomainParameters(p.getCurve(), p.getG(), p.getN(), p.getH());
+                ECDomainParameters params = new ECDomainParameters(p.getCurve(), p.getG(), p.getN(), p.getH(), p.getSeed());
                 BigInteger dValue = new BigInteger("20186677036482506117540275567393538695075300175221296989956723148347484984008");
 
                 ECPoint Q = params.getCurve().decodePoint(Hex.decode("03596375E6CE57E0F20294FC46BDFCFD19A39F8161B58695B3EC5B3D16427C274D"));
@@ -1006,9 +1315,9 @@ public final class FipsEC
     {
         if (curveParams instanceof NamedECDomainParameters)
         {
-            return new EcNamedDomainParameters(((NamedECDomainParameters)curveParams).getID(), curveParams.getCurve(), curveParams.getG(), curveParams.getN(), curveParams.getH(), curveParams.getSeed());
+            return new EcNamedDomainParameters((NamedECDomainParameters)curveParams);
         }
-        return new EcDomainParameters(curveParams.getCurve(), curveParams.getG(), curveParams.getN(), curveParams.getH(), curveParams.getSeed());
+        return new EcDomainParameters(curveParams);
     }
 
     private static EcPrivateKeyParameters getLwKey(final AsymmetricECPrivateKey privKey)
@@ -1018,6 +1327,26 @@ public final class FipsEC
             public EcPrivateKeyParameters run()
             {
                 return new EcPrivateKeyParameters(privKey.getS(), getDomainParams(privKey.getDomainParameters()));
+            }
+        });
+    }
+
+    private static EcDomainParameters getDomainParamsWithInv(ECDomainParameters curveParams)
+    {
+        if (curveParams instanceof NamedECDomainParameters)
+        {
+            return new EcNamedDomainParameters((NamedECDomainParameters)curveParams, curveParams.getInverseH());
+        }
+        return new EcDomainParameters(curveParams, curveParams.getInverseH());
+    }
+
+    private static EcPrivateKeyParameters getLwKeyWithInv(final AsymmetricECPrivateKey privKey)
+    {
+        return AccessController.doPrivileged(new PrivilegedAction<EcPrivateKeyParameters>()
+        {
+            public EcPrivateKeyParameters run()
+            {
+                return new EcPrivateKeyParameters(privKey.getS(), getDomainParamsWithInv(privKey.getDomainParameters()));
             }
         });
     }

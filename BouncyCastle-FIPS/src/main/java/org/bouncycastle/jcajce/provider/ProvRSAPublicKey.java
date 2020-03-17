@@ -9,6 +9,7 @@ import java.security.spec.RSAPublicKeySpec;
 
 import org.bouncycastle.crypto.Algorithm;
 import org.bouncycastle.crypto.asymmetric.AsymmetricRSAPublicKey;
+import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.Strings;
 
 class ProvRSAPublicKey
@@ -85,14 +86,23 @@ class ProvRSAPublicKey
             return true;
         }
 
-        if (!(o instanceof ProvRSAPublicKey))
+        if (!(o instanceof RSAPublicKey))
         {
             return false;
         }
 
-        ProvRSAPublicKey other = (ProvRSAPublicKey)o;
+        if (o instanceof ProvRSAPublicKey)
+        {
+            ProvRSAPublicKey other = (ProvRSAPublicKey)o;
 
-        return this.baseKey.equals(other.baseKey);
+            return this.baseKey.equals(other.baseKey);
+        }
+        else
+        {
+            RSAPublicKey other = (RSAPublicKey)o;
+
+            return Arrays.areEqual(this.getEncoded(), other.getEncoded());
+        }
     }
 
     public int hashCode()
@@ -128,9 +138,10 @@ class ProvRSAPublicKey
         StringBuilder buf = new StringBuilder();
         String nl = Strings.lineSeparator();
 
-        buf.append("RSA Public Key").append(nl);
-        buf.append("            modulus: ").append(this.getModulus().toString(16)).append(nl);
-        buf.append("    public exponent: ").append(this.getPublicExponent().toString(16)).append(nl);
+        buf.append("RSA Public Key [").append(KeyUtil.generateFingerPrint(this.getModulus())).append("]")
+            .append(",[").append(KeyUtil.generateExponentFingerprint(this.getPublicExponent())).append("]").append(nl);
+        buf.append("        modulus: ").append(this.getModulus().toString(16)).append(nl);
+        buf.append("public exponent: ").append(this.getPublicExponent().toString(16)).append(nl);
 
         return buf.toString();
     }

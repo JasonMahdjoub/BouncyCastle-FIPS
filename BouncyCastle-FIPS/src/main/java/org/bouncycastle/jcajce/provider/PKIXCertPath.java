@@ -370,7 +370,7 @@ class PKIXCertPath
         }
     }
 
-    private class ByteArrayWriter
+    private static class ByteArrayWriter
         extends Writer
     {
         private final ByteArrayOutputStream bOut;

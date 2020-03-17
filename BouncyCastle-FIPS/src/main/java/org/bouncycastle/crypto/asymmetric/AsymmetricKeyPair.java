@@ -6,6 +6,7 @@ import java.security.PrivilegedAction;
 
 import org.bouncycastle.crypto.AsymmetricPrivateKey;
 import org.bouncycastle.crypto.AsymmetricPublicKey;
+import org.bouncycastle.util.Arrays;
 
 /**
  * Carrier class for a public key and its associated private key. This class will check the key
@@ -163,6 +164,38 @@ public final class AsymmetricKeyPair<P extends AsymmetricPublicKey, S extends As
                 throw new IllegalArgumentException("DSTU4145 keys do not have the same domain parameters");
             }
             if (!priv.getParameters().getDomainParameters().getG().multiply(priv.getS()).negate().normalize().equals(pub.getW()))
+            {
+                // FSM_TRANS:5.IKP.2, "IMPORTED KEY PAIR CONSISTENCY TEST", "USER COMMAND REJECTED", "Consistency test on imported key pair failed"
+                throw new IllegalArgumentException("DSTU4145 public key not consistent with DSTU4145 private key");
+            }
+        }
+        else if (publicKey instanceof AsymmetricEdDSAKey && privateKey instanceof AsymmetricEdDSAKey)
+        {
+            AsymmetricEdDSAPrivateKey priv = (AsymmetricEdDSAPrivateKey)privateKey;
+            AsymmetricEdDSAPublicKey pub = (AsymmetricEdDSAPublicKey)publicKey;
+
+            if (!priv.getAlgorithm().equals(pub.getAlgorithm()))
+            {
+                // FSM_TRANS:5.IKP.2, "IMPORTED KEY PAIR CONSISTENCY TEST", "USER COMMAND REJECTED", "Consistency test on imported key pair failed"
+                throw new IllegalArgumentException("EdDSA keys do not have the same domain parameters");
+            }
+            if (!Arrays.areEqual(priv.getPublicData(), pub.getPublicData()))
+            {
+                // FSM_TRANS:5.IKP.2, "IMPORTED KEY PAIR CONSISTENCY TEST", "USER COMMAND REJECTED", "Consistency test on imported key pair failed"
+                throw new IllegalArgumentException("DSTU4145 public key not consistent with DSTU4145 private key");
+            }
+        }
+        else if (publicKey instanceof AsymmetricXDHKey && privateKey instanceof AsymmetricXDHKey)
+        {
+            AsymmetricXDHPrivateKey priv = (AsymmetricXDHPrivateKey)privateKey;
+            AsymmetricXDHPublicKey pub = (AsymmetricXDHPublicKey)publicKey;
+
+            if (!priv.getAlgorithm().equals(pub.getAlgorithm()))
+            {
+                // FSM_TRANS:5.IKP.2, "IMPORTED KEY PAIR CONSISTENCY TEST", "USER COMMAND REJECTED", "Consistency test on imported key pair failed"
+                throw new IllegalArgumentException("EdDSA keys do not have the same domain parameters");
+            }
+            if (!Arrays.areEqual(priv.getPublicData(), pub.getPublicData()))
             {
                 // FSM_TRANS:5.IKP.2, "IMPORTED KEY PAIR CONSISTENCY TEST", "USER COMMAND REJECTED", "Consistency test on imported key pair failed"
                 throw new IllegalArgumentException("DSTU4145 public key not consistent with DSTU4145 private key");

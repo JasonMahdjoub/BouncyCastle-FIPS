@@ -27,7 +27,7 @@ public class TimeStampTokenEvidence
 
     public TimeStampTokenEvidence(TimeStampAndCRL[] timeStampAndCRLs)
     {
-        this.timeStampAndCRLs = timeStampAndCRLs.clone();
+        this.timeStampAndCRLs = copy(timeStampAndCRLs);
     }
 
     public TimeStampTokenEvidence(TimeStampAndCRL timeStampAndCRL)
@@ -83,9 +83,18 @@ public class TimeStampTokenEvidence
 
     public TimeStampAndCRL[] toTimeStampAndCRLArray()
     {
-        return timeStampAndCRLs.clone();
+        return copy(timeStampAndCRLs);
     }
-    
+
+    private TimeStampAndCRL[] copy(TimeStampAndCRL[] tsAndCrls)
+    {
+        TimeStampAndCRL[] tmp = new TimeStampAndCRL[tsAndCrls.length];
+
+        System.arraycopy(tsAndCrls, 0, tmp, 0, tmp.length);
+
+        return tmp;
+    }
+
     public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector v = new ASN1EncodableVector();

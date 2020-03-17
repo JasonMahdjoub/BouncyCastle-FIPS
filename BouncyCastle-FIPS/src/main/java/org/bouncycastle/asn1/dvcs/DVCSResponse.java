@@ -55,7 +55,7 @@ public class DVCSResponse
                 }
                 catch (IOException e)
                 {
-                    throw new IllegalArgumentException("Failed to construct sequence from byte[]: " + e.getMessage());
+                    throw new IllegalArgumentException("failed to construct sequence from byte[]: " + e.getMessage());
                 }
             }
             if (obj instanceof ASN1Sequence)

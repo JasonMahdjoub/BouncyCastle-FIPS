@@ -188,17 +188,11 @@ class BaseCipher
 
     private Set<Algorithm> activeAlgorithmSet = new HashSet<Algorithm>();
 
-    private int                     ivLength = 0;
-
-    private boolean                 padded;
-
     private PBEParameterSpec        pbeSpec = null;
     private String                  pbeAlgorithm = null;
 
     private AlgorithmParameters     engineParams = null;
     private String                  modeName = null;
-
-    private int                      opMode;
 
     private OutputCipher<Parameters> cipher;
 
@@ -385,7 +379,6 @@ class BaseCipher
 
         if (paddingName.equals("NOPADDING"))
         {
-            padded = false;
             for (Algorithm alg : currentAlgs)
             {
                 // one or none
@@ -408,8 +401,6 @@ class BaseCipher
         }
         else
         {
-            padded = true;
-
             if (paddingName.equals("PKCS5PADDING") || paddingName.equals("PKCS7PADDING"))
             {
                 for (Algorithm alg : currentAlgs)
@@ -509,10 +500,6 @@ class BaseCipher
         SecureRandom            random)
         throws InvalidKeyException, InvalidAlgorithmParameterException
     {
-        this.opMode = opmode;
-
-
-
         this.pbeAlgorithm = null;
         this.engineParams = null;
 //        this.aeadParams = null;

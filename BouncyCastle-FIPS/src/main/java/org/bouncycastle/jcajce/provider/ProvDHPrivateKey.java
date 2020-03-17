@@ -8,13 +8,13 @@ import java.math.BigInteger;
 import javax.crypto.interfaces.DHPrivateKey;
 import javax.crypto.spec.DHParameterSpec;
 import javax.crypto.spec.DHPrivateKeySpec;
+import javax.security.auth.Destroyable;
 
 import org.bouncycastle.crypto.Algorithm;
 import org.bouncycastle.crypto.asymmetric.AsymmetricDHPrivateKey;
-import org.bouncycastle.util.Strings;
 
 class ProvDHPrivateKey
-    implements DHPrivateKey
+    implements Destroyable, DHPrivateKey
 {
     static final long serialVersionUID = 311058815616901812L;
 
@@ -23,9 +23,9 @@ class ProvDHPrivateKey
     ProvDHPrivateKey(
         Algorithm algorithm,
         DHPrivateKey key)
-     {
-         this.baseKey = new AsymmetricDHPrivateKey(algorithm, DHUtils.extractParams(key.getParams()), key.getX());
-     }
+    {
+        this.baseKey = new AsymmetricDHPrivateKey(algorithm, DHUtils.extractParams(key.getParams()), key.getX());
+    }
 
     ProvDHPrivateKey(
         Algorithm algorithm,
@@ -43,6 +43,8 @@ class ProvDHPrivateKey
 
     public String getAlgorithm()
     {
+        KeyUtil.checkDestroyed(this);
+
         return "DH";
     }
 
@@ -53,6 +55,8 @@ class ProvDHPrivateKey
      */
     public String getFormat()
     {
+        KeyUtil.checkDestroyed(this);
+
         return "PKCS#8";
     }
 
@@ -76,22 +80,31 @@ class ProvDHPrivateKey
         return baseKey.getEncoded();
     }
 
+    public void destroy()
+    {
+        baseKey.destroy();
+    }
+
+    public boolean isDestroyed()
+    {
+        return baseKey.isDestroyed();
+    }
+
     public String toString()
     {
-        StringBuilder   buf = new StringBuilder();
-        String          nl = Strings.lineSeparator();
+        if (isDestroyed())
+        {
+            return KeyUtil.destroyedPrivateKeyToString("DH");
+        }
 
-        buf.append("DH Private Key").append(nl);
         try
         {
-            buf.append("    X: ").append(this.getX().toString(16)).append(nl);
+            return KeyUtil.privateKeyToString("DH", baseKey.getX(), baseKey.getDomainParameters());
         }
         catch (Exception e)
         {
-            buf.append("RESTRICTED").append(nl);
+            return KeyUtil.restrictedToString("DH");
         }
-
-        return buf.toString();
     }
 
     public boolean equals(Object o)
@@ -133,6 +146,11 @@ class ProvDHPrivateKey
         ObjectOutputStream out)
         throws IOException
     {
+        if (isDestroyed())
+        {
+            throw new IOException("key has been destroyed");
+        }
+
         out.defaultWriteObject();
 
         out.writeObject(baseKey.getAlgorithm());

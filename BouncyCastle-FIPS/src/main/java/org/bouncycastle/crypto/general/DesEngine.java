@@ -19,6 +19,7 @@ class DesEngine
 
     private static final int    MAX_BLOCK_COUNT = 1 << 20;
 
+    private boolean             forEncryption;
     private int[]               workingKey = null;
     private int                 blockCount;
 
@@ -41,6 +42,8 @@ class DesEngine
         boolean           encrypting,
         CipherParameters  params)
     {
+        this.forEncryption = encrypting;
+
         if (params instanceof KeyParameter)
         {
             if (((KeyParameter)params).getKey().length > 8)
@@ -79,9 +82,12 @@ class DesEngine
             throw new IllegalStateException("DES engine not initialised");
         }
 
-        if (blockCount >= MAX_BLOCK_COUNT)
+        if (forEncryption)
         {
-            throw new IllegalStateException("attempt to process more than " + MAX_BLOCK_COUNT + " blocks with TripleDES");
+            if (blockCount >= MAX_BLOCK_COUNT)
+            {
+                throw new IllegalStateException("attempt to process more than " + MAX_BLOCK_COUNT + " blocks with DES");
+            }
         }
 
         if ((inOff + BLOCK_SIZE) > in.length)

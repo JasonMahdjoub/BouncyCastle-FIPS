@@ -9,6 +9,24 @@ import org.bouncycastle.util.Pack;
 
 public abstract class Nat320
 {
+    public static void copy64(long[] x, long[] z)
+    {
+        z[0] = x[0];
+        z[1] = x[1];
+        z[2] = x[2];
+        z[3] = x[3];
+        z[4] = x[4];
+    }
+
+    public static void copy64(long[] x, int xOff, long[] z, int zOff)
+    {
+        z[zOff + 0] = x[xOff + 0];
+        z[zOff + 1] = x[xOff + 1];
+        z[zOff + 2] = x[xOff + 2];
+        z[zOff + 3] = x[xOff + 3];
+        z[zOff + 4] = x[xOff + 4];
+    }
+
     public static long[] create64()
     {
         return new long[5];

@@ -8,6 +8,8 @@ import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.RSAPrivateCrtKeySpec;
 
+import javax.security.auth.Destroyable;
+
 import org.bouncycastle.crypto.Algorithm;
 import org.bouncycastle.crypto.asymmetric.AsymmetricRSAPrivateKey;
 import org.bouncycastle.util.Strings;
@@ -16,7 +18,7 @@ import org.bouncycastle.util.Strings;
  * A provider representation for a RSA private key, with CRT factors included.
  */
 class ProvRSAPrivateCrtKey
-    implements RSAPrivateKey, RSAPrivateCrtKey, ProvKey<AsymmetricRSAPrivateKey>
+    implements Destroyable, RSAPrivateKey, RSAPrivateCrtKey, ProvKey<AsymmetricRSAPrivateKey>
 {
     static final long serialVersionUID = 7834723820638524718L;
 
@@ -46,6 +48,8 @@ class ProvRSAPrivateCrtKey
 
     public AsymmetricRSAPrivateKey getBaseKey()
     {
+        KeyUtil.checkDestroyed(baseKey);
+
         return baseKey;
     }
 
@@ -56,11 +60,15 @@ class ProvRSAPrivateCrtKey
      */
     public String getFormat()
     {
+        KeyUtil.checkDestroyed(baseKey);
+
         return "PKCS#8";
     }
 
     public String getAlgorithm()
     {
+        KeyUtil.checkDestroyed(baseKey);
+
         return "RSA";
     }
 
@@ -145,6 +153,16 @@ class ProvRSAPrivateCrtKey
         return baseKey.getQInv();
     }
 
+    public void destroy()
+    {
+        baseKey.destroy();
+    }
+
+    public boolean isDestroyed()
+    {
+        return baseKey.isDestroyed();
+    }
+
     public boolean equals(Object o)
     {
         if (o == this)
@@ -184,6 +202,11 @@ class ProvRSAPrivateCrtKey
         ObjectOutputStream out)
         throws IOException
     {
+        if (isDestroyed())
+        {
+            throw new IOException("key has been destroyed");
+        }
+
         out.defaultWriteObject();
 
         out.writeObject(baseKey.getAlgorithm());
@@ -195,26 +218,19 @@ class ProvRSAPrivateCrtKey
         StringBuilder buf = new StringBuilder();
         String nl = Strings.lineSeparator();
 
-        buf.append("RSA Private CRT Key").append(nl);
-        buf.append("             modulus: ").append(this.getModulus().toString(16)).append(nl);
-        buf.append("     public exponent: ").append(this.getPublicExponent().toString(16)).append(nl);
-        try
+        if (isDestroyed())
         {
-            buf.append("    private exponent: ").append(this.getPrivateExponent().toString(16)).append(nl);
-            buf.append("              primeP: ").append(this.getPrimeP().toString(16)).append(nl);
-            buf.append("              primeQ: ").append(this.getPrimeQ().toString(16)).append(nl);
-            buf.append("      primeExponentP: ").append(this.getPrimeExponentP().toString(16)).append(nl);
-            buf.append("      primeExponentQ: ").append(this.getPrimeExponentQ().toString(16)).append(nl);
-            buf.append("      crtCoefficient: ").append(this.getCrtCoefficient().toString(16)).append(nl);
+            buf.append("RSA Private CRT Key [DESTROYED]").append(nl);
         }
-        catch (Exception e)
+        else
         {
-            buf.append("RESTRICTED").append(nl);
-            buf.append("              primeP: ").append("RESTRICTED").append(nl);
-            buf.append("              primeQ: ").append("RESTRICTED").append(nl);
-            buf.append("      primeExponentP: ").append("RESTRICTED").append(nl);
-            buf.append("      primeExponentQ: ").append("RESTRICTED").append(nl);
-            buf.append("      crtCoefficient: ").append("RESTRICTED").append(nl);
+            buf.append("RSA Private CRT Key [").append(
+                KeyUtil.generateFingerPrint(this.getModulus())).append("]")
+                .append(",[").append(
+                KeyUtil.generateExponentFingerprint(this.getPublicExponent())).append("]").append(nl);
+
+            buf.append("             modulus: ").append(this.getModulus().toString(16)).append(nl);
+            buf.append("     public exponent: ").append(this.getPublicExponent().toString(16)).append(nl);
         }
 
         return buf.toString();

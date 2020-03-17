@@ -43,6 +43,7 @@ import org.bouncycastle.crypto.fips.FipsDH;
 import org.bouncycastle.crypto.fips.FipsKDF;
 import org.bouncycastle.crypto.fips.FipsUnapprovedOperationError;
 import org.bouncycastle.jcajce.spec.DHDomainParameterSpec;
+import org.bouncycastle.jcajce.spec.DHUParameterSpec;
 import org.bouncycastle.jcajce.spec.MQVParameterSpec;
 import org.bouncycastle.jcajce.spec.UserKeyingMaterialSpec;
 
@@ -314,9 +315,9 @@ class ProvDH
     static class AlgorithmParametersSpi
         extends DHAlgorithmParametersSpi
     {
-        AlgorithmParametersSpi()
+        AlgorithmParametersSpi(String algorithm)
         {
-            super("DH");
+            super(algorithm);
         }
 
         /**
@@ -434,6 +435,7 @@ class ProvDH
     private static final String PREFIX = "org.bouncycastle.jcajce.provider.asymmetric" + ".dh.";
 
     private static final AgreementFactory fipsDHFactory = new FipsDH.DHAgreementFactory();
+    private static final AgreementFactory fipsDHUFactory = new FipsDH.DHUAgreementFactory();
     private static final AgreementFactory fipsMQVFactory = new FipsDH.MQVAgreementFactory();
 
     private static final ParametersCreator mqvParametersCreator = new ParametersCreator()
@@ -471,6 +473,41 @@ class ProvDH
         }
     };
 
+    private static final ParametersCreator dhuParametersCreator = new ParametersCreator()
+    {
+
+        public Parameters createParameters(boolean forEncryption, AlgorithmParameterSpec spec, SecureRandom random)
+            throws InvalidAlgorithmParameterException
+        {
+            try
+            {
+                if (!(spec instanceof DHUParameterSpec))
+                {
+                    throw new InvalidAlgorithmParameterException("DHU can only take an DHUParameterSpec");
+                }
+
+                DHUParameterSpec dhuSpec = (DHUParameterSpec)spec;
+
+                if (dhuSpec.getEphemeralPublicKey() != null)
+                {
+                    return FipsDH.DHU.using(publicKeyConverter.convertKey(FipsDH.DHU.getAlgorithm(), dhuSpec.getEphemeralPublicKey()),
+                        privateKeyConverter.convertKey(FipsDH.DHU.getAlgorithm(), dhuSpec.getEphemeralPrivateKey()),
+                        publicKeyConverter.convertKey(FipsDH.DHU.getAlgorithm(), dhuSpec.getOtherPartyEphemeralKey()));
+                }
+                else
+                {
+                    return FipsDH.DHU.using(
+                        privateKeyConverter.convertKey(FipsDH.DHU.getAlgorithm(), dhuSpec.getEphemeralPrivateKey()),
+                        publicKeyConverter.convertKey(FipsDH.DHU.getAlgorithm(), dhuSpec.getOtherPartyEphemeralKey()));
+                }
+            }
+            catch (InvalidKeyException e)
+            {
+                throw new InvalidAlgorithmParameterException("Unable to convert keys in MQVParameterSpec: " + e.getMessage(), e);
+            }
+        }
+    };
+
     private static final ParametersCreator parametersCreator = new ParametersCreator()
     {
 
@@ -496,6 +533,7 @@ class ProvDH
         });
         provider.addAlias("Alg.Alias.KeyPairGenerator.DIFFIEHELLMAN", "DH");
         provider.addAlias("Alg.Alias.KeyPairGenerator.MQV", "DH");
+        provider.addAlias("Alg.Alias.KeyPairGenerator.DHU", "DH");
 
         provider.addAlgorithmImplementation("KeyAgreement.DH", PREFIX + "KeyAgreementSpi", generalDhAttributes, new EngineCreator()
         {
@@ -525,7 +563,7 @@ class ProvDH
         {
             public Object createInstance(Object constructorParameter)
             {
-                return new AlgorithmParametersSpi();
+                return new AlgorithmParametersSpi("DH");
             }
         });
         provider.addAlias("Alg.Alias.AlgorithmParameters.DIFFIEHELLMAN", "DH");
@@ -554,6 +592,21 @@ class ProvDH
             }
         });
 
+        provider.addAlgorithmImplementation("AlgorithmParameters.DHU", PREFIX + "DHUAlgorithmParametersSpi", new EngineCreator()
+        {
+            public Object createInstance(Object constructorParameter)
+            {
+                return new AlgorithmParametersSpi("DHU");
+            }
+        });
+        provider.addAlgorithmImplementation("AlgorithmParameterGenerator.DHU", PREFIX + "DHUAlgorithmParameterGeneratorSpi", new EngineCreator()
+        {
+            public Object createInstance(Object constructorParameter)
+            {
+                return new DHAlgorithmParameterGeneratorSpi(provider, "MQV");
+            }
+        });
+
         addX963DHAlgorithm(provider, "SHA1", FipsKDF.AgreementKDFPRF.SHA1);
         addX963DHAlgorithm(provider, "SHA224", FipsKDF.AgreementKDFPRF.SHA224);
         addX963DHAlgorithm(provider, "SHA256", FipsKDF.AgreementKDFPRF.SHA256);
@@ -561,6 +614,14 @@ class ProvDH
         addX963DHAlgorithm(provider, "SHA512", FipsKDF.AgreementKDFPRF.SHA512);
         addX963DHAlgorithm(provider, "SHA512(224)", FipsKDF.AgreementKDFPRF.SHA512_224);
         addX963DHAlgorithm(provider, "SHA512(256)", FipsKDF.AgreementKDFPRF.SHA512_256);
+
+        addX963DHUAlgorithm(provider, "SHA1", FipsKDF.AgreementKDFPRF.SHA1);
+        addX963DHUAlgorithm(provider, "SHA224", FipsKDF.AgreementKDFPRF.SHA224);
+        addX963DHUAlgorithm(provider, "SHA256", FipsKDF.AgreementKDFPRF.SHA256);
+        addX963DHUAlgorithm(provider, "SHA384", FipsKDF.AgreementKDFPRF.SHA384);
+        addX963DHUAlgorithm(provider, "SHA512", FipsKDF.AgreementKDFPRF.SHA512);
+        addX963DHUAlgorithm(provider, "SHA512(224)", FipsKDF.AgreementKDFPRF.SHA512_224);
+        addX963DHUAlgorithm(provider, "SHA512(256)", FipsKDF.AgreementKDFPRF.SHA512_256);
 
         addX963MQVAlgorithm(provider, "SHA1", FipsKDF.AgreementKDFPRF.SHA1);
         addX963MQVAlgorithm(provider, "SHA224", FipsKDF.AgreementKDFPRF.SHA224);
@@ -577,6 +638,22 @@ class ProvDH
         addConcatDHAlgorithm(provider, "SHA512", FipsKDF.AgreementKDFPRF.SHA512);
         addConcatDHAlgorithm(provider, "SHA512(224)", FipsKDF.AgreementKDFPRF.SHA512_224);
         addConcatDHAlgorithm(provider, "SHA512(256)", FipsKDF.AgreementKDFPRF.SHA512_256);
+        addConcatDHAlgorithm(provider, "SHA3-224", FipsKDF.AgreementKDFPRF.SHA3_224);
+        addConcatDHAlgorithm(provider, "SHA3-256", FipsKDF.AgreementKDFPRF.SHA3_256);
+        addConcatDHAlgorithm(provider, "SHA3-384", FipsKDF.AgreementKDFPRF.SHA3_384);
+        addConcatDHAlgorithm(provider, "SHA3-512", FipsKDF.AgreementKDFPRF.SHA3_512);
+
+        addConcatDHUAlgorithm(provider, "SHA1", FipsKDF.AgreementKDFPRF.SHA1);
+        addConcatDHUAlgorithm(provider, "SHA224", FipsKDF.AgreementKDFPRF.SHA224);
+        addConcatDHUAlgorithm(provider, "SHA256", FipsKDF.AgreementKDFPRF.SHA256);
+        addConcatDHUAlgorithm(provider, "SHA384", FipsKDF.AgreementKDFPRF.SHA384);
+        addConcatDHUAlgorithm(provider, "SHA512", FipsKDF.AgreementKDFPRF.SHA512);
+        addConcatDHUAlgorithm(provider, "SHA512(224)", FipsKDF.AgreementKDFPRF.SHA512_224);
+        addConcatDHUAlgorithm(provider, "SHA512(256)", FipsKDF.AgreementKDFPRF.SHA512_256);
+        addConcatDHUAlgorithm(provider, "SHA3-224", FipsKDF.AgreementKDFPRF.SHA3_224);
+        addConcatDHUAlgorithm(provider, "SHA3-256", FipsKDF.AgreementKDFPRF.SHA3_256);
+        addConcatDHUAlgorithm(provider, "SHA3-384", FipsKDF.AgreementKDFPRF.SHA3_384);
+        addConcatDHUAlgorithm(provider, "SHA3-512", FipsKDF.AgreementKDFPRF.SHA3_512);
 
         addConcatMQVAlgorithm(provider, "SHA1", FipsKDF.AgreementKDFPRF.SHA1);
         addConcatMQVAlgorithm(provider, "SHA224", FipsKDF.AgreementKDFPRF.SHA224);
@@ -594,6 +671,17 @@ class ProvDH
                     public Object createInstance(Object constructorParameter)
                     {
                 return new BaseAgreement(fipsDHFactory, publicKeyConverter, privateKeyConverter, parametersCreator, FipsKDF.X963.withPRF(prf));
+            }
+        });
+    }
+
+    private void addX963DHUAlgorithm(BouncyCastleFipsProvider provider, String digest, final FipsKDF.AgreementKDFPRF prf)
+    {
+        addKeyAgreementAlgorithm(provider, "DHUWITH" + digest + "KDF", PREFIX + "KeyAgreementSpi$DHU" + digest + "KDF", generalDhAttributes, new EngineCreator()
+                {
+                    public Object createInstance(Object constructorParameter)
+                    {
+                return new BaseAgreement(fipsDHUFactory, publicKeyConverter, privateKeyConverter, dhuParametersCreator, FipsKDF.X963.withPRF(prf));
             }
         });
     }
@@ -616,6 +704,17 @@ class ProvDH
                     public Object createInstance(Object constructorParameter)
                     {
                 return new BaseAgreement(fipsDHFactory, publicKeyConverter, privateKeyConverter, parametersCreator, FipsKDF.CONCATENATION.withPRF(prf));
+            }
+        });
+    }
+
+    private void addConcatDHUAlgorithm(BouncyCastleFipsProvider provider, String digest, final FipsKDF.AgreementKDFPRF prf)
+    {
+        addKeyAgreementAlgorithm(provider, "DHUWITH" + digest + "CKDF", PREFIX + "KeyAgreementSpi$DHU" + digest + "CKDF", generalDhAttributes, new EngineCreator()
+        {
+            public Object createInstance(Object constructorParameter)
+            {
+                return new BaseAgreement(fipsDHUFactory, publicKeyConverter, privateKeyConverter, dhuParametersCreator, FipsKDF.CONCATENATION.withPRF(prf));
             }
         });
     }

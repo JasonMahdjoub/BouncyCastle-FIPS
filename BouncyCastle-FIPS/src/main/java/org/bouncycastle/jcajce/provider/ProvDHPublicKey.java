@@ -11,7 +11,7 @@ import javax.crypto.spec.DHPublicKeySpec;
 
 import org.bouncycastle.crypto.Algorithm;
 import org.bouncycastle.crypto.asymmetric.AsymmetricDHPublicKey;
-import org.bouncycastle.util.Strings;
+import org.bouncycastle.util.Arrays;
 
 class ProvDHPublicKey
     implements DHPublicKey
@@ -72,13 +72,7 @@ class ProvDHPublicKey
 
     public String toString()
     {
-        StringBuilder   buf = new StringBuilder();
-        String          nl = Strings.lineSeparator();
-
-        buf.append("DH Public Key").append(nl);
-        buf.append("    Y: ").append(this.getY().toString(16)).append(nl);
-
-        return buf.toString();
+        return KeyUtil.publicKeyToString("DH", baseKey.getY(), baseKey.getDomainParameters());
     }
 
     public boolean equals(Object o)
@@ -88,14 +82,23 @@ class ProvDHPublicKey
             return true;
         }
 
-        if (!(o instanceof ProvDHPublicKey))
+        if (!(o instanceof DHPublicKey))
         {
             return false;
         }
 
-        ProvDHPublicKey other = (ProvDHPublicKey)o;
+        if (o instanceof ProvDHPublicKey)
+        {
+            ProvDHPublicKey other = (ProvDHPublicKey)o;
 
-        return this.baseKey.equals(other.baseKey);
+            return this.baseKey.equals(other.baseKey);
+        }
+        else
+        {
+            DHPublicKey other = (DHPublicKey)o;
+
+            return Arrays.areEqual(this.getEncoded(), other.getEncoded());
+        }
     }
 
     public int hashCode()

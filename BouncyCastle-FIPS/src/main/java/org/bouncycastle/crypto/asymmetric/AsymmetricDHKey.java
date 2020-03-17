@@ -21,8 +21,9 @@ public abstract class AsymmetricDHKey
     implements AsymmetricKey
 {
     private final boolean    approvedModeOnly;
-    private final Algorithm algorithm;
-    private final DHDomainParameters domainParameters;
+
+    private Algorithm algorithm;
+    private DHDomainParameters domainParameters;
 
     AsymmetricDHKey(Algorithm algorithm, DHDomainParameters domainParameters)
     {
@@ -94,7 +95,7 @@ public abstract class AsymmetricDHKey
      *
      * @return the key's algorithm.
      */
-    public final Algorithm getAlgorithm()
+    public Algorithm getAlgorithm()
     {
         return algorithm;
     }
@@ -104,7 +105,7 @@ public abstract class AsymmetricDHKey
      *
      * @return the Diffie-Hellman domain parameters for this key.
      */
-    public final DHDomainParameters getDomainParameters()
+    public DHDomainParameters getDomainParameters()
     {
         return domainParameters;
     }
@@ -115,5 +116,11 @@ public abstract class AsymmetricDHKey
         {
               throw new FipsUnapprovedOperationError("No access to key in current thread.");
         }
+    }
+
+    protected void zeroize()
+    {
+        this.algorithm = null;
+        this.domainParameters = null;
     }
 }

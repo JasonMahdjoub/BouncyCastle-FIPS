@@ -454,7 +454,7 @@ final class ProvDESede
             }));
             provider.addAlias("SecretKeyFactory", "PBEWITHSHAAND3-KEYTRIPLEDES",
                 "PBEWITHSHA1AND3-KEYTRIPLEDES", "PBEWITHSHA-1AND3-KEYTRIPLEDES",
-                "PBEWITHSHAAND3-KEYDESEDE", "PBEWITHSHA1AND3-KEYDESEDE", "PBEWITHSHA-1AND3-KEYDESEDE");
+                "PBEWITHSHAAND3-KEYDESEDE", "PBEWITHSHA1AND3-KEYDESEDE", "PBEWITHSHA-1AND3-KEYDESEDE", "PBEWITHSHA1ANDDESEDE");
             provider.addAlias("SecretKeyFactory", "DESEDE", OIWObjectIdentifiers.desEDE);
 
             provider.addAlias("AlgorithmParameters", "PBKDF-PKCS12", PKCSObjectIdentifiers.pbeWithSHAAnd2_KeyTripleDES_CBC, PKCSObjectIdentifiers.pbeWithSHAAnd3_KeyTripleDES_CBC);

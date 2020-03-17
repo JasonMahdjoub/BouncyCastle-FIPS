@@ -185,7 +185,7 @@ class ProvTwofish
                 return new ProvPKCS12.KeyFactory("Twofish", PasswordBasedDeriver.KeyType.CIPHER, 256);
             }
         }));
-        provider.addAlias("SecretKeyFactory", "PBEWITHSHAAND256BITTWOFISH-BC", "PBEWITHSHA1AND256BITTWOFISH-BC", "PBEWITHSHA-1AND256BITTWOFISH-BC");
-
+        provider.addAlias("SecretKeyFactory", "PBEWITHSHAAND256BITTWOFISH-BC",
+            "PBEWITHSHA1AND256BITTWOFISH-BC", "PBEWITHSHA-1AND256BITTWOFISH-BC", "PBEWITHSHAANDTWOFISH");
     }
 }

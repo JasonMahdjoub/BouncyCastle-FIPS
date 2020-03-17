@@ -220,6 +220,17 @@ public class ECAlgorithms
         return p;
     }
 
+    public static ECPoint cleanPoint(ECCurve c, ECPoint p)
+    {
+        ECCurve cp = p.getCurve();
+        if (!c.equals(cp))
+        {
+            throw new IllegalArgumentException("Point must be on the same curve");
+        }
+
+        return c.decodePoint(p.getEncoded(false));
+    }
+
     static ECPoint implCheckResult(ECPoint p)
     {
         if (!p.isValidPartial())
@@ -406,7 +417,7 @@ public class ECAlgorithms
         ECPointMap pointMap = glvEndomorphism.getPointMap();
         if (glvEndomorphism.hasEfficientPointMap())
         {
-            return ECAlgorithms.implSumOfMultiplies(ps, pointMap, abs);
+            return implSumOfMultiplies(ps, pointMap, abs);
         }
 
         ECPoint[] pqs = new ECPoint[len << 1];
@@ -416,9 +427,8 @@ public class ECAlgorithms
             pqs[j++] = p;
             pqs[j++] = q;
         }
-        
-        return ECAlgorithms.implSumOfMultiplies(pqs, abs);
 
+        return implSumOfMultiplies(pqs, abs);
     }
 
     static ECPoint implSumOfMultiplies(ECPoint[] ps, ECPointMap pointMap, BigInteger[] ks)

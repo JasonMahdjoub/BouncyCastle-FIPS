@@ -23,10 +23,4 @@ class ElGamalPrivateKeyParameters
     {
         return x;
     }
-
-    protected void finalize()
-        throws Throwable
-    {
-        this.x = null;  // ZEROIZE: clear x pointer on de-allocation
-    }
 }

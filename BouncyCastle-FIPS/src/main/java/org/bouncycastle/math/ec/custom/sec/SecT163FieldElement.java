@@ -176,7 +176,9 @@ public class SecT163FieldElement extends ECFieldElement.AbstractF2m
 
     public ECFieldElement sqrt()
     {
-        return squarePow(getM() - 1);
+        long[] z = Nat192.create64();
+        SecT163Field.sqrt(x, z);
+        return new SecT163FieldElement(z);
     }
 
     public int getRepresentation()

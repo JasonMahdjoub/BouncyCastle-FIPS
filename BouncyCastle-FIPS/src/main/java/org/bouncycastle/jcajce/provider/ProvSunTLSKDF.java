@@ -4,6 +4,7 @@ package org.bouncycastle.jcajce.provider;
 import java.lang.reflect.Constructor;
 import java.security.AccessController;
 import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidParameterException;
 import java.security.PrivilegedAction;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
@@ -108,6 +109,13 @@ class ProvSunTLSKDF
             public Object createInstance(Object constructorParameter)
             {
                 return new TLSMasterSecretGenerator();
+            }
+        });
+        provider.addAlgorithmImplementation("KeyGenerator.SUNTLSEXTENDEDMASTERSECRET", KDF_PACKAGE + "SunTLSExtendedKeyGeneratorMaster", new EngineCreator()
+        {
+            public Object createInstance(Object constructorParameter)
+            {
+                return new TLSExtendedMasterSecretGenerator();
             }
         });
         provider.addAlgorithmImplementation("KeyGenerator.SUNTLS12MASTERSECRET", KDF_PACKAGE + "SunTLS12KeyGeneratorMaster", new EngineCreator()
@@ -298,6 +306,70 @@ class ProvSunTLSKDF
                         prfSpec = createPrfParameterSpec(spec.getPremasterSecret(), FipsKDF.TLSStage.MASTER_SECRET, seed, 48,
                                                                          null, 0, 0);
                     }
+                    return calculatePRF(prfSpec, "TlsMasterSecret");
+                }
+            });
+        }
+    }
+
+    // RFC 7627
+    final static class TLSExtendedMasterSecretGenerator
+        extends BaseTLSKeyGeneratorSpi
+    {
+        private TlsMasterSecretParameterSpec spec;
+
+        @Override
+        protected void engineInit(SecureRandom secureRandom)
+        {
+            throw new InvalidParameterException("only initialise with TlsMasterSecretParameterSpec");
+        }
+
+        @Override
+        protected void engineInit(int keySize, SecureRandom secureRandom)
+        {
+            throw new InvalidParameterException("only initialise with TlsMasterSecretParameterSpec");
+        }
+
+        @Override
+        protected void engineInit(final AlgorithmParameterSpec algorithmParameterSpec, final SecureRandom secureRandom)
+            throws InvalidAlgorithmParameterException
+        {
+            AccessController.doPrivileged(new PrivilegedAction<Object>()
+            {
+                public Object run()
+                {
+                    TLSExtendedMasterSecretGenerator.this.spec = (TlsMasterSecretParameterSpec)algorithmParameterSpec;
+                    TLSExtendedMasterSecretGenerator.this.secureRandom = secureRandom;
+
+                    return null;
+                }
+            });
+        }
+
+        @Override
+        protected SecretKey engineGenerateKey()
+        {
+            return AccessController.doPrivileged(new PrivilegedAction<SecretKey>()
+            {
+                public SecretKey run()
+                {
+                    TlsPrfParameterSpec prfSpec;
+
+                    String label = FipsKDF.TLSStage.EXTENDED_MASTER_SECRET;
+                    byte[] seed = spec.getExtendedMasterSecretSessionHash();
+
+                    int version = (spec.getMajorVersion() << 8) | spec.getMinorVersion();
+                    if (version >= 0x0303)
+                    {
+                        prfSpec = createPrfParameterSpec(spec.getPremasterSecret(), label, seed, 48,
+                            spec.getPRFHashAlg(), spec.getPRFHashLength(), spec.getPRFBlockSize());
+                    }
+                    else
+                    {
+                        prfSpec = createPrfParameterSpec(spec.getPremasterSecret(), label, seed, 48,
+                            "NONE", 0, 0);
+                    }
+
                     return calculatePRF(prfSpec, "TlsMasterSecret");
                 }
             });

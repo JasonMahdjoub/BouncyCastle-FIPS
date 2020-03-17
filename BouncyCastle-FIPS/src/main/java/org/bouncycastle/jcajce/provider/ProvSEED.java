@@ -215,5 +215,6 @@ class ProvSEED
                 });
             }
         }));
+        provider.addAlias("SecretKeyFactory", "SEED", KISAObjectIdentifiers.id_seedCBC, KISAObjectIdentifiers.id_seedMAC);
     }
 }

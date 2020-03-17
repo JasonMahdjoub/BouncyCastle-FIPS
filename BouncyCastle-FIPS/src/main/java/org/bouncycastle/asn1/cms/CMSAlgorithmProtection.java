@@ -1,3 +1,6 @@
+/***************************************************************/
+/******    DO NOT EDIT THIS CLASS bc-java SOURCE FILE     ******/
+/***************************************************************/
 package org.bouncycastle.asn1.cms;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -87,7 +90,7 @@ public class CMSAlgorithmProtection
     }
 
     public static CMSAlgorithmProtection getInstance(
-        Object  obj)
+        Object obj)
     {
         if (obj instanceof CMSAlgorithmProtection)
         {
@@ -117,7 +120,6 @@ public class CMSAlgorithmProtection
         return signatureAlgorithm;
     }
 
-    @Override
     public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector v = new ASN1EncodableVector();

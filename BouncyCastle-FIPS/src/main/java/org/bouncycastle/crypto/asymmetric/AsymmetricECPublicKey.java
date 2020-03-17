@@ -2,7 +2,6 @@ package org.bouncycastle.crypto.asymmetric;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ECPoint;
@@ -24,28 +23,28 @@ public final class AsymmetricECPublicKey
     {
         super(ecAlg, domainParameterID);
 
-        this.q = KeyUtils.validated(this.getDomainParameters().getCurve().decodePoint(encodedPoint));
+        this.q = KeyUtils.validated(getDomainParameters().getCurve(), encodedPoint);
     }
 
     public AsymmetricECPublicKey(Algorithm ecAlg, ECDomainParameters domainParameters, byte[] encodedPoint)
     {
         super(ecAlg, domainParameters);
 
-        this.q = KeyUtils.validated(this.getDomainParameters().getCurve().decodePoint(encodedPoint));
+        this.q = KeyUtils.validated(getDomainParameters().getCurve(), encodedPoint);
     }
 
     public AsymmetricECPublicKey(Algorithm ecAlg, ECDomainParametersID domainParameterID, ECPoint q)
     {
         super(ecAlg, domainParameterID);
 
-        this.q = KeyUtils.validated(q);
+        this.q = KeyUtils.validated(getDomainParameters().getCurve(), q);
     }
 
     public AsymmetricECPublicKey(Algorithm ecAlg, ECDomainParameters domainParameters, ECPoint q)
     {
         super(ecAlg, domainParameters);
 
-        this.q = KeyUtils.validated(q);
+        this.q = KeyUtils.validated(getDomainParameters().getCurve(), q);
     }
 
     public AsymmetricECPublicKey(Algorithm ecAlg, byte[] publicKeyInfoEncoding)
@@ -56,11 +55,11 @@ public final class AsymmetricECPublicKey
     public AsymmetricECPublicKey(Algorithm ecAlg, SubjectPublicKeyInfo publicKeyInfo)
     {
         super(ecAlg, publicKeyInfo.getAlgorithm());
-         // really this should be getOctets() but there are keys with padbits out in the wild
-        ASN1OctetString key = new DEROctetString(publicKeyInfo.getPublicKeyData().getBytes());
-        X9ECPoint derQ = new X9ECPoint(this.getDomainParameters().getCurve(), key);
 
-        this.q = KeyUtils.validated(derQ.getPoint());
+        // really this should be getOctets() but there are keys with padbits out in the wild
+        byte[] encodedPoint = publicKeyInfo.getPublicKeyData().getBytes();
+
+        this.q = KeyUtils.validated(getDomainParameters().getCurve(), encodedPoint);
     }
 
     public byte[] getEncoded()

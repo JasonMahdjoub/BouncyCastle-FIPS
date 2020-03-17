@@ -29,7 +29,6 @@ import org.bouncycastle.asn1.x509.PolicyInformation;
 public class PathProcInput
     extends ASN1Object
 {
-
     private PolicyInformation[] acceptablePolicySet;
     private boolean inhibitPolicyMapping = false;
     private boolean explicitPolicyReqd = false;
@@ -37,12 +36,12 @@ public class PathProcInput
 
     public PathProcInput(PolicyInformation[] acceptablePolicySet)
     {
-        this.acceptablePolicySet = acceptablePolicySet.clone();
+        this.acceptablePolicySet = copy(acceptablePolicySet);
     }
 
     public PathProcInput(PolicyInformation[] acceptablePolicySet, boolean inhibitPolicyMapping, boolean explicitPolicyReqd, boolean inhibitAnyPolicy)
     {
-        this.acceptablePolicySet = acceptablePolicySet.clone();
+        this.acceptablePolicySet = copy(acceptablePolicySet);
         this.inhibitPolicyMapping = inhibitPolicyMapping;
         this.explicitPolicyReqd = explicitPolicyReqd;
         this.inhibitAnyPolicy = inhibitAnyPolicy;
@@ -153,7 +152,7 @@ public class PathProcInput
 
     public PolicyInformation[] getAcceptablePolicySet()
     {
-        return acceptablePolicySet.clone();
+        return copy(acceptablePolicySet);
     }
 
     public boolean isInhibitPolicyMapping()
@@ -184,5 +183,14 @@ public class PathProcInput
     private void setInhibitAnyPolicy(boolean inhibitAnyPolicy)
     {
         this.inhibitAnyPolicy = inhibitAnyPolicy;
+    }
+
+    private PolicyInformation[] copy(PolicyInformation[] policySet)
+    {
+        PolicyInformation[] rv = new PolicyInformation[policySet.length];
+
+        System.arraycopy(policySet, 0, rv, 0, rv.length);
+
+        return rv;
     }
 }

@@ -16,6 +16,7 @@ import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * The AuthorityKeyIdentifier object.
@@ -178,6 +179,6 @@ public class AuthorityKeyIdentifier
 
     public String toString()
     {
-        return ("AuthorityKeyIdentifier: KeyID(" + this.keyidentifier.getOctets() + ")");
+        return ("AuthorityKeyIdentifier: KeyID(" + ((keyidentifier != null) ? Hex.toHexString(this.keyidentifier.getOctets()) : "null") + ")");
     }
 }

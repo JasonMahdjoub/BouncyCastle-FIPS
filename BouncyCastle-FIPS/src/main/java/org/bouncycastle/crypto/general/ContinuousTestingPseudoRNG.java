@@ -11,9 +11,9 @@ class ContinuousTestingPseudoRNG
 
      private final DRBG drbg;
 
-     private volatile byte[] block;
-     private volatile byte[] nextBlock;
-     private volatile byte[] initialAdditionalInput;
+     private byte[] block;
+     private byte[] nextBlock;
+     private byte[] initialAdditionalInput;
 
      ContinuousTestingPseudoRNG(DRBG drbg, byte[] primaryAdditionalInput)
      {

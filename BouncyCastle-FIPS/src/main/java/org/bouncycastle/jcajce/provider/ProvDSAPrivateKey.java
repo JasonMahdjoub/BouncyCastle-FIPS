@@ -8,12 +8,13 @@ import java.security.interfaces.DSAParams;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.spec.DSAPrivateKeySpec;
 
+import javax.security.auth.Destroyable;
+
 import org.bouncycastle.crypto.Algorithm;
 import org.bouncycastle.crypto.asymmetric.AsymmetricDSAPrivateKey;
-import org.bouncycastle.util.Strings;
 
 class ProvDSAPrivateKey
-    implements DSAPrivateKey, ProvKey<AsymmetricDSAPrivateKey>
+    implements Destroyable, DSAPrivateKey, ProvKey<AsymmetricDSAPrivateKey>
 {
     private static final long serialVersionUID = -4677259546958385734L;
 
@@ -51,16 +52,22 @@ class ProvDSAPrivateKey
 
     public AsymmetricDSAPrivateKey getBaseKey()
     {
+        KeyUtil.checkDestroyed(this);
+        
         return baseKey;
     }
 
     public String getAlgorithm()
     {
+        KeyUtil.checkDestroyed(this);
+
         return "DSA";
     }
 
     public String getFormat()
     {
+        KeyUtil.checkDestroyed(this);
+        
         return "PKCS#8";
     }
 
@@ -69,22 +76,31 @@ class ProvDSAPrivateKey
         return baseKey.getEncoded();
     }
 
+    public void destroy()
+    {
+        baseKey.destroy();
+    }
+
+    public boolean isDestroyed()
+    {
+        return baseKey.isDestroyed();
+    }
+
     public String toString()
     {
-        StringBuilder   buf = new StringBuilder();
-        String          nl = Strings.lineSeparator();
+        if (isDestroyed())
+        {
+            return KeyUtil.destroyedPrivateKeyToString("DSA");
+        }
 
-        buf.append("DSA Private Key").append(nl);
         try
         {
-            buf.append("    X: ").append(this.getX().toString(16)).append(nl);
+            return KeyUtil.privateKeyToString("DSA", baseKey.getX(), baseKey.getDomainParameters());
         }
         catch (Exception e)
         {
-            buf.append("RESTRICTED").append(nl);
+            return KeyUtil.restrictedToString("DSA");
         }
-
-        return buf.toString();
     }
 
     public boolean equals(Object o)
@@ -126,6 +142,11 @@ class ProvDSAPrivateKey
         ObjectOutputStream out)
         throws IOException
     {
+        if (isDestroyed())
+        {
+            throw new IOException("key has been destroyed");
+        }
+
         out.defaultWriteObject();
 
         out.writeObject(baseKey.getAlgorithm());

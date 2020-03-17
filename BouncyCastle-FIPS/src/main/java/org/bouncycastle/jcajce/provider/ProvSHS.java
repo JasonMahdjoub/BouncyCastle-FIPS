@@ -494,6 +494,48 @@ class ProvSHS
                 }
             });
             provider.addAlias("MessageDigest", "SHA3-224", NISTObjectIdentifiers.id_sha3_224);
+            
+            addHMACAlgorithm(provider, "SHA3-224",
+                PREFIX + "$HashMac", new EngineCreator()
+                {
+                    public Object createInstance(Object constructorParameter)
+                    {
+                        return new BaseHMac(FipsSHS.Algorithm.SHA3_224_HMAC, new ParametersCreator(FipsSHS.SHA3_224_HMAC));
+                    }
+                },
+                PREFIX + "$KeyGenerator", new EngineCreator()
+                {
+
+                    public Object createInstance(Object constructorParameter)
+                    {
+                        return new BaseKeyGenerator(provider, "HmacSHA3-224", 224, new KeyGeneratorCreator()
+                        {
+                            public SymmetricKeyGenerator createInstance(int keySize, SecureRandom random)
+                            {
+                                return new FipsSHS.KeyGenerator(FipsSHS.Algorithm.SHA3_224_HMAC, keySize, random);
+                            }
+                        });
+                    }
+                },
+                PREFIX + "$SecretKeyFactory", new EngineCreator()
+                {
+                    public Object createInstance(Object constructorParameter)
+                    {
+                        return new BaseSecretKeyFactory("HmacSHA3-224", FipsSHS.Algorithm.SHA3_224_HMAC, anythingGoesValidator);
+                    }
+                }
+            );
+
+            provider.addAlgorithmImplementation("Mac.HMAC128SHA3-224", PREFIX + "$HashMac128", new EngineCreator()
+            {
+                public Object createInstance(Object constructorParameter)
+                {
+                    return new BaseHMac(FipsSHS.Algorithm.SHA3_224_HMAC, new TruncatedParametersCreator(FipsSHS.SHA3_224_HMAC, 128));
+                }
+            });
+
+            addHMACAlias(provider, "SHA3-224",  "HMACSHA3-224");
+            addHMACAlias(provider, "SHA3-224", NISTObjectIdentifiers.id_hmacWithSHA3_224, NISTObjectIdentifiers.id_sha3_224);
         }
     }
 
@@ -512,6 +554,48 @@ class ProvSHS
                 }
             });
             provider.addAlias("MessageDigest", "SHA3-256", NISTObjectIdentifiers.id_sha3_256);
+
+            addHMACAlgorithm(provider, "SHA3-256",
+                PREFIX + "$HashMac", new EngineCreator()
+                {
+                    public Object createInstance(Object constructorParameter)
+                    {
+                        return new BaseHMac(FipsSHS.Algorithm.SHA3_256_HMAC, new ParametersCreator(FipsSHS.SHA3_256_HMAC));
+                    }
+                },
+                PREFIX + "$KeyGenerator", new EngineCreator()
+                {
+
+                    public Object createInstance(Object constructorParameter)
+                    {
+                        return new BaseKeyGenerator(provider, "HmacSHA3-256", 256, new KeyGeneratorCreator()
+                        {
+                            public SymmetricKeyGenerator createInstance(int keySize, SecureRandom random)
+                            {
+                                return new FipsSHS.KeyGenerator(FipsSHS.Algorithm.SHA3_256_HMAC, keySize, random);
+                            }
+                        });
+                    }
+                },
+                PREFIX + "$SecretKeyFactory", new EngineCreator()
+                {
+                    public Object createInstance(Object constructorParameter)
+                    {
+                        return new BaseSecretKeyFactory("HmacSHA3-256", FipsSHS.Algorithm.SHA3_256_HMAC, anythingGoesValidator);
+                    }
+                }
+            );
+
+            provider.addAlgorithmImplementation("Mac.HMAC128SHA3-256", PREFIX + "$HashMac128", new EngineCreator()
+            {
+                public Object createInstance(Object constructorParameter)
+                {
+                    return new BaseHMac(FipsSHS.Algorithm.SHA3_256_HMAC, new TruncatedParametersCreator(FipsSHS.SHA3_256_HMAC, 128));
+                }
+            });
+
+            addHMACAlias(provider, "SHA3-256",  "HMACSHA3-256");
+            addHMACAlias(provider, "SHA3-256", NISTObjectIdentifiers.id_hmacWithSHA3_256, NISTObjectIdentifiers.id_sha3_256);
         }
     }
 
@@ -530,6 +614,48 @@ class ProvSHS
                 }
             });
             provider.addAlias("MessageDigest", "SHA3-384", NISTObjectIdentifiers.id_sha3_384);
+            
+            addHMACAlgorithm(provider, "SHA3-384",
+                PREFIX + "$HashMac", new EngineCreator()
+                {
+                    public Object createInstance(Object constructorParameter)
+                    {
+                        return new BaseHMac(FipsSHS.Algorithm.SHA3_384_HMAC, new ParametersCreator(FipsSHS.SHA3_384_HMAC));
+                    }
+                },
+                PREFIX + "$KeyGenerator", new EngineCreator()
+                {
+
+                    public Object createInstance(Object constructorParameter)
+                    {
+                        return new BaseKeyGenerator(provider, "HmacSHA3-384", 384, new KeyGeneratorCreator()
+                        {
+                            public SymmetricKeyGenerator createInstance(int keySize, SecureRandom random)
+                            {
+                                return new FipsSHS.KeyGenerator(FipsSHS.Algorithm.SHA3_384_HMAC, keySize, random);
+                            }
+                        });
+                    }
+                },
+                PREFIX + "$SecretKeyFactory", new EngineCreator()
+                {
+                    public Object createInstance(Object constructorParameter)
+                    {
+                        return new BaseSecretKeyFactory("HmacSHA3-384", FipsSHS.Algorithm.SHA3_384_HMAC, anythingGoesValidator);
+                    }
+                }
+            );
+
+            provider.addAlgorithmImplementation("Mac.HMAC256SHA3-384", PREFIX + "$HashMac256", new EngineCreator()
+            {
+                public Object createInstance(Object constructorParameter)
+                {
+                    return new BaseHMac(FipsSHS.Algorithm.SHA3_384_HMAC, new TruncatedParametersCreator(FipsSHS.SHA3_384_HMAC, 256));
+                }
+            });
+
+            addHMACAlias(provider, "SHA3-384", "HMACSHA3-384");
+            addHMACAlias(provider, "SHA3-384", NISTObjectIdentifiers.id_hmacWithSHA3_384, NISTObjectIdentifiers.id_sha3_384);
         }
     }
 
@@ -548,6 +674,48 @@ class ProvSHS
                 }
             });
             provider.addAlias("MessageDigest", "SHA3-512", NISTObjectIdentifiers.id_sha3_512);
+            
+            addHMACAlgorithm(provider, "SHA3-512",
+                PREFIX + "$HashMac", new EngineCreator()
+                {
+                    public Object createInstance(Object constructorParameter)
+                    {
+                        return new BaseHMac(FipsSHS.Algorithm.SHA3_512_HMAC, new ParametersCreator(FipsSHS.SHA3_512_HMAC));
+                    }
+                },
+                PREFIX + "$KeyGenerator", new EngineCreator()
+                {
+
+                    public Object createInstance(Object constructorParameter)
+                    {
+                        return new BaseKeyGenerator(provider, "HmacSHA3-512", 512, new KeyGeneratorCreator()
+                        {
+                            public SymmetricKeyGenerator createInstance(int keySize, SecureRandom random)
+                            {
+                                return new FipsSHS.KeyGenerator(FipsSHS.Algorithm.SHA3_512_HMAC, keySize, random);
+                            }
+                        });
+                    }
+                },
+                PREFIX + "$SecretKeyFactory", new EngineCreator()
+                {
+                    public Object createInstance(Object constructorParameter)
+                    {
+                        return new BaseSecretKeyFactory("HmacSHA3-512", FipsSHS.Algorithm.SHA3_512_HMAC, anythingGoesValidator);
+                    }
+                }
+            );
+
+            provider.addAlgorithmImplementation("Mac.HMAC256SHA3-512", PREFIX + "$HashMac256", new EngineCreator()
+            {
+                public Object createInstance(Object constructorParameter)
+                {
+                    return new BaseHMac(FipsSHS.Algorithm.SHA3_512_HMAC, new TruncatedParametersCreator(FipsSHS.SHA3_512_HMAC, 256));
+                }
+            });
+
+            addHMACAlias(provider, "SHA3-512", "HMACSHA3-512");
+            addHMACAlias(provider, "SHA3-512", NISTObjectIdentifiers.id_hmacWithSHA3_512, NISTObjectIdentifiers.id_sha3_512);
         }
     }
 }

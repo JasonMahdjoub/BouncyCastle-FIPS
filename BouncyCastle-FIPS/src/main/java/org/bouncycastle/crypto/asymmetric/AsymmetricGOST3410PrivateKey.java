@@ -2,6 +2,7 @@ package org.bouncycastle.crypto.asymmetric;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
@@ -20,7 +21,9 @@ public final class AsymmetricGOST3410PrivateKey
     extends AsymmetricGOST3410Key<GOST3410DomainParameters>
     implements AsymmetricPrivateKey
 {
-    private final int hashCode;
+    private final AtomicBoolean hasBeenDestroyed = new AtomicBoolean(false);
+
+    private int hashCode;
 
     private BigInteger x;
 
@@ -66,6 +69,31 @@ public final class AsymmetricGOST3410PrivateKey
         }
     }
 
+    /**
+      * Return the algorithm this GOST R 34.10 key is for.
+      *
+      * @return the key's algorithm.
+      */
+    public final Algorithm getAlgorithm()
+    {
+        KeyUtils.checkDestroyed(this);
+
+        return super.getAlgorithm();
+    }
+
+    /**
+     * Return the domain parameters associated with this key.These will either
+     * be for GOST R 34.10-1994 or GOST R 34.10-2001 depending on the key type.
+     *
+     * @return the GOST3410 domain parameters.
+     */
+    public final GOST3410Parameters<GOST3410DomainParameters> getParameters()
+    {
+        KeyUtils.checkDestroyed(this);
+
+        return super.getParameters();
+    }
+
     public final byte[] getEncoded()
     {
         byte[]                  keyEnc = this.getX().toByteArray();
@@ -98,12 +126,29 @@ public final class AsymmetricGOST3410PrivateKey
     {
         KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
 
+        KeyUtils.checkDestroyed(this);
+
         return x;
     }
 
-    private void zeroize()
+    public void destroy()
     {
-        this.x = null;
+        checkApprovedOnlyModeStatus();
+
+        KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
+
+        if (!hasBeenDestroyed.getAndSet(true))
+        {
+            this.x = null;
+            this.hashCode = -1;
+
+            super.zeroize();
+        }
+    }
+
+    public boolean isDestroyed()
+    {
+        return hasBeenDestroyed.get();
     }
 
     @Override
@@ -125,7 +170,7 @@ public final class AsymmetricGOST3410PrivateKey
     {
         super.finalize();
 
-        zeroize();
+        destroy();
     }
 
     @Override
@@ -142,6 +187,11 @@ public final class AsymmetricGOST3410PrivateKey
         }
 
         AsymmetricGOST3410PrivateKey other = (AsymmetricGOST3410PrivateKey)o;
+
+        if (this.isDestroyed() || other.isDestroyed())
+        {
+            return false;
+        }
 
         return x.equals(other.x) && this.getParameters().equals(other.getParameters());
     }

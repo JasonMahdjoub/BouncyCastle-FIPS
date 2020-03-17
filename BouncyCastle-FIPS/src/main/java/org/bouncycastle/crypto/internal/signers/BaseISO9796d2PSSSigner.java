@@ -47,8 +47,7 @@ public class BaseISO9796d2PSSSigner
     private int preTLength;
 
     /**
-     * Generate a signer for the with either implicit or explicit trailers
-     * for ISO9796-2, scheme 2 or 3.
+     * Generate a signer with either implicit or explicit trailers for ISO9796-2, scheme 2 or 3.
      *
      * @param cipher     base cipher to use for signature creation/verification
      * @param digest     digest to use.
@@ -80,7 +79,7 @@ public class BaseISO9796d2PSSSigner
             }
             else
             {
-                throw new IllegalArgumentException("no valid trailer for digest");
+                throw new IllegalArgumentException("no valid trailer for digest: " + digest.getAlgorithmName());
             }
         }
     }
@@ -131,7 +130,7 @@ public class BaseISO9796d2PSSSigner
      * @param forSigning true if for signing, false if for verification.
      * @param param      parameters for signature generation/verification. If the
      *                   parameters are for generation they should be a ParametersWithRandom,
-     *                   a ParametersWithSalt, or just an RsaKeyParameters object. If RsaKeyParameters
+     *                   a ParametersWithSalt, or just an RSAKeyParameters object. If RSAKeyParameters
      *                   are passed in a SecureRandom will be created.
      * @throws IllegalArgumentException if wrong parameter type or a fixed
      * salt is passed in which is the wrong length.
@@ -255,9 +254,13 @@ public class BaseISO9796d2PSSSigner
 
             if (trailerObj != null)
             {
-                if (sigTrail != trailerObj.intValue())
+                int trailer = trailerObj.intValue();
+                if (sigTrail != trailer)
                 {
-                    throw new IllegalStateException("signer initialised with wrong digest for trailer " + sigTrail);
+                    if (!(trailer == ISOTrailers.TRAILER_SHA512_256 && sigTrail == 0x40CC))
+                    {
+                        throw new IllegalStateException("signer initialized with wrong digest for trailer " + sigTrail);
+                    }
                 }
             }
             else
@@ -399,7 +402,7 @@ public class BaseISO9796d2PSSSigner
         digest.doFinal(m2Hash, 0);
 
         byte[] C = new byte[8];
-        LtoOSP(messageLength * 8, C);
+        LtoOSP(messageLength * 8L, C);
 
         digest.update(C, 0, C.length);
 
@@ -518,7 +521,7 @@ public class BaseISO9796d2PSSSigner
         // check the hashes
         //
         byte[] C = new byte[8];
-        LtoOSP(recoveredMessage.length * 8, C);
+        LtoOSP(recoveredMessage.length * 8L, C);
 
         digest.update(C, 0, C.length);
 
@@ -577,9 +580,11 @@ public class BaseISO9796d2PSSSigner
                 clearBlock(mBuf);
                 return false;
             }
-        }
 
+        }
+        
         messageLength = 0;
+
         clearBlock(mBuf);
         return true;
     }

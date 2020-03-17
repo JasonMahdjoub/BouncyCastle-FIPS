@@ -1,3 +1,6 @@
+/***************************************************************/
+/******    DO NOT EDIT THIS CLASS bc-java SOURCE FILE     ******/
+/***************************************************************/
 package org.bouncycastle.asn1.bc;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -60,7 +63,6 @@ public class SecretKeyData
         return keyAlgorithm;
     }
 
-    @Override
     public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector v = new ASN1EncodableVector();

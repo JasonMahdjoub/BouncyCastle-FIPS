@@ -2,6 +2,7 @@ package org.bouncycastle.crypto.asymmetric;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -23,7 +24,9 @@ public final class AsymmetricDSTU4145PrivateKey
     extends AsymmetricDSTU4145Key
     implements AsymmetricPrivateKey
 {
-    private final int        hashCode;
+    private final AtomicBoolean hasBeenDestroyed = new AtomicBoolean(false);
+
+    private int        hashCode;
 
     private PrivateKeyInfo privKeyInfo;
     private BigInteger d;
@@ -112,13 +115,60 @@ public final class AsymmetricDSTU4145PrivateKey
         }
     }
 
-    public BigInteger getS()
+    /**
+     * Return the algorithm this DSTU4145 key is for.
+     *
+     * @return the key's algorithm.
+     */
+    public final Algorithm getAlgorithm()
+    {
+        KeyUtils.checkDestroyed(this);
+
+        return super.getAlgorithm();
+    }
+
+    /**
+     * Return the domain parameters for this DSTU4145 key.
+     *
+     * @return the DSTU4145 domain parameters.
+     */
+    public final DSTU4145Parameters getParameters()
+    {
+        KeyUtils.checkDestroyed(this);
+
+        return super.getParameters();
+    }
+
+    public final BigInteger getS()
     {
         checkApprovedOnlyModeStatus();
 
         KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
 
+        KeyUtils.checkDestroyed(this);
+
         return d;
+    }
+
+    public void destroy()
+    {
+        checkApprovedOnlyModeStatus();
+
+        KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
+        
+        if (!hasBeenDestroyed.getAndSet(true))
+        {
+            this.d = null;
+            this.hashCode = -1;
+            super.zeroize();
+        }
+    }
+
+    public boolean isDestroyed()
+    {
+        checkApprovedOnlyModeStatus();
+
+        return hasBeenDestroyed.get();
     }
 
     @Override
@@ -137,6 +187,11 @@ public final class AsymmetricDSTU4145PrivateKey
         }
 
         AsymmetricDSTU4145PrivateKey other = (AsymmetricDSTU4145PrivateKey)o;
+
+        if (this.isDestroyed() || other.isDestroyed())
+        {
+            return false;
+        }
 
         if (d == null)
         {
@@ -177,13 +232,8 @@ public final class AsymmetricDSTU4145PrivateKey
     protected void finalize()
         throws Throwable
     {
+        destroy();
+
         super.finalize();
-
-        zeroize();
-    }
-
-    private void zeroize()
-    {
-        this.d = null;
     }
 }

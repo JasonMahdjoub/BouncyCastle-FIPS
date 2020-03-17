@@ -23,6 +23,7 @@ import org.bouncycastle.crypto.internal.params.EcNamedDomainParameters;
 import org.bouncycastle.crypto.internal.params.EcPrivateKeyParameters;
 import org.bouncycastle.crypto.internal.params.EcPublicKeyParameters;
 import org.bouncycastle.crypto.internal.params.ParametersWithRandom;
+import org.bouncycastle.util.Properties;
 
 /**
  * Source class for non-FIPS implementations of Elliptic Curve based algorithms.
@@ -150,6 +151,8 @@ public final class EC
         {
             super(keyGenParameters);
 
+            checkEnabled();
+
             this.kpGen = new FipsEC.KeyPairGenerator(new FipsEC.KeyGenParameters(keyGenParameters.domainParameters), random);
         }
 
@@ -178,6 +181,11 @@ public final class EC
     public static final class DSAOperatorFactory
         extends GuardedSignatureOperatorFactory<DSAParameters>
     {
+        public DSAOperatorFactory()
+        {
+            checkEnabled();
+        }
+
         @Override
         protected OutputSigner<DSAParameters> doCreateSigner(AsymmetricPrivateKey key, DSAParameters parameters)
         {
@@ -222,13 +230,21 @@ public final class EC
         }
     }
 
+    private static void checkEnabled()
+    {
+        if (Properties.isOverrideSet("org.bouncycastle.ec.disable"))
+        {
+            throw new UnsupportedOperationException("EC has been disabled by setting \"org.bouncycastle.ec.disable\"");
+        }
+    }
+
     private static EcDomainParameters getDomainParams(ECDomainParameters curveParams)
     {
         if (curveParams instanceof NamedECDomainParameters)
         {
-            return new EcNamedDomainParameters(((NamedECDomainParameters)curveParams).getID(), curveParams.getCurve(), curveParams.getG(), curveParams.getN(), curveParams.getH(), curveParams.getSeed());
+            return new EcNamedDomainParameters((NamedECDomainParameters)curveParams);
         }
-        return new EcDomainParameters(curveParams.getCurve(), curveParams.getG(), curveParams.getN(), curveParams.getH(), curveParams.getSeed());
+        return new EcDomainParameters(curveParams);
     }
 
     private static EcPrivateKeyParameters getLwKey(final AsymmetricECPrivateKey privKey)

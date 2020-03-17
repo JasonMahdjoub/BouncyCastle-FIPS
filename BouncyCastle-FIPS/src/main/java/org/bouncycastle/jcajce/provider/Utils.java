@@ -1,9 +1,11 @@
 package org.bouncycastle.jcajce.provider;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.security.AccessController;
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.KeyStore;
 import java.security.PrivilegedAction;
 import java.security.SecureRandom;
 import java.util.HashMap;
@@ -12,6 +14,10 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.crypto.SecretKey;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.DERNull;
@@ -36,6 +42,10 @@ class Utils
         digestNameToAlgMap.put("SHA-256", FipsSHS.Algorithm.SHA256);
         digestNameToAlgMap.put("SHA-384", FipsSHS.Algorithm.SHA384);
         digestNameToAlgMap.put("SHA-512", FipsSHS.Algorithm.SHA512);
+        digestNameToAlgMap.put("SHA3-224", FipsSHS.Algorithm.SHA3_224);
+        digestNameToAlgMap.put("SHA3-256", FipsSHS.Algorithm.SHA3_256);
+        digestNameToAlgMap.put("SHA3-384", FipsSHS.Algorithm.SHA3_384);
+        digestNameToAlgMap.put("SHA3-512", FipsSHS.Algorithm.SHA3_512);
 
         hmacToAlgMap.put(FipsSHS.Algorithm.SHA1_HMAC, FipsSHS.Algorithm.SHA1);
         hmacToAlgMap.put(FipsSHS.Algorithm.SHA224_HMAC, FipsSHS.Algorithm.SHA224);
@@ -44,6 +54,10 @@ class Utils
         hmacToAlgMap.put(FipsSHS.Algorithm.SHA512_HMAC, FipsSHS.Algorithm.SHA512);
         hmacToAlgMap.put(FipsSHS.Algorithm.SHA512_224_HMAC, FipsSHS.Algorithm.SHA512_224);
         hmacToAlgMap.put(FipsSHS.Algorithm.SHA512_256_HMAC, FipsSHS.Algorithm.SHA512_256);
+        hmacToAlgMap.put(FipsSHS.Algorithm.SHA3_224_HMAC, FipsSHS.Algorithm.SHA3_224);
+        hmacToAlgMap.put(FipsSHS.Algorithm.SHA3_256_HMAC, FipsSHS.Algorithm.SHA3_256);
+        hmacToAlgMap.put(FipsSHS.Algorithm.SHA3_384_HMAC, FipsSHS.Algorithm.SHA3_384);
+        hmacToAlgMap.put(FipsSHS.Algorithm.SHA3_512_HMAC, FipsSHS.Algorithm.SHA3_512);
 
         hmacToAlgMap.put(SecureHash.Algorithm.MD5_HMAC, SecureHash.Algorithm.MD5);
         hmacToAlgMap.put(SecureHash.Algorithm.GOST3411_HMAC, SecureHash.Algorithm.GOST3411);
@@ -177,5 +191,42 @@ class Utils
                 });
 
         return keyBytes.length != ((keySizeInBits + 7) / 8);
+    }
+
+    static char[] extractPassword(KeyStore.LoadStoreParameter bcParam)
+        throws IOException
+    {
+        KeyStore.ProtectionParameter protParam = bcParam.getProtectionParameter();
+
+        if (protParam == null)
+        {
+            return null;
+        }
+        else if (protParam instanceof KeyStore.PasswordProtection)
+        {
+            return ((KeyStore.PasswordProtection)protParam).getPassword();
+        }
+        else if (protParam instanceof KeyStore.CallbackHandlerProtection)
+        {
+            CallbackHandler handler = ((KeyStore.CallbackHandlerProtection)protParam).getCallbackHandler();
+
+            PasswordCallback passwordCallback = new PasswordCallback("password: ", false);
+
+            try
+            {
+                handler.handle(new Callback[]{passwordCallback});
+
+                return passwordCallback.getPassword();
+            }
+            catch (UnsupportedCallbackException e)
+            {
+                throw new IllegalArgumentException("PasswordCallback not recognised: " + e.getMessage(), e);
+            }
+        }
+        else
+        {
+            throw new IllegalArgumentException(
+                "no support for protection parameter of type " + protParam.getClass().getName());
+        }
     }
 }

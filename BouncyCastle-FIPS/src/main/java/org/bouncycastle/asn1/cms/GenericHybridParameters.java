@@ -1,3 +1,6 @@
+/***************************************************************/
+/******    DO NOT EDIT THIS CLASS bc-java SOURCE FILE     ******/
+/***************************************************************/
 package org.bouncycastle.asn1.cms;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
@@ -67,7 +70,6 @@ public class GenericHybridParameters
         return kem;
     }
 
-    @Override
     public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector v = new ASN1EncodableVector();

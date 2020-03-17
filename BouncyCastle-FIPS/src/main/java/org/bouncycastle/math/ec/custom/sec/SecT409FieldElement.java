@@ -177,7 +177,9 @@ class SecT409FieldElement extends ECFieldElement.AbstractF2m
 
     public ECFieldElement sqrt()
     {
-        return squarePow(getM() - 1);
+        long[] z = Nat448.create64();
+        SecT409Field.sqrt(x, z);
+        return new SecT409FieldElement(z);
     }
 
     public int getRepresentation()

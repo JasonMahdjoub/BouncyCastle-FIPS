@@ -75,14 +75,7 @@ class ProvDSTU4145PublicKey
 
     public String toString()
     {
-        StringBuilder   buf = new StringBuilder();
-        String          nl = Strings.lineSeparator();
-
-        buf.append("DSTU4145 Public Key").append(nl);
-        buf.append("    X: ").append(baseKey.getW().getAffineXCoord().toBigInteger().toString(16)).append(nl);
-        buf.append("    Y: ").append(baseKey.getW().getAffineYCoord().toBigInteger().toString(16)).append(nl);
-
-        return buf.toString();
+        return KeyUtil.publicKeyToString("DSTU4145", baseKey.getW().normalize(), baseKey.getParameters().getDomainParameters());
     }
 
     public boolean equals(Object o)

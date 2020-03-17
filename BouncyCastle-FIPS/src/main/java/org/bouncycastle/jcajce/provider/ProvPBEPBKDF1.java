@@ -16,6 +16,7 @@ import org.bouncycastle.crypto.DigestAlgorithm;
 import org.bouncycastle.crypto.PasswordBasedDeriver;
 import org.bouncycastle.crypto.PasswordConverter;
 import org.bouncycastle.crypto.general.PBKD;
+import org.bouncycastle.jcajce.PBKDF1Key;
 
 class ProvPBEPBKDF1
     extends AlgorithmProvider
@@ -117,7 +118,7 @@ class ProvPBEPBKDF1
 
                 if (pbeSpec.getSalt() == null)
                 {
-                    throw new InvalidKeySpecException("Missing required salt");
+                    return new PBKDF1Key(((PBEKeySpec)keySpec).getPassword(), passwordConverter);
                 }
 
                 PasswordBasedDeriver deriver = new PBKD.DeriverFactory().createDeriver(

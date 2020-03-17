@@ -1,8 +1,3 @@
-/***************************************************************
- * DO NOT EDIT THIS CLASS bc-java SOURCE FILE
-
-/******    DO NOT EDIT THIS CLASS bc-java SOURCE FILE     ******/
-/***************************************************************/
 package org.bouncycastle.crypto.fips;
 
 import java.math.BigInteger;
@@ -25,13 +20,11 @@ class RsaKeyPairGenerator
     private static final BigInteger ONE = BigInteger.valueOf(1);
 
     private RsaKeyGenerationParameters param;
-    private int iterations;
 
     public void init(
         KeyGenerationParameters param)
     {
         this.param = (RsaKeyGenerationParameters)param;
-        this.iterations = getNumberOfIterations(this.param.getStrength(), this.param.getCertainty());
     }
 
     public AsymmetricCipherKeyPair generateKeyPair()
@@ -165,8 +158,10 @@ class RsaKeyPairGenerator
      * @param e         the RSA public exponent
      * @return A prime p, with (p-1) relatively prime to e
      */
-    protected BigInteger chooseRandomPrime(int bitlength, BigInteger e, BigInteger sqrdBound)
+    private BigInteger chooseRandomPrime(int bitlength, BigInteger e, BigInteger sqrdBound)
     {
+        int iterations = getNumberOfIterations(bitlength, this.param.getCertainty());
+
         for (int i = 0; i != 5 * bitlength; i++)
         {
             BigInteger p = new BigInteger(bitlength, 1, param.getRandom());
@@ -181,7 +176,7 @@ class RsaKeyPairGenerator
                 continue;
             }
 
-            if (!isProbablePrime(p))
+            if (!isProbablePrime(p, iterations))
             {
                 continue;
             }
@@ -197,7 +192,7 @@ class RsaKeyPairGenerator
         throw new IllegalStateException("unable to generate prime number for RSA key");
     }
 
-    protected boolean isProbablePrime(BigInteger x)
+    private boolean isProbablePrime(BigInteger x, int iterations)
     {
         /*
          * Primes class for FIPS 186-4 C.3 primality checking

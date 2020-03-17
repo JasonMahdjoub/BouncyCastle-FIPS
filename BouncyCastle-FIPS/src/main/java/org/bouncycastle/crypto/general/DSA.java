@@ -331,8 +331,6 @@ public final class DSA
 
                 signer.init(false, kp.getPublic());
 
-                signer.verifySignature(data, rv[0], rv[1]);
-
                 return signer.verifySignature(data, rv[0], rv[1]);
             }
         });

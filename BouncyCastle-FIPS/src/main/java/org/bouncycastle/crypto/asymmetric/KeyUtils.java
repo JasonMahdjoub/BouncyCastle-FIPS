@@ -4,11 +4,14 @@ import java.math.BigInteger;
 import java.security.Permission;
 import java.security.SecureRandom;
 
+import javax.security.auth.Destroyable;
+
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -16,6 +19,8 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X962Parameters;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.crypto.fips.FipsDRBG;
+import org.bouncycastle.math.ec.ECAlgorithms;
+import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.math.internal.Primes;
 import org.bouncycastle.util.Pack;
@@ -109,7 +114,7 @@ class KeyUtils
             }
 
             // Use the same iterations as if we were testing a candidate p or q value with error probability 2^-100
-            int bits = modulus.bitLength();
+            int bits = modulus.bitLength() / 2;
             int iterations = bits >= 1536 ? 3
                 : bits >= 1024 ? 4
                 : bits >= 512 ? 7
@@ -136,7 +141,7 @@ class KeyUtils
         return modulus;
     }
 
-    static ECPoint validated(ECPoint q)
+    static ECPoint validated(ECCurve c, ECPoint q)
     {
         // FSM_STATE:5.9, "FIPS 186-3/SP 800-89 ASSURANCES", "The module is performing FIPS 186-3/SP 800-89 Assurances self-test"
         // FSM_TRANS:5.14, "CONDITIONAL TEST", "FIPS 186-3/SP 800-89 ASSURANCES CHECK", "Invoke FIPS 186-3/SP 800-89 Assurances test"
@@ -146,13 +151,13 @@ class KeyUtils
             throw new IllegalArgumentException("Point has null value");
         }
 
+        q = ECAlgorithms.importPoint(c, q).normalize();
+
         if (q.isInfinity())
         {
             // FSM_TRANS:5.16, "FIPS 186-3/SP 800-89 ASSURANCES CHECK", "CONDITIONAL TEST", "FIPS 186-3/SP 800-89 Assurances test failed"
             throw new IllegalArgumentException("Point at infinity");
         }
-
-        q = q.normalize();
 
         if (!q.isValid())
         {
@@ -161,6 +166,35 @@ class KeyUtils
         }
 
         // FSM_TRANS:5.15, "FIPS 186-3/SP 800-89 ASSURANCES CHECK", "CONDITIONAL TEST", "FIPS 186-3/SP 800-89 Assurances test successful"
+        return q;
+    }
+
+    static ECPoint validated(ECCurve c, byte[] encodedPoint)
+    {
+        // FSM_STATE:5.9, "FIPS 186-3/SP 800-89 ASSURANCES", "The module is performing FIPS 186-3/SP 800-89 Assurances self-test"
+        // FSM_TRANS:5.14, "CONDITIONAL TEST", "FIPS 186-3/SP 800-89 ASSURANCES CHECK", "Invoke FIPS 186-3/SP 800-89 Assurances test"
+        if (encodedPoint == null)
+        {
+            // FSM_TRANS:5.16, "FIPS 186-3/SP 800-89 ASSURANCES CHECK", "CONDITIONAL TEST", "FIPS 186-3/SP 800-89 Assurances test failed"
+            throw new IllegalArgumentException("Point encoding has null value");
+        }
+
+        ECPoint q = c.decodePoint(encodedPoint);
+
+        if (q == null)
+        {
+            // FSM_TRANS:5.16, "FIPS 186-3/SP 800-89 ASSURANCES CHECK", "CONDITIONAL TEST", "FIPS 186-3/SP 800-89 Assurances test failed"
+            throw new IllegalArgumentException("Point has null value");
+        }
+
+        q = q.normalize();
+
+        if (q.isInfinity())
+        {
+            // FSM_TRANS:5.16, "FIPS 186-3/SP 800-89 ASSURANCES CHECK", "CONDITIONAL TEST", "FIPS 186-3/SP 800-89 Assurances test failed"
+            throw new IllegalArgumentException("Point at infinity");
+        }
+
         return q;
     }
 
@@ -266,6 +300,28 @@ class KeyUtils
          }
     }
 
+    static byte[] getEncodedPrivateKeyInfo(AlgorithmIdentifier algId, ASN1Encodable privKey, ASN1Set attributes, byte[] publicKey)
+    {
+         try
+         {
+             PrivateKeyInfo info = new PrivateKeyInfo(algId, privKey.toASN1Primitive(), attributes, publicKey);
+
+             return getEncodedInfo(info);
+         }
+         catch (Exception e)
+         {
+             return null;
+         }
+    }
+
+    static void checkDestroyed(Destroyable destroyable)
+    {
+        if (destroyable.isDestroyed())
+        {
+            throw new IllegalStateException("key has been destroyed");
+        }
+    }
+
     static void checkPermission(final Permission keyPermission)
     {
         final SecurityManager securityManager = System.getSecurityManager();
@@ -274,5 +330,22 @@ class KeyUtils
         {
             securityManager.checkPermission(keyPermission);
         }
+    }
+
+    static boolean isValidPrefix(byte[] prefix, byte[] encoding)
+    {
+        if (encoding.length < prefix.length)
+        {
+            return !isValidPrefix(prefix, prefix);
+        }
+
+        int nonEqual = 0;
+
+        for (int i = 0; i != prefix.length; i++)
+        {
+            nonEqual |= (prefix[i] ^ encoding[i]);
+        }
+
+        return nonEqual == 0;
     }
 }

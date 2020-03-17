@@ -29,11 +29,36 @@ public final class KDF
             super(algorithm);
         }
 
+        /**
+         * Generate a key using the scrypt key derivation function.
+         *
+         * @param salt     the salt to use for this invocation.
+         * @param n     CPU/Memory cost parameter. Must be larger than 1, a power of 2 and less than
+         *              <code>2^(128 * r / 8)</code>.
+         * @param r     the block size, must be &gt;= 1.
+         * @param p     Parallelization parameter. Must be a positive integer less than or equal to
+         *              <code>Integer.MAX_VALUE / (128 * r * 8)</code>.
+         * @param seed  the value feed into the PBKDF2 function.
+         * @return the generated key.
+         */
         public ScryptParameters using(byte[] salt, int n, int r, int p, byte[] seed)
         {
             return new ScryptParameters(n, Arrays.clone(seed), r, p, Arrays.clone(salt));
         }
 
+        /**
+         * Generate a key using the scrypt key derivation function.
+         *
+         * @param salt     the salt to use for this invocation.
+         * @param n     CPU/Memory cost parameter. Must be larger than 1, a power of 2 and less than
+         *              <code>2^(128 * r / 8)</code>.
+         * @param r     the block size, must be &gt;= 1.
+         * @param p     Parallelization parameter. Must be a positive integer less than or equal to
+         *              <code>Integer.MAX_VALUE / (128 * r * 8)</code>.
+         * @param converter a converter to turn the password characters into the byte array for the seed.
+         * @param password  a character string to use as a seed.
+         * @return the generated key.
+         */
         public ScryptParameters using(byte[] salt, int n, int r, int p, PasswordConverter converter, char[] password)
         {
             return new ScryptParameters(n, converter.convert(password), r, p, Arrays.clone(salt));
@@ -41,7 +66,7 @@ public final class KDF
     }
 
     /**
-     * Parameters for the SCrypt key derivation function.
+     * Parameters for the scrypt key derivation function.
      */
     public static final class ScryptParameters
         extends GeneralParameters<GeneralAlgorithm>
@@ -65,7 +90,7 @@ public final class KDF
     }
 
     /**
-     * Factory for SCrypt KDFs.
+     * Factory for scrypt KDFs.
      */
     public static final class SCryptFactory
         extends GuardedKDFOperatorFactory<ScryptParameters>

@@ -49,8 +49,7 @@ public abstract class ECPoint
     protected ECFieldElement y;
     protected ECFieldElement[] zs;
 
-    // Map is (String -> PreCompInfo)
-    protected Map preCompTable = null;
+    protected Map<String, PreCompInfo> preCompTable = null;
 
     protected ECPoint(ECCurve curve, ECFieldElement x, ECFieldElement y)
     {
@@ -78,18 +77,12 @@ public abstract class ECPoint
         this.zs = zs;
     }
 
-    protected boolean satisfiesCofactor()
-    {
-        BigInteger h = curve.getCofactor();
-        return h.equals(ECConstants.ONE) || !ECAlgorithms.referenceMultiply(this, h).isInfinity();
-    }
-
     protected abstract boolean satisfiesCurveEquation();
 
     protected boolean satisfiesOrder()
     {
-        BigInteger h = curve.getCofactor();
-        return h.equals(ECConstants.ONE) || ECAlgorithms.referenceMultiply(this, curve.getOrder()).isInfinity();
+        return ECConstants.ONE.equals(curve.getCofactor())
+            || ECAlgorithms.referenceMultiply(this, curve.getOrder()).isInfinity();
     }
 
     public ECCurve getCurve()
@@ -275,62 +268,58 @@ public abstract class ECPoint
 
     public boolean isValid()
     {
-        return implIsValid(true);
+        return implIsValid(false, true);
     }
 
     boolean isValidPartial()
     {
-        return implIsValid(false);
+        return implIsValid(false, false);
     }
 
-    boolean implIsValid(boolean checkOrder)
+    boolean implIsValid(final boolean decompressed, final boolean checkOrder)
     {
         if (isInfinity())
         {
             return true;
         }
 
-        ECCurve curve = getCurve();
-        ValidityPrecompInfo info = (ValidityPrecompInfo)curve.getPreCompInfo(this, ValidityPrecompInfo.PRECOMP_NAME);
-        if (info == null)
+        ValidityPrecompInfo validity = (ValidityPrecompInfo)getCurve().precompute(this, ValidityPrecompInfo.PRECOMP_NAME, new PreCompCallback()
         {
-            info = new ValidityPrecompInfo();
-            curve.setPreCompInfo(this, ValidityPrecompInfo.PRECOMP_NAME, info);
-        }
+            public PreCompInfo precompute(PreCompInfo existing)
+            {
+                ValidityPrecompInfo info = (existing instanceof ValidityPrecompInfo) ? (ValidityPrecompInfo)existing : null;
+                if (info == null)
+                {
+                    info = new ValidityPrecompInfo();
+                }
 
-        if (info.hasFailed())
-        {
-            return false;
-        }
-        if (!info.hasCurveEquationPassed())
-        {
-            if (!satisfiesCurveEquation())
-            {
-                info.reportFailed();
-                return false;
+                if (info.hasFailed())
+                {
+                    return info;
+                }
+                if (!info.hasCurveEquationPassed())
+                {
+                    if (!decompressed && !satisfiesCurveEquation())
+                    {
+                        info.reportFailed();
+                        return info;
+                    }
+                    info.reportCurveEquationPassed();
+                }
+                if (checkOrder && !info.hasOrderPassed())
+                {
+                    if (!satisfiesOrder())
+                    {
+                        info.reportFailed();
+                        return info;
+                    }
+                    info.reportOrderPassed();
+                }
+                return info;
             }
-            info.reportCurveEquationPassed();
-        }
-        if (!info.hasCofactorPassed())
-        {
-            if (!satisfiesCofactor())
-            {
-                info.reportFailed();
-                return false;
-            }
-            info.reportCofactorPassed();
-        }
-        if (checkOrder && !info.hasOrderPassed())
-        {
-            if (!satisfiesOrder())
-            {
-                info.reportFailed();
-                return false;
-            }
-            info.reportOrderPassed();
-        }
+        });
 
-        return true;
+        return !validity.hasFailed();
     }
 
     public ECPoint scaleX(ECFieldElement scale)
@@ -452,6 +441,7 @@ public abstract class ECPoint
 
     /**
      * Get an uncompressed encoding of the point value, see also {@link #getEncoded(boolean)}
+     * @return a byte encoding.
      */
     public byte[] getEncoded()
     {
@@ -1400,7 +1390,7 @@ public abstract class ECPoint
         protected boolean satisfiesOrder()
         {
             BigInteger cofactor = curve.getCofactor();
-            if (cofactor.equals(ECConstants.TWO))
+            if (ECConstants.TWO.equals(cofactor))
             {
                 /*
                  *  Check that the trace of (X + A) is 0, then there exists a solution to L^2 + L = X + A,
@@ -1411,7 +1401,7 @@ public abstract class ECPoint
                 ECFieldElement rhs = X.add(curve.getA());
                 return ((ECFieldElement.AbstractF2m)rhs).trace() == 0;
             }
-            if (cofactor.equals(ECConstants.FOUR))
+            if (ECConstants.FOUR.equals(cofactor))
             {
                 /*
                  * Solve L^2 + L = X + A to find the half of this point, if it exists (fail if not).

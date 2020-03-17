@@ -54,6 +54,18 @@ class DigestUtil
         algorithms.put("SHA-512(256)", FipsSHS.Algorithm.SHA512_256);
         algorithms.put(NISTObjectIdentifiers.id_sha512_256.getId(), FipsSHS.Algorithm.SHA512_256);
 
+        algorithms.put("SHA3-224", FipsSHS.Algorithm.SHA3_224);
+        algorithms.put(NISTObjectIdentifiers.id_sha3_224.getId(), FipsSHS.Algorithm.SHA3_224);
+
+        algorithms.put("SHA3-256", FipsSHS.Algorithm.SHA3_256);
+        algorithms.put(NISTObjectIdentifiers.id_sha3_256.getId(), FipsSHS.Algorithm.SHA3_256);
+
+        algorithms.put("SHA3-384", FipsSHS.Algorithm.SHA3_384);
+        algorithms.put(NISTObjectIdentifiers.id_sha3_384.getId(), FipsSHS.Algorithm.SHA3_384);
+
+        algorithms.put("SHA3-512", FipsSHS.Algorithm.SHA3_512);
+        algorithms.put(NISTObjectIdentifiers.id_sha3_512.getId(), FipsSHS.Algorithm.SHA3_512);
+
         algorithms.put("RIPEMD128", SecureHash.Algorithm.RIPEMD128);
         algorithms.put("RIPEMD-128", SecureHash.Algorithm.RIPEMD128);
         algorithms.put(TeleTrusTObjectIdentifiers.ripemd128.getId(), SecureHash.Algorithm.RIPEMD128);
@@ -108,6 +120,18 @@ class DigestUtil
         oids.put("SHA512/256", NISTObjectIdentifiers.id_sha512_256);
         oids.put("SHA-512/256", NISTObjectIdentifiers.id_sha512_256);
         oids.put(NISTObjectIdentifiers.id_sha512_256.getId(), NISTObjectIdentifiers.id_sha512_256);
+
+        oids.put("SHA3-224", NISTObjectIdentifiers.id_sha3_224);
+        oids.put(NISTObjectIdentifiers.id_sha3_224.getId(), NISTObjectIdentifiers.id_sha3_224);
+        ;
+        oids.put("SHA3-256", NISTObjectIdentifiers.id_sha3_256);
+        oids.put(NISTObjectIdentifiers.id_sha3_256.getId(), NISTObjectIdentifiers.id_sha3_256);
+
+        oids.put("SHA3-384", NISTObjectIdentifiers.id_sha3_384);
+        oids.put(NISTObjectIdentifiers.id_sha3_384.getId(), NISTObjectIdentifiers.id_sha3_384);
+
+        oids.put("SHA3-512", NISTObjectIdentifiers.id_sha3_512);
+        oids.put(NISTObjectIdentifiers.id_sha3_512.getId(), NISTObjectIdentifiers.id_sha3_512);
 
         oids.put("RIPEMD128", TeleTrusTObjectIdentifiers.ripemd128);
         oids.put("RIPEMD-128", TeleTrusTObjectIdentifiers.ripemd128);

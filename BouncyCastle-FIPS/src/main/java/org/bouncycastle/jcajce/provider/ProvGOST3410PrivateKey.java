@@ -5,16 +5,17 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 
+import javax.security.auth.Destroyable;
+
 import org.bouncycastle.crypto.Algorithm;
 import org.bouncycastle.crypto.asymmetric.AsymmetricGOST3410PrivateKey;
 import org.bouncycastle.jcajce.interfaces.GOST3410PrivateKey;
 import org.bouncycastle.jcajce.spec.GOST3410DomainParameterSpec;
 import org.bouncycastle.jcajce.spec.GOST3410ParameterSpec;
 import org.bouncycastle.jcajce.spec.GOST3410PrivateKeySpec;
-import org.bouncycastle.util.Strings;
 
 class ProvGOST3410PrivateKey
-    implements GOST3410PrivateKey, ProvKey<AsymmetricGOST3410PrivateKey>
+    implements Destroyable, GOST3410PrivateKey, ProvKey<AsymmetricGOST3410PrivateKey>
 {
     private static final long serialVersionUID = 8581661527592305464L;
 
@@ -52,22 +53,38 @@ class ProvGOST3410PrivateKey
 
     public AsymmetricGOST3410PrivateKey getBaseKey()
     {
+        KeyUtil.checkDestroyed(this);
+
         return baseKey;
     }
 
     public String getAlgorithm()
     {
+        KeyUtil.checkDestroyed(this);
+
         return "GOST3410";
     }
 
     public String getFormat()
     {
+        KeyUtil.checkDestroyed(this);
+
         return "PKCS#8";
     }
 
     public byte[] getEncoded()
     {
         return baseKey.getEncoded();
+    }
+
+    public void destroy()
+    {
+        baseKey.destroy();
+    }
+
+    public boolean isDestroyed()
+    {
+        return baseKey.isDestroyed();
     }
 
     public boolean equals(Object o)
@@ -89,21 +106,21 @@ class ProvGOST3410PrivateKey
 
     public String toString()
     {
-        StringBuilder   buf = new StringBuilder();
-        String          nl = Strings.lineSeparator();
-
-        buf.append("GOST3410 Private Key").append(nl);
-        try
+        if (isDestroyed())
         {
-            buf.append("    X: ").append(this.getX().toString(16)).append(nl);
+             return KeyUtil.destroyedPrivateKeyToString("GOST3410");
         }
-        catch (Exception e)
+        else
         {
-            buf.append("RESTRICTED").append(nl);
+            try
+            {
+                return KeyUtil.privateKeyToString("GOST3410", baseKey.getX(), baseKey.getParameters().getDomainParameters());
+            }
+            catch (Exception e)
+            {
+                return KeyUtil.restrictedToString("GOST3410");
+            }
         }
-
-        return buf.toString();
-
     }
 
     public int hashCode()
@@ -128,6 +145,11 @@ class ProvGOST3410PrivateKey
         ObjectOutputStream out)
         throws IOException
     {
+        if (isDestroyed())
+        {
+            throw new IOException("key has been destroyed");
+        }
+
         out.defaultWriteObject();
 
         out.writeObject(baseKey.getAlgorithm());

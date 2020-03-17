@@ -194,9 +194,9 @@ public final class ECGOST3410
     {
         if (curveParams instanceof NamedECDomainParameters)
         {
-            return new EcNamedDomainParameters(((NamedECDomainParameters)curveParams).getID(), curveParams.getCurve(), curveParams.getG(), curveParams.getN(), curveParams.getH(), curveParams.getSeed());
+            return new EcNamedDomainParameters((NamedECDomainParameters)curveParams);
         }
-        return new EcDomainParameters(curveParams.getCurve(), curveParams.getG(), curveParams.getN(), curveParams.getH(), curveParams.getSeed());
+        return new EcDomainParameters(curveParams);
     }
 
     private static EcPrivateKeyParameters getLwKey(final AsymmetricECGOST3410PrivateKey privKey)

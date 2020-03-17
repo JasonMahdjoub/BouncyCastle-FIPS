@@ -42,9 +42,16 @@ class ECUtil
 
         for (ASN1ObjectIdentifier curveOID : oids)
         {
-            ECDomainParameters domainParameters = ECDomainParametersIndex.lookupDomainParameters(curveOID);
+            try
+            {
+                ECDomainParameters domainParameters = ECDomainParametersIndex.lookupDomainParameters(curveOID);
 
-            customCurves.put(ECNamedCurveTable.getByOID(curveOID).getCurve(), domainParameters.getCurve());
+                customCurves.put(ECNamedCurveTable.getByOID(curveOID).getCurve(), domainParameters.getCurve());
+            }
+            catch (UnsupportedOperationException ex)
+            {
+                // ignore - will be a disabled F2m curve
+            }
         }
     }
 

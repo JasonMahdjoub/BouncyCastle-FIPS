@@ -56,7 +56,7 @@ public class DirectoryString
             return new DirectoryString((DERBMPString)o);
         }
 
-        throw new IllegalArgumentException("Illegal object in getInstance: " + o.getClass().getName());
+        throw new IllegalArgumentException("illegal object in getInstance: " + o.getClass().getName());
     }
 
     public static DirectoryString getInstance(ASN1TaggedObject o, boolean explicit)

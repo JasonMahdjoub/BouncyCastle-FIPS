@@ -1,3 +1,6 @@
+/***************************************************************/
+/******    DO NOT EDIT THIS CLASS bc-java SOURCE FILE     ******/
+/***************************************************************/
 package org.bouncycastle.asn1.cms;
 
 import java.math.BigInteger;
@@ -75,7 +78,6 @@ public class RsaKemParameters
         return keyLength;
     }
 
-    @Override
     public ASN1Primitive toASN1Primitive()
     {
         ASN1EncodableVector v = new ASN1EncodableVector();

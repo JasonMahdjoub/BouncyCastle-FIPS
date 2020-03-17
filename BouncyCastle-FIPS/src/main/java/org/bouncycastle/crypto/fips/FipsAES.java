@@ -976,17 +976,21 @@ public final class FipsAES
     private static final class EngineProvider
         extends FipsEngineProvider<BlockCipher>
     {
+        private static final byte[] input = Hex.decode("00112233445566778899aabbccddeeff");
+        private static final byte[] output = Hex.decode("69c4e0d86a7b0430d8cdb78070b4c55a");
+
+        private static final byte[] keyBytes = Hex.decode("000102030405060708090a0b0c0d0e0f");
+
         public BlockCipher createEngine()
         {
             return SelfTestExecutor.validate(ALGORITHM, new AESEngine(), new VariantKatTest<AESEngine>()
             {
                 public void evaluate(AESEngine aesEngine)
                 {
-                    byte[] input = Hex.decode("00112233445566778899aabbccddeeff");
-                    byte[] output = Hex.decode("8ea2b7ca516745bfeafc49904b496089");
+
                     byte[] tmp = new byte[input.length];
 
-                    KeyParameter key = new KeyParameterImpl(Hex.decode("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"));
+                    KeyParameter key = new KeyParameterImpl(keyBytes);
 
                     aesEngine.init(true, key);
 
@@ -1024,8 +1028,9 @@ public final class FipsAES
                 byte[] C = Hex.decode("7162015b4dac255d");
                 byte[] T = Hex.decode("6084341b");
 
-                CCMBlockCipher encCipher = new CCMBlockCipher(provider.createEngine());
-                CCMBlockCipher decCipher = new CCMBlockCipher(provider.createEngine());
+                BlockCipher aesCipher = provider.createEngine();
+                CCMBlockCipher encCipher = new CCMBlockCipher(aesCipher);
+
                 int macSize = T.length * 8;
 
                 KeyParameter keyParam = new KeyParameterImpl(K);
@@ -1047,6 +1052,8 @@ public final class FipsAES
                 {
                     fail("MAC fails to match in self test encrypt");
                 }
+
+                CCMBlockCipher decCipher = new CCMBlockCipher(aesCipher);
 
                 decCipher.init(false, new org.bouncycastle.crypto.internal.params.AEADParameters(keyParam, macSize, N, A));
 
@@ -1110,8 +1117,9 @@ public final class FipsAES
             public void evaluate(EngineProvider provider)
                 throws Exception
             {
-                GCMBlockCipher encCipher = new GCMBlockCipher(provider.createEngine());
-                GCMBlockCipher decCipher = new GCMBlockCipher(provider.createEngine());
+
+                BlockCipher aesCipher = provider.createEngine();
+                GCMBlockCipher encCipher = new GCMBlockCipher(aesCipher);
 
                 byte[] K = Hex.decode("feffe9928665731c6d6a8f9467308308");
                 byte[] P = Hex.decode("d9313225f88406e5a55909c5aff5269a"
@@ -1130,7 +1138,6 @@ public final class FipsAES
                 CipherParameters params = new org.bouncycastle.crypto.internal.params.AEADParameters(new KeyParameterImpl(K), T.length * 8, IV, A);
 
                 encCipher.init(true, params);
-                decCipher.init(false, params);
 
                 byte[] enc = new byte[encCipher.getOutputSize(P.length)];
 
@@ -1163,6 +1170,10 @@ public final class FipsAES
                 {
                     fail("Stream contained wrong MAC");
                 }
+
+                GCMBlockCipher decCipher = new GCMBlockCipher(aesCipher);
+
+                decCipher.init(false, params);
 
                 byte[] dec = new byte[decCipher.getOutputSize(enc.length)];
 

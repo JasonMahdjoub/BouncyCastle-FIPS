@@ -106,7 +106,7 @@ public class DVCSRequestInformation
                     this.extensions = Extensions.getInstance(t, false);
                     break;
                 default:
-                    throw new IllegalArgumentException("Unknown tag number encountered: " + tagNo);
+                    throw new IllegalArgumentException("unknown tag number encountered: " + tagNo);
                 }
             }
             else

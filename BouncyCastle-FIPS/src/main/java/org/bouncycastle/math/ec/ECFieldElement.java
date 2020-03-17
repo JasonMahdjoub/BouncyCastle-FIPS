@@ -575,7 +575,7 @@ public abstract class ECFieldElement
         /**
          * The <code>LongArray</code> holding the bits.
          */
-        private LongArray x;
+        LongArray x;
 
         /**
          * Constructor for PPB.
@@ -630,23 +630,7 @@ public abstract class ECFieldElement
             this.x = new LongArray(x);
         }
 
-        /**
-         * Constructor for TPB.
-         * @param m  The exponent <code>m</code> of
-         * <code>F<sub>2<sup>m</sup></sub></code>.
-         * @param k The integer <code>k</code> where <code>x<sup>m</sup> +
-         * x<sup>k</sup> + 1</code> represents the reduction
-         * polynomial <code>f(z)</code>.
-         * @param x The BigInteger representing the value of the field element.
-         * @deprecated Use ECCurve.fromBigInteger to construct field elements
-         */
-        F2m(int m, int k, BigInteger x)
-        {
-            // Set k1 to k, and set k2 and k3 to 0
-            this(m, k, 0, 0, x);
-        }
-
-        private F2m(int m, int[] ks, LongArray x)
+        F2m(int m, int[] ks, LongArray x)
         {
             this.m = m;
             this.representation = (ks.length == 1) ? TPB : PPB;

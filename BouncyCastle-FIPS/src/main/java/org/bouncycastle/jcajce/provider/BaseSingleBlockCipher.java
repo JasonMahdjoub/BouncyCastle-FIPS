@@ -385,6 +385,22 @@ class BaseSingleBlockCipher
             {
                 initFromSpec(currentAlgs, new OAEPParameterSpec("SHA-512", "MGF1", MGF1ParameterSpec.SHA512, PSource.PSpecified.DEFAULT));
             }
+            else if (paddingName.equals("OAEPWITHSHA3-224ANDMGF1PADDING"))
+            {
+                initFromSpec(currentAlgs, new OAEPParameterSpec("SHA3-224", "MGF1", new MGF1ParameterSpec("SHA3-224"), PSource.PSpecified.DEFAULT));
+            }
+            else if (paddingName.equals("OAEPWITHSHA3-256ANDMGF1PADDING"))
+            {
+                initFromSpec(currentAlgs, new OAEPParameterSpec("SHA3-256", "MGF1", new MGF1ParameterSpec("SHA3-256"), PSource.PSpecified.DEFAULT));
+            }
+            else if (paddingName.equals("OAEPWITHSHA3-384ANDMGF1PADDING"))
+            {
+                initFromSpec(currentAlgs, new OAEPParameterSpec("SHA3-384", "MGF1", new MGF1ParameterSpec("SHA3-384"), PSource.PSpecified.DEFAULT));
+            }
+            else if (paddingName.equals("OAEPWITHSHA3-512ANDMGF1PADDING"))
+            {
+                initFromSpec(currentAlgs, new OAEPParameterSpec("SHA3-512", "MGF1", new MGF1ParameterSpec("SHA3-512"), PSource.PSpecified.DEFAULT));
+            }
             else
             {
                 throw new NoSuchPaddingException("Padding " + padding + " unknown.");

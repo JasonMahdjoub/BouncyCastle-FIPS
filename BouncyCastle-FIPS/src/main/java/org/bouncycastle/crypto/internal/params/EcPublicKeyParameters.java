@@ -15,7 +15,8 @@ public class EcPublicKeyParameters
         EcDomainParameters params)
     {
         super(false, params);
-        this.Q = Q.normalize();
+
+        this.Q = EcDomainParameters.validate(params.getCurve(), Q);
     }
 
     public ECPoint getQ()

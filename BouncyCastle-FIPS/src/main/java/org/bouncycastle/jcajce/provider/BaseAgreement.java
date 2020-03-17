@@ -42,6 +42,7 @@ import org.bouncycastle.crypto.fips.FipsDH;
 import org.bouncycastle.crypto.fips.FipsKDF;
 import org.bouncycastle.crypto.fips.FipsUnapprovedOperationError;
 import org.bouncycastle.jcajce.AgreedKeyWithMacKey;
+import org.bouncycastle.jcajce.spec.DHUParameterSpec;
 import org.bouncycastle.jcajce.spec.MQVParameterSpec;
 import org.bouncycastle.jcajce.spec.UserKeyingMaterialSpec;
 import org.bouncycastle.util.Arrays;
@@ -207,8 +208,18 @@ class BaseAgreement
 
         if (kdfAlgorithm != null)
         {
-            throw new UnsupportedOperationException(
-                "KDF can only be used when algorithm is known");
+            byte[] secret = result;
+            byte[] keyBytes = new byte[result.length];
+
+            FipsKDF.AgreementKDFParameters params = kdfAlgorithm.using(secret).withIV(userKeyingMaterial);
+
+            KDFCalculator kdf = kdfOperatorFactory.createKDFCalculator(params);
+
+            kdf.generateBytes(keyBytes, 0, keyBytes.length);
+
+            Arrays.fill(secret, (byte)0);
+
+            result = keyBytes;
         }
 
         byte[] rv = result;
@@ -373,6 +384,10 @@ class BaseAgreement
         if (params instanceof MQVParameterSpec)
         {
             userKeyingMaterial = ((MQVParameterSpec)params).getUserKeyingMaterial();
+        }
+        else if (params instanceof DHUParameterSpec)
+        {
+            userKeyingMaterial = ((DHUParameterSpec)params).getUserKeyingMaterial();
         }
         else if (params instanceof UserKeyingMaterialSpec)
         {

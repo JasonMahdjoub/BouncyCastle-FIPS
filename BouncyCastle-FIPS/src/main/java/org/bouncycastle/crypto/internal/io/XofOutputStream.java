@@ -48,7 +48,7 @@ public class XofOutputStream
     {
         Utils.approvedModeCheck(isApprovedMode, algorithmName);
 
-        return digest.doFinal(output, off, outLen);
+        return digest.doOutput(output, off, outLen);
     }
 
     public void reset()

@@ -10,7 +10,7 @@ import java.security.spec.DSAPublicKeySpec;
 
 import org.bouncycastle.crypto.Algorithm;
 import org.bouncycastle.crypto.asymmetric.AsymmetricDSAPublicKey;
-import org.bouncycastle.util.Strings;
+import org.bouncycastle.util.Arrays;
 
 class ProvDSAPublicKey
     implements DSAPublicKey, ProvKey<AsymmetricDSAPublicKey>
@@ -80,14 +80,23 @@ class ProvDSAPublicKey
             return true;
         }
 
-        if (!(o instanceof ProvDSAPublicKey))
+        if (!(o instanceof DSAPublicKey))
         {
             return false;
         }
 
-        ProvDSAPublicKey other = (ProvDSAPublicKey)o;
+        if (o instanceof ProvDSAPublicKey)
+        {
+            ProvDSAPublicKey other = (ProvDSAPublicKey)o;
 
-        return this.baseKey.equals(other.baseKey);
+            return this.baseKey.equals(other.baseKey);
+        }
+        else
+        {
+            DSAPublicKey other = (DSAPublicKey)o;
+
+            return Arrays.areEqual(this.getEncoded(), other.getEncoded());
+        }
     }
 
     public int hashCode()
@@ -120,12 +129,6 @@ class ProvDSAPublicKey
 
     public String toString()
     {
-        StringBuilder   buf = new StringBuilder();
-        String          nl = Strings.lineSeparator();
-
-        buf.append("DSA Public Key").append(nl);
-        buf.append("    Y: ").append(this.getY().toString(16)).append(nl);
-
-        return buf.toString();
+        return KeyUtil.publicKeyToString("DSA", baseKey.getY(), baseKey.getDomainParameters());
     }
 }

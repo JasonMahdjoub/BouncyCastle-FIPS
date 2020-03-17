@@ -7,12 +7,14 @@ import java.math.BigInteger;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.RSAPrivateKeySpec;
 
+import javax.security.auth.Destroyable;
+
 import org.bouncycastle.crypto.Algorithm;
 import org.bouncycastle.crypto.asymmetric.AsymmetricRSAPrivateKey;
 import org.bouncycastle.util.Strings;
 
 class ProvRSAPrivateKey
-    implements RSAPrivateKey, ProvKey<AsymmetricRSAPrivateKey>
+    implements Destroyable, RSAPrivateKey, ProvKey<AsymmetricRSAPrivateKey>
 {
     static final long serialVersionUID = 5110188922551353628L;
 
@@ -40,6 +42,8 @@ class ProvRSAPrivateKey
 
     public AsymmetricRSAPrivateKey getBaseKey()
     {
+        KeyUtil.checkDestroyed(baseKey);
+
         return baseKey;
     }
 
@@ -53,14 +57,23 @@ class ProvRSAPrivateKey
         return baseKey.getPrivateExponent();
     }
 
-    public String getAlgorithm()
-    {
-        return "RSA";
-    }
-
+    /**
+     * return the encoding format we produce in getEncoded().
+     *
+     * @return the encoding format we produce in getEncoded().
+     */
     public String getFormat()
     {
+        KeyUtil.checkDestroyed(baseKey);
+
         return "PKCS#8";
+    }
+
+    public String getAlgorithm()
+    {
+        KeyUtil.checkDestroyed(baseKey);
+
+        return "RSA";
     }
 
     public byte[] getEncoded()
@@ -68,20 +81,29 @@ class ProvRSAPrivateKey
         return baseKey.getEncoded();
     }
 
+    public void destroy()
+    {
+        baseKey.destroy();
+    }
+
+    public boolean isDestroyed()
+    {
+        return baseKey.isDestroyed();
+    }
+
     public String toString()
     {
         StringBuilder buf = new StringBuilder();
         String nl = Strings.lineSeparator();
 
-        buf.append("RSA Private Key").append(nl);
-        buf.append("             modulus: ").append(this.getModulus().toString(16)).append(nl);
-        try
+        if (isDestroyed())
         {
-            buf.append("    private exponent: ").append(this.getPrivateExponent().toString(16)).append(nl);
+            buf.append("RSA Private Key [DESTROYED]").append(nl);
         }
-        catch (Exception e)
+        else
         {
-            buf.append("RESTRICTED").append(nl);
+            buf.append("RSA Private Key [").append(KeyUtil.generateFingerPrint(this.getModulus())).append("],[]").append(nl);
+            buf.append("         modulus: ").append(this.getModulus().toString(16)).append(nl);
         }
 
         return buf.toString();
@@ -126,6 +148,11 @@ class ProvRSAPrivateKey
         ObjectOutputStream out)
         throws IOException
     {
+        if (isDestroyed())
+        {
+            throw new IOException("key has been destroyed");
+        }
+
         out.defaultWriteObject();
 
         out.writeObject(baseKey.getAlgorithm());

@@ -5,16 +5,17 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 
+import javax.security.auth.Destroyable;
+
 import org.bouncycastle.crypto.Algorithm;
 import org.bouncycastle.crypto.asymmetric.AsymmetricECGOST3410PrivateKey;
 import org.bouncycastle.jcajce.interfaces.ECGOST3410PrivateKey;
 import org.bouncycastle.jcajce.spec.ECDomainParameterSpec;
 import org.bouncycastle.jcajce.spec.ECGOST3410PrivateKeySpec;
 import org.bouncycastle.jcajce.spec.GOST3410ParameterSpec;
-import org.bouncycastle.util.Strings;
 
 class ProvECGOST3410PrivateKey
-    implements ECGOST3410PrivateKey, ProvKey<AsymmetricECGOST3410PrivateKey>
+    implements Destroyable, ECGOST3410PrivateKey, ProvKey<AsymmetricECGOST3410PrivateKey>
 {
     private static final long serialVersionUID = 7245981689601667138L;
 
@@ -23,11 +24,11 @@ class ProvECGOST3410PrivateKey
     ProvECGOST3410PrivateKey(
         Algorithm algorithm,
         ECGOST3410PrivateKey key)
-     {
-         GOST3410ParameterSpec<ECDomainParameterSpec> params = key.getParams();
+    {
+        GOST3410ParameterSpec<ECDomainParameterSpec> params = key.getParams();
 
-         this.baseKey = new AsymmetricECGOST3410PrivateKey(algorithm, GOST3410Util.convertToECParams(params), key.getS());
-     }
+        this.baseKey = new AsymmetricECGOST3410PrivateKey(algorithm, GOST3410Util.convertToECParams(params), key.getS());
+    }
 
     ProvECGOST3410PrivateKey(
         Algorithm algorithm,
@@ -44,6 +45,8 @@ class ProvECGOST3410PrivateKey
 
     public AsymmetricECGOST3410PrivateKey getBaseKey()
     {
+        KeyUtil.checkDestroyed(this);
+        
         return baseKey;
     }
 
@@ -59,6 +62,8 @@ class ProvECGOST3410PrivateKey
      */
     public String getFormat()
     {
+        KeyUtil.checkDestroyed(this);
+        
         return "PKCS#8";
     }
 
@@ -81,6 +86,16 @@ class ProvECGOST3410PrivateKey
     public BigInteger getS()
     {
         return baseKey.getS();
+    }
+
+    public void destroy()
+    {
+        baseKey.destroy();
+    }
+
+    public boolean isDestroyed()
+    {
+        return baseKey.isDestroyed();
     }
 
     public boolean equals(Object o)
@@ -107,21 +122,19 @@ class ProvECGOST3410PrivateKey
 
     public String toString()
     {
-        StringBuilder   buf = new StringBuilder();
-        String          nl = Strings.lineSeparator();
+        if (isDestroyed())
+        {
+            return KeyUtil.destroyedPrivateKeyToString("ECGOST3410");
+        }
 
-        buf.append("ECGOST3410 Private Key").append(nl);
         try
         {
-            buf.append("    S: ").append(this.getS().toString(16)).append(nl);
+            return KeyUtil.privateKeyToString("ECGOST3410", baseKey.getS(), baseKey.getParameters().getDomainParameters());
         }
         catch (Exception e)
         {
-            buf.append("RESTRICTED").append(nl);
+            return KeyUtil.restrictedToString("ECGOST3410");
         }
-
-        return buf.toString();
-
     }
 
     private void readObject(
@@ -141,6 +154,11 @@ class ProvECGOST3410PrivateKey
         ObjectOutputStream out)
         throws IOException
     {
+        if (isDestroyed())
+        {
+            throw new IOException("key has been destroyed");
+        }
+
         out.defaultWriteObject();
 
         out.writeObject(baseKey.getAlgorithm());

@@ -29,8 +29,9 @@ public abstract class AsymmetricDSAKey
     }
 
     private final boolean    approvedModeOnly;
-    private final Algorithm algorithm;
-    private final DSADomainParameters domainParameters;
+
+    private Algorithm algorithm;
+    private DSADomainParameters domainParameters;
 
     AsymmetricDSAKey(Algorithm algorithm, DSADomainParameters domainParameters)
     {
@@ -68,7 +69,7 @@ public abstract class AsymmetricDSAKey
      *
      * @return the key's algorithm.
      */
-    public final Algorithm getAlgorithm()
+    public Algorithm getAlgorithm()
     {
         return algorithm;
     }
@@ -78,7 +79,7 @@ public abstract class AsymmetricDSAKey
      *
      * @return the DSA domain parameters for this key.
      */
-    public final DSADomainParameters getDomainParameters()
+    public DSADomainParameters getDomainParameters()
     {
         return domainParameters;
     }
@@ -89,5 +90,11 @@ public abstract class AsymmetricDSAKey
         {
             throw new FipsUnapprovedOperationError("No access to key in current thread.");
         }
+    }
+
+    protected void zeroize()
+    {
+        this.algorithm = null;
+        this.domainParameters = null;
     }
 }

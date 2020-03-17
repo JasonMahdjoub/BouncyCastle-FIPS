@@ -1105,12 +1105,7 @@ public final class RSA
                     throw new IllegalKeyException("Attempt to encrypt/decrypt with RSA modulus already used for sign/verify.");
                 }
                 // FSM_TRANS:5.RSAK.1,"RSA KEY USAGE CHECK", "CONDITIONAL TEST", "RSA key usage check successful"
-
-                if (!(parameters instanceof Parameters))
-                {
-                    throw new IllegalArgumentException("Unknown parameters object: " + parameters.getClass().getName());
-                }
-
+                
                 this.key = key;
                 this.parameters = parameters;
 

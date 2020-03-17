@@ -1036,14 +1036,8 @@ public class SECNamedCurves
     public static X9ECParameters getByName(
         String name)
     {
-        ASN1ObjectIdentifier oid = (ASN1ObjectIdentifier)objIds.get(Strings.toLowerCase(name));
-
-        if (oid != null)
-        {
-            return getByOID(oid);
-        }
-
-        return null;
+        ASN1ObjectIdentifier oid = getOID(name);
+        return oid == null ? null : getByOID(oid);
     }
 
     /**
@@ -1056,13 +1050,7 @@ public class SECNamedCurves
         ASN1ObjectIdentifier oid)
     {
         X9ECParametersHolder holder = (X9ECParametersHolder)curves.get(oid);
-
-        if (holder != null)
-        {
-            return holder.getParameters();
-        }
-
-        return null;
+        return holder == null ? null : holder.getParameters();
     }
 
     /**

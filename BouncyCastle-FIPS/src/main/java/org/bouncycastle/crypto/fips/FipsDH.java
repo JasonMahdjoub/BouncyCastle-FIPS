@@ -21,11 +21,14 @@ import org.bouncycastle.crypto.internal.params.DhKeyGenerationParameters;
 import org.bouncycastle.crypto.internal.params.DhParameters;
 import org.bouncycastle.crypto.internal.params.DhPrivateKeyParameters;
 import org.bouncycastle.crypto.internal.params.DhPublicKeyParameters;
+import org.bouncycastle.crypto.internal.params.DhuPrivateParameters;
+import org.bouncycastle.crypto.internal.params.DhuPublicParameters;
 import org.bouncycastle.crypto.internal.params.MqvPrivateParameters;
 import org.bouncycastle.crypto.internal.params.MqvPublicParameters;
 import org.bouncycastle.crypto.internal.test.ConsistencyTest;
 import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.BigIntegers;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * Source class for FIPS approved mode Diffie-Hellman implementations.
@@ -36,11 +39,13 @@ public final class FipsDH
 
     static final FipsEngineProvider<DhBasicAgreement> AGREEMENT_PROVIDER;
     static final FipsEngineProvider<MqvBasicAgreement> MQV_PROVIDER;
+    static final FipsEngineProvider<DhuBasicAgreement> DHU_PROVIDER;
 
     private enum Variations
     {
         DH,
-        MQV
+        MQV,
+        DHU
     }
 
     /**
@@ -50,6 +55,7 @@ public final class FipsDH
 
     private static final FipsAlgorithm ALGORITHM_DH = new FipsAlgorithm("DH", Variations.DH);
     private static final FipsAlgorithm ALGORITHM_MQV = new FipsAlgorithm("DH", Variations.MQV);
+    private static final FipsAlgorithm ALGORITHM_DHU = new FipsAlgorithm("DH", Variations.DHU);
 
     /**
      * Regular Diffie-Hellman algorithm marker.
@@ -60,15 +66,22 @@ public final class FipsDH
      */
     public static final MQVAgreementParametersBuilder MQV = new MQVAgreementParametersBuilder();
 
+    /**
+     * Unified Diffie-Hellman algorithm marker.
+     */
+    public static final DHUAgreementParametersBuilder DHU = new DHUAgreementParametersBuilder();
+    
     static
     {
         AGREEMENT_PROVIDER = new AgreementProvider();
         MQV_PROVIDER = new MqvProvider();
+        DHU_PROVIDER = new DhuProvider();
 
         // FSM_STATE:3.DH.0,"FF AGREEMENT KAT", "The module is performing FF Key Agreement verify KAT self-test"
         // FSM_TRANS:3.DH.0,"POWER ON SELF-TEST", "FF AGREEMENT KAT", "Invoke FF Diffie-Hellman/MQV  KAT self-test"
         AGREEMENT_PROVIDER.createEngine();
         MQV_PROVIDER.createEngine();
+        DHU_PROVIDER.createEngine();
         // FSM_TRANS:3.DH.1,"FF AGREEMENT KAT", "POWER ON SELF-TEST", "FF Diffie-Hellman/MQV KAT self-test successful completion"
 
         // FSM_STATE:3.DH.1,"KAS CVL Primitive 'Z' computation KAT", "The module is performing KAS CVL Primitive 'Z' computation KAT verify KAT self-test"
@@ -118,6 +131,17 @@ public final class FipsDH
          * @param domainParameters Diffie-Hellman domain parameters any generated keys will be for.
          */
         public KeyGenParameters(MQVAgreementParametersBuilder builder, DHDomainParameters domainParameters)
+        {
+            this(builder.getAlgorithm(), domainParameters);
+        }
+
+        /**
+         * Base constructor for specifying an algorithm ID from an Diffie-Hellman Unified builder.
+         *
+         * @param builder        the parameters containing the algorithm the generated keys are for.
+         * @param domainParameters Diffie-Hellman domain parameters any generated keys will be for.
+         */
+        public KeyGenParameters(DHUAgreementParametersBuilder builder, DHDomainParameters domainParameters)
         {
             this(builder.getAlgorithm(), domainParameters);
         }
@@ -365,6 +389,159 @@ public final class FipsDH
         }
     }
 
+    /**
+     * Initial builder for DHU parameters.
+     */
+    public static final class DHUAgreementParametersBuilder
+        extends FipsParameters
+    {
+        DHUAgreementParametersBuilder()
+        {
+            super(ALGORITHM_DHU);
+        }
+
+        /**
+         * Constructor for DH DHU parameters from an ephemeral public/private key pair. This constructor
+         * will result in an agreement which returns the raw calculated agreement value, or shared secret.
+         *
+         * @param ephemeralKeyPair       our ephemeral public/private key pair.
+         * @param otherPartyEphemeralKey the other party's ephemeral public key.
+         */
+        public DHUAgreementParameters using(AsymmetricKeyPair ephemeralKeyPair, AsymmetricDHPublicKey otherPartyEphemeralKey)
+        {
+            return new DHUAgreementParameters((AsymmetricDHPublicKey)ephemeralKeyPair.getPublicKey(), (AsymmetricDHPrivateKey)ephemeralKeyPair.getPrivateKey(), otherPartyEphemeralKey, null);
+        }
+
+        /**
+         * Constructor for DH DHU parameters which assumes later calculation of our ephemeral public key. This constructor
+         * will result in an agreement which returns the raw calculated agreement value, or shared secret.
+         *
+         * @param ephemeralPrivateKey    our ephemeral private key.
+         * @param otherPartyEphemeralKey the other party's ephemeral public key.
+         */
+        public DHUAgreementParameters using(AsymmetricDHPrivateKey ephemeralPrivateKey, AsymmetricDHPublicKey otherPartyEphemeralKey)
+        {
+            return new DHUAgreementParameters(null, ephemeralPrivateKey, otherPartyEphemeralKey, null);
+        }
+
+        /**
+         * Constructor for DH DHU parameters which results in an agreement returning the raw value.
+         *
+         * @param ephemeralPublicKey     our ephemeral public key.
+         * @param ephemeralPrivateKey    our ephemeral private key.
+         * @param otherPartyEphemeralKey the other party's ephemeral public key.
+         */
+        public DHUAgreementParameters using(AsymmetricDHPublicKey ephemeralPublicKey, AsymmetricDHPrivateKey ephemeralPrivateKey, AsymmetricDHPublicKey otherPartyEphemeralKey)
+        {
+            return new DHUAgreementParameters(ephemeralPublicKey, ephemeralPrivateKey, otherPartyEphemeralKey, null);
+        }
+    }
+
+    /**
+     * Parameters for Diffie-Hellman based key agreement using DHU.
+     */
+    public static final class DHUAgreementParameters
+        extends FipsAgreementParameters
+    {
+        private final AsymmetricDHPublicKey ephemeralPublicKey;
+        private final AsymmetricDHPrivateKey ephemeralPrivateKey;
+        private final AsymmetricDHPublicKey otherPartyEphemeralKey;
+
+        private DHUAgreementParameters(AsymmetricDHPublicKey ephemeralPublicKey, AsymmetricDHPrivateKey ephemeralPrivateKey, AsymmetricDHPublicKey otherPartyEphemeralKey, FipsAlgorithm digestAlgorithm)
+        {
+            super(ALGORITHM_DHU, digestAlgorithm);
+
+            this.ephemeralPublicKey = ephemeralPublicKey;
+            this.ephemeralPrivateKey = ephemeralPrivateKey;
+            this.otherPartyEphemeralKey = otherPartyEphemeralKey;
+        }
+
+        private DHUAgreementParameters(AsymmetricDHPublicKey ephemeralPublicKey, AsymmetricDHPrivateKey ephemeralPrivateKey, AsymmetricDHPublicKey otherPartyEphemeralKey, FipsKDF.PRF prfAlgorithm, byte[] salt)
+        {
+            super(ALGORITHM_DHU, prfAlgorithm, salt);
+
+            this.ephemeralPublicKey = ephemeralPublicKey;
+            this.ephemeralPrivateKey = ephemeralPrivateKey;
+            this.otherPartyEphemeralKey = otherPartyEphemeralKey;
+        }
+
+        private DHUAgreementParameters(AsymmetricDHPublicKey ephemeralPublicKey, AsymmetricDHPrivateKey ephemeralPrivateKey, AsymmetricDHPublicKey otherPartyEphemeralKey, FipsKDF.AgreementKDFParametersBuilder kdfType, byte[] iv, int outputSize)
+        {
+            super(ALGORITHM_DHU, kdfType, iv, outputSize);
+
+            this.ephemeralPublicKey = ephemeralPublicKey;
+            this.ephemeralPrivateKey = ephemeralPrivateKey;
+            this.otherPartyEphemeralKey = otherPartyEphemeralKey;
+        }
+
+        /**
+         * Return our ephemeral public key, if present.
+         *
+         * @return our ephemeral public key, or null.
+         */
+        public AsymmetricDHPublicKey getEphemeralPublicKey()
+        {
+            return ephemeralPublicKey;
+        }
+
+        /**
+         * Return our ephemeral private key.
+         *
+         * @return our ephemeral private key.
+         */
+        public AsymmetricDHPrivateKey getEphemeralPrivateKey()
+        {
+            return ephemeralPrivateKey;
+        }
+
+        /**
+         * Return the other party's ephemeral public key.
+         *
+         * @return the other party's ephemeral public key.
+         */
+        public AsymmetricDHPublicKey getOtherPartyEphemeralKey()
+        {
+            return otherPartyEphemeralKey;
+        }
+
+        /**
+         * Add a digest algorithm to process the Z value with.
+         *
+         * @param digestAlgorithm digest algorithm to use.
+         * @return a new parameter set, including the digest algorithm
+         */
+        public DHUAgreementParameters withDigest(FipsAlgorithm digestAlgorithm)
+        {
+            return new DHUAgreementParameters(this.ephemeralPublicKey, this.ephemeralPrivateKey, this.otherPartyEphemeralKey, digestAlgorithm);
+        }
+
+        /**
+         * Add a PRF algorithm and salt to process the Z value with (as in SP 800-56C)
+         *
+         * @param prfAlgorithm PRF represent the MAC/HMAC algorithm to use.
+         * @param salt         the salt to use to initialise the PRF
+         * @return a new parameter set, including the digest algorithm
+         */
+        public DHUAgreementParameters withPRF(FipsKDF.PRF prfAlgorithm, byte[] salt)
+        {
+            return new DHUAgreementParameters(this.ephemeralPublicKey, this.ephemeralPrivateKey, this.otherPartyEphemeralKey, prfAlgorithm, salt);
+        }
+
+        /**
+         * Add a KDF to process the Z value with. The outputSize parameter determines how many bytes
+         * will be generated.
+         *
+         * @param kdfType            KDF algorithm type to use for parameter creation.
+         * @param iv                 the iv parameter for KDF initialization.
+         * @param outputSize         the size of the output to be generated from the KDF.
+         * @return a new parameter set, the KDF definition.
+         */
+        public DHUAgreementParameters withKDF(FipsKDF.AgreementKDFParametersBuilder kdfType, byte[] iv, int outputSize)
+        {
+            return new DHUAgreementParameters(this.ephemeralPublicKey, this.ephemeralPrivateKey, this.otherPartyEphemeralKey, kdfType, iv, outputSize);
+        }
+    }
+    
     /**
      * Parameters for generating Diffie-Hellman domain parameters.
      */
@@ -674,6 +851,54 @@ public final class FipsDH
     }
 
     /**
+     * Factory for Unified Agreement operators based on Diffie-Hellman
+     */
+    public static final class DHUAgreementFactory
+        extends FipsAgreementFactory<DHUAgreementParameters>
+    {
+        /**
+         * Return an Agreement operator based on the regular Diffie-Hellman algorithm.
+         *
+         * @param key        the private key to initialize the Agreement with.
+         * @param parameters the parameters for configuring the agreement.
+         * @return a new Agreement operator for Diffie-Hellman.
+         */
+        @Override
+        public FipsAgreement<DHUAgreementParameters> createAgreement(AsymmetricPrivateKey key, final DHUAgreementParameters parameters)
+        {
+            AsymmetricDHPrivateKey dhKey = (AsymmetricDHPrivateKey)key;
+            DhuPrivateParameters lwDhKey = new DhuPrivateParameters(getLwKey(dhKey), getLwKey(parameters.ephemeralPrivateKey));
+            
+            final DhuBasicAgreement dh = DHU_PROVIDER.createEngine();
+
+            dh.init(lwDhKey);
+
+            return new FipsAgreement<DHUAgreementParameters>()
+            {
+                @Override
+                public DHUAgreementParameters getParameters()
+                {
+                    return parameters;
+                }
+
+                @Override
+                public byte[] calculate(AsymmetricPublicKey key)
+                {
+                    AsymmetricDHPublicKey dhKey = (AsymmetricDHPublicKey)key;
+                    DhPublicKeyParameters lwDhKey = new DhPublicKeyParameters(dhKey.getY(), getDomainParams(dhKey.getDomainParameters()));
+
+                    DhuPublicParameters dhuParams = new DhuPublicParameters(lwDhKey,
+                            new DhPublicKeyParameters(parameters.otherPartyEphemeralKey.getY(), lwDhKey.getParameters()));
+
+                    byte[] zBytes = dh.calculateAgreement(dhuParams);
+           
+                    return FipsKDF.processZBytes(zBytes, parameters);
+                }
+            };
+        }
+    }
+
+    /**
      * Factory for Agreement operators based on MQV
      */
     public static final class MQVAgreementFactory
@@ -784,6 +1009,33 @@ public final class FipsDH
                 }
             });
             break;
+        case DHU:
+            SelfTestExecutor.validate(algorithm, keyPair, new ConsistencyTest<AsymmetricCipherKeyPair>()
+            {
+                public boolean hasTestPassed(AsymmetricCipherKeyPair kp)
+                    throws Exception
+                {
+                    DhuBasicAgreement agreement = new DhuBasicAgreement();
+
+                    agreement.init(new DhuPrivateParameters((DhPrivateKeyParameters)kp.getPrivate(), (DhPrivateKeyParameters)kp.getPrivate()));
+
+                    byte[] agree1 = agreement.calculateAgreement(new DhuPublicParameters((DhPublicKeyParameters)kp.getPublic(), (DhPublicKeyParameters)kp.getPublic()));
+
+                    AsymmetricCipherKeyPair testSKP = getTestKeyPair(kp);
+                    AsymmetricCipherKeyPair testEKP = getTestKeyPair(kp);
+
+                    agreement.init(new DhuPrivateParameters((DhPrivateKeyParameters)kp.getPrivate(), (DhPrivateKeyParameters)kp.getPrivate()));
+
+                    byte[] agree2 = agreement.calculateAgreement(new DhuPublicParameters((DhPublicKeyParameters)testSKP.getPublic(), (DhPublicKeyParameters)testEKP.getPublic()));
+
+                    agreement.init(new DhuPrivateParameters((DhPrivateKeyParameters)testSKP.getPrivate(), (DhPrivateKeyParameters)testEKP.getPrivate()));
+
+                    byte[] agree3 = agreement.calculateAgreement(new DhuPublicParameters((DhPublicKeyParameters)kp.getPublic(), (DhPublicKeyParameters)kp.getPublic()));
+
+                    return !Arrays.areEqual(agree1, agree2) && Arrays.areEqual(agree2, agree3);
+                }
+            });
+            break;
         default:
             throw new IllegalStateException("Unhandled DH algorithm: " + algorithm.getName());
         }
@@ -792,6 +1044,8 @@ public final class FipsDH
     private static class AgreementProvider
         extends FipsEngineProvider<DhBasicAgreement>
     {
+        static final BigInteger expected = new BigInteger("8b2ba83764fc961a7aeb335d67aa206c1013be9127e2d37a43fa7fff45dd13d4699173a727f4fc88b66d5f53c8848667c090adb2879501d1f7fe53b430beb220b6cce85c5bff74c61b16dbc788ab1459eec1b6f03455862324210e72f7e1f01a55f464bbd996267d3693cdc61053d87a17cb93f6e5079188377db48774bc9232552440471218ec2834e0e29fcdba7e0b7caf9a8f679c4e4382f83f66f8a4dd61cc5d91d15440f10a0f76c3e3a495e7cc53993ba7fb3231310c79e2b587a10074030f158a560e85c89642da9c883f78947116d8ea0d94bfe77c6fb07a7fca8c524827f5779aa7f5428fec0d282f8aca22dd1d47ed61eb6584b5444c5344ab716e", 16);
+
         public DhBasicAgreement createEngine()
         {
             return SelfTestExecutor.validate(ALGORITHM_DH, new DhBasicAgreement(), new VariantKatTest<DhBasicAgreement>()
@@ -806,8 +1060,6 @@ public final class FipsDH
 
                     engine.init(kp.getPrivate());
 
-                    BigInteger expected = new BigInteger("8b2ba83764fc961a7aeb335d67aa206c1013be9127e2d37a43fa7fff45dd13d4699173a727f4fc88b66d5f53c8848667c090adb2879501d1f7fe53b430beb220b6cce85c5bff74c61b16dbc788ab1459eec1b6f03455862324210e72f7e1f01a55f464bbd996267d3693cdc61053d87a17cb93f6e5079188377db48774bc9232552440471218ec2834e0e29fcdba7e0b7caf9a8f679c4e4382f83f66f8a4dd61cc5d91d15440f10a0f76c3e3a495e7cc53993ba7fb3231310c79e2b587a10074030f158a560e85c89642da9c883f78947116d8ea0d94bfe77c6fb07a7fca8c524827f5779aa7f5428fec0d282f8aca22dd1d47ed61eb6584b5444c5344ab716e", 16);
-
                     if (!expected.equals(engine.calculateAgreement(testOther.getPublic())))
                     {
                         fail("KAT DH agreement not verified");
@@ -820,6 +1072,8 @@ public final class FipsDH
     private static class MqvProvider
         extends FipsEngineProvider<MqvBasicAgreement>
     {
+        static final BigInteger expected = new BigInteger("52b800582b28e89d8ee581014ea4a1bc59cc3cc202562788ac40cbf9b1b11657019b556f112ecc9404b1de17630edcd0b8f9f4075e39624e94074b5060d3e699f726873b16e6ec49bdf689bcc275477da4170c7bbe93bfd5bc32a9556311d3f54d0e534118363deda2e3d25b6213b3d01f218c3f1d237967d128cd5a0f0caca8e287fd599d48ce297c8d92a4b7b2d95950a8ddb0e86e7b9bdc6abab91f758613762d185b2a5f516434f96c1bcba67f47bb780ade54dfa6a4f6a8d130aca76f9b28d77ef5eae1e254e5b61526b8c0fecf11b22e8630ebdd5e95f3902954526bd99eb8735263855b5f4d1ea32f6a0d2895ed292e9bb17a07ba1742a1619f4d95c9", 16);
+
         public MqvBasicAgreement createEngine()
         {
             return SelfTestExecutor.validate(ALGORITHM_MQV, new MqvBasicAgreement(), new VariantKatTest<MqvBasicAgreement>()
@@ -837,11 +1091,40 @@ public final class FipsDH
 
                     BigInteger calculated = engine.calculateAgreement(new MqvPublicParameters((DhPublicKeyParameters)testSKP.getPublic(), (DhPublicKeyParameters)testEKP.getPublic()));
 
-                    BigInteger expected = new BigInteger("52b800582b28e89d8ee581014ea4a1bc59cc3cc202562788ac40cbf9b1b11657019b556f112ecc9404b1de17630edcd0b8f9f4075e39624e94074b5060d3e699f726873b16e6ec49bdf689bcc275477da4170c7bbe93bfd5bc32a9556311d3f54d0e534118363deda2e3d25b6213b3d01f218c3f1d237967d128cd5a0f0caca8e287fd599d48ce297c8d92a4b7b2d95950a8ddb0e86e7b9bdc6abab91f758613762d185b2a5f516434f96c1bcba67f47bb780ade54dfa6a4f6a8d130aca76f9b28d77ef5eae1e254e5b61526b8c0fecf11b22e8630ebdd5e95f3902954526bd99eb8735263855b5f4d1ea32f6a0d2895ed292e9bb17a07ba1742a1619f4d95c9", 16);
-
                     if (!expected.equals(calculated))
                     {
                         fail("KAT DH MQV agreement not verified");
+                    }
+                }
+            });
+        }
+    }
+
+    private static class DhuProvider
+        extends FipsEngineProvider<DhuBasicAgreement>
+    {
+        static final byte[] expected = Hex.decode("8b2ba83764fc961a7aeb335d67aa206c1013be9127e2d37a43fa7fff45dd13d4699173a727f4fc88b66d5f53c8848667c090adb2879501d1f7fe53b430beb220b6cce85c5bff74c61b16dbc788ab1459eec1b6f03455862324210e72f7e1f01a55f464bbd996267d3693cdc61053d87a17cb93f6e5079188377db48774bc9232552440471218ec2834e0e29fcdba7e0b7caf9a8f679c4e4382f83f66f8a4dd61cc5d91d15440f10a0f76c3e3a495e7cc53993ba7fb3231310c79e2b587a10074030f158a560e85c89642da9c883f78947116d8ea0d94bfe77c6fb07a7fca8c524827f5779aa7f5428fec0d282f8aca22dd1d47ed61eb6584b5444c5344ab716e8b2ba83764fc961a7aeb335d67aa206c1013be9127e2d37a43fa7fff45dd13d4699173a727f4fc88b66d5f53c8848667c090adb2879501d1f7fe53b430beb220b6cce85c5bff74c61b16dbc788ab1459eec1b6f03455862324210e72f7e1f01a55f464bbd996267d3693cdc61053d87a17cb93f6e5079188377db48774bc9232552440471218ec2834e0e29fcdba7e0b7caf9a8f679c4e4382f83f66f8a4dd61cc5d91d15440f10a0f76c3e3a495e7cc53993ba7fb3231310c79e2b587a10074030f158a560e85c89642da9c883f78947116d8ea0d94bfe77c6fb07a7fca8c524827f5779aa7f5428fec0d282f8aca22dd1d47ed61eb6584b5444c5344ab716e");
+
+        public DhuBasicAgreement createEngine()
+        {
+            return SelfTestExecutor.validate(ALGORITHM_DHU, new DhuBasicAgreement(), new VariantKatTest<DhuBasicAgreement>()
+            {
+                @Override
+                void evaluate(DhuBasicAgreement engine)
+                    throws Exception
+                {
+                    AsymmetricCipherKeyPair kp = getKATKeyPair();
+
+                    AsymmetricCipherKeyPair testSKP = getTestKeyPair(kp);
+                    AsymmetricCipherKeyPair testEKP = getTestKeyPair(kp);
+
+                    engine.init(new DhuPrivateParameters((DhPrivateKeyParameters)kp.getPrivate(), (DhPrivateKeyParameters)kp.getPrivate()));
+
+                    byte[] calculated = engine.calculateAgreement(new DhuPublicParameters((DhPublicKeyParameters)testSKP.getPublic(), (DhPublicKeyParameters)testEKP.getPublic()));
+
+                    if (!Arrays.areEqual(expected, calculated))
+                    {
+                        fail("KAT DH DHU agreement not verified");
                     }
                 }
             });

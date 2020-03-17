@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.cryptopro.CryptoProObjectIdentifiers;
+import org.bouncycastle.asn1.rosstandart.RosstandartObjectIdentifiers;
 import org.bouncycastle.crypto.Algorithm;
 import org.bouncycastle.crypto.IllegalKeyException;
 import org.bouncycastle.crypto.ParametersWithIV;
@@ -413,8 +414,6 @@ public final class GOST28147
         }
     }
 
-    protected static final int BLOCK_SIZE = 8;
-
     // these are the S-boxes given in Applied Cryptography 2nd Ed., p. 333
     // This is default S-box!
     private static byte Sbox_Default[] = {
@@ -488,6 +487,18 @@ public final class GOST28147
         0x1, 0xA, 0x6, 0x8, 0xF, 0xB, 0x0, 0x4, 0xC, 0x3, 0x5, 0x9, 0x7, 0xD, 0x2, 0xE
     };
 
+    // Rosstandart param-Z
+    private static byte Param_Z[] = {
+        0xc, 0x4, 0x6, 0x2, 0xa, 0x5, 0xb, 0x9, 0xe, 0x8, 0xd, 0x7, 0x0, 0x3, 0xf, 0x1,
+        0x6, 0x8, 0x2, 0x3, 0x9, 0xa, 0x5, 0xc, 0x1, 0xe, 0x4, 0x7, 0xb, 0xd, 0x0, 0xf,
+        0xb, 0x3, 0x5, 0x8, 0x2, 0xf, 0xa, 0xd, 0xe, 0x1, 0x7, 0x4, 0xc, 0x9, 0x6, 0x0,
+        0xc, 0x8, 0x2, 0x1, 0xd, 0x4, 0xf, 0x6, 0x7, 0x0, 0xa, 0x5, 0x3, 0xe, 0x9, 0xb,
+        0x7, 0xf, 0x5, 0xa, 0x8, 0x1, 0x6, 0xd, 0x0, 0x9, 0x3, 0xe, 0xb, 0x4, 0x2, 0xc,
+        0x5, 0xd, 0xf, 0x6, 0x9, 0x2, 0xc, 0xa, 0xb, 0x7, 0x8, 0x1, 0x4, 0x3, 0xe, 0x0,
+        0x8, 0xe, 0x2, 0x5, 0x6, 0x9, 0x1, 0xc, 0xf, 0x4, 0xb, 0x0, 0xd, 0xa, 0x3, 0x7,
+        0x1, 0x7, 0xe, 0xd, 0x0, 0x5, 0x8, 0x3, 0x4, 0xf, 0xa, 0x6, 0x9, 0xc, 0xb, 0x2
+    };
+
     //S-box for digest
     private static byte DSbox_Test[] = {
         0x4, 0xA, 0x9, 0x2, 0xD, 0x8, 0x0, 0xE, 0x6, 0xB, 0x1, 0xC, 0x7, 0xF, 0x5, 0x3,
@@ -524,6 +535,7 @@ public final class GOST28147
         addSBox("E-B", ESbox_B);
         addSBox("E-C", ESbox_C);
         addSBox("E-D", ESbox_D);
+        addSBox("Param-Z", Param_Z);
         addSBox("D-TEST", DSbox_Test);
         addSBox("D-A", DSbox_A);
     }
@@ -547,7 +559,7 @@ public final class GOST28147
         if (sBox == null)
         {
             throw new IllegalArgumentException("Unknown S-Box - possible types: "
-                + "\"Default\", \"E-Test\", \"E-A\", \"E-B\", \"E-C\", \"E-D\", \"D-Test\", \"D-A\".");
+                + "\"Default\", \"E-Test\", \"E-A\", \"E-B\", \"E-C\", \"E-D\", \"Param-Z\", \"D-Test\", \"D-A\".");
         }
 
         return Arrays.clone(sBox);
@@ -591,12 +603,12 @@ public final class GOST28147
 
     public static ASN1ObjectIdentifier getSBoxOID(byte[] sBox)
     {
-        for (String name : sBoxes.keySet())
+        for (Map.Entry<String, byte[]> name : sBoxes.entrySet())
         {
-            byte[] sb = sBoxes.get(name);
+            byte[] sb = name.getValue();
             if (Arrays.areEqual(sb, sBox))
             {
-                return getSBoxOID(name);
+                return getSBoxOID(name.getKey());
             }
         }
 
@@ -613,11 +625,13 @@ public final class GOST28147
         oidMappings.put(CryptoProObjectIdentifiers.id_Gost28147_89_CryptoPro_B_ParamSet, "E-B");
         oidMappings.put(CryptoProObjectIdentifiers.id_Gost28147_89_CryptoPro_C_ParamSet, "E-C");
         oidMappings.put(CryptoProObjectIdentifiers.id_Gost28147_89_CryptoPro_D_ParamSet, "E-D");
+        oidMappings.put(RosstandartObjectIdentifiers.id_tc26_gost_28147_param_Z, "Param-Z");
 
         nameMappings.put("E-A", CryptoProObjectIdentifiers.id_Gost28147_89_CryptoPro_A_ParamSet);
         nameMappings.put("E-B", CryptoProObjectIdentifiers.id_Gost28147_89_CryptoPro_B_ParamSet);
         nameMappings.put("E-C", CryptoProObjectIdentifiers.id_Gost28147_89_CryptoPro_C_ParamSet);
         nameMappings.put("E-D", CryptoProObjectIdentifiers.id_Gost28147_89_CryptoPro_D_ParamSet);
+        nameMappings.put("Param-Z", RosstandartObjectIdentifiers.id_tc26_gost_28147_param_Z);
     }
 
     private static KeyParameter createGOST28147Parameters(SymmetricKey key, Algorithm algorithm, byte[] sBox)

@@ -70,7 +70,7 @@ dependencies {
 def javaVersion=7
 sourceCompatibility = javaVersion
 targetCompatibility= javaVersion
-version='1.0.1-DMRECOMPILE'
+version='1.0.2-DMRECOMPILE'
 
 idea {
     project {

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.Key;
+import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.KeyStoreSpi;
 import java.security.NoSuchAlgorithmException;
@@ -19,8 +20,10 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.bouncycastle.crypto.CryptoServicesRegistrar;
 import org.bouncycastle.crypto.fips.FipsOutputDigestCalculator;
 import org.bouncycastle.crypto.fips.FipsSHS;
+import org.bouncycastle.jcajce.BCLoadStoreParameter;
 import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.Strings;
 import org.bouncycastle.util.io.Streams;
@@ -39,21 +42,56 @@ class ProvJKS
         {
             public Object createInstance(Object constructorParameter)
             {
-                return new JKSKeyStoreSpi(provider);
+                return new JKSKeyStoreSpi(true, provider);
             }
         });
+        if (!CryptoServicesRegistrar.isInApprovedOnlyMode())
+        {
+            provider.addAlgorithmImplementation("KeyStore.JKS-DEF", PREFIX + "JKSDef", new GuardedEngineCreator(new EngineCreator()
+            {
+                public Object createInstance(Object constructorParameter)
+                {
+                    return new JKSKeyStoreSpi(false,null);
+                }
+            }));
+        }
     }
 
-    private class JKSKeyStoreSpi
+    static class JKSKeyStoreSpi
         extends KeyStoreSpi
     {
         private final Hashtable<String, BCJKSTrustedCertEntry> certificateEntries = new Hashtable<String, BCJKSTrustedCertEntry>();
         private static final String NOT_IMPLEMENTED_MESSAGE = "BCFIPS JKS store is read-only and only supports certificate entries";
+        private final boolean matchOnProbe;
         private final BouncyCastleFipsProvider fipsProvider;
 
-        public JKSKeyStoreSpi(BouncyCastleFipsProvider provider)
+        public JKSKeyStoreSpi(boolean matchOnProbe, BouncyCastleFipsProvider provider)
         {
+            this.matchOnProbe = matchOnProbe;
             this.fipsProvider = provider;
+        }
+
+        public boolean engineProbe(InputStream stream)
+            throws IOException
+        {
+            if (!matchOnProbe)
+            {
+                return false;
+            }
+
+            DataInputStream storeStream;
+            if (stream instanceof DataInputStream)
+            {
+                storeStream = (DataInputStream)stream;
+            }
+            else
+            {
+                storeStream = new DataInputStream(stream);
+            }
+
+            int magic = storeStream.readInt();
+            int storeVersion = storeStream.readInt();
+            return magic == (int)0x0000feedfeedL && (storeVersion == 1 || storeVersion == 2);
         }
 
         public Key engineGetKey(String alias, char[] password)
@@ -178,6 +216,27 @@ class ProvJKS
             throw new IOException(NOT_IMPLEMENTED_MESSAGE);
         }
 
+        public void engineLoad(KeyStore.LoadStoreParameter loadStoreParameter)
+            throws IOException, NoSuchAlgorithmException, CertificateException
+        {
+            if (loadStoreParameter == null)
+            {
+                throw new IllegalArgumentException("'param' arg cannot be null");
+            }
+
+            if (loadStoreParameter instanceof BCLoadStoreParameter)
+            {
+                BCLoadStoreParameter bcParam = (BCLoadStoreParameter)loadStoreParameter;
+
+                engineLoad(bcParam.getInputStream(), Utils.extractPassword(loadStoreParameter));
+            }
+            else
+            {
+                throw new IllegalArgumentException(
+                    "no support for 'param' of type " + loadStoreParameter.getClass().getName());
+            }
+        }
+
         public void engineLoad(InputStream stream, char[] password)
             throws IOException, NoSuchAlgorithmException, CertificateException
         {
@@ -204,7 +263,7 @@ class ProvJKS
                         switch (storeVersion)
                         {
                         case 1:  // all certs X.509
-                            certFact = CertificateFactory.getInstance("X.509", fipsProvider);
+                            certFact = createCertFactory("X.509");
                             break;
                         case 2:  // provision for format in store.
                             certFactories = new Hashtable();
@@ -234,7 +293,7 @@ class ProvJKS
                                     }
                                     else
                                     {
-                                        certFact = CertificateFactory.getInstance(certFormat, fipsProvider);
+                                        certFact = createCertFactory(certFormat);
                                         certFactories.put(certFormat, certFact);
                                     }
                                 }
@@ -276,6 +335,19 @@ class ProvJKS
                 {
                     storeStream.erase();
                 }
+            }
+        }
+
+        private CertificateFactory createCertFactory(String certFormat)
+            throws CertificateException
+        {
+            if (fipsProvider != null)
+            {
+                return CertificateFactory.getInstance(certFormat, fipsProvider);
+            }
+            else
+            {
+                return CertificateFactory.getInstance(certFormat);
             }
         }
 
@@ -375,3 +447,4 @@ class ProvJKS
         }
     }
 }
+

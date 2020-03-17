@@ -111,6 +111,11 @@ public abstract class Nat
         System.arraycopy(x, 0, z, 0, len);
     }
 
+    public static void copy(int len, int[] x, int xOff, int[] z, int zOff)
+    {
+        System.arraycopy(x, xOff, z, zOff, len);
+    }
+
     public static int[] create(int len)
     {
         return new int[len];
@@ -660,6 +665,14 @@ public abstract class Nat
         for (int i = 0; i < len; ++i)
         {
             z[i] = 0;
+        }
+    }
+
+    public static void zero64(int len, long[] z)
+    {
+        for (int i = 0; i < len; ++i)
+        {
+            z[i] = 0L;
         }
     }
 }

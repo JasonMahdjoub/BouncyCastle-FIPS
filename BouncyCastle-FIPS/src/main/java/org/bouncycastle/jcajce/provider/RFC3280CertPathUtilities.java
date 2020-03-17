@@ -1050,10 +1050,10 @@ class RFC3280CertPathUtilities
                     }
 
                     //
-                    // (2)
+                    // (2) policyMapping <= 0
                     //
                 }
-                else if (policyMapping <= 0)
+                else
                 {
                     Iterator nodes_i = policyNodes[i].iterator();
                     while (nodes_i.hasNext())
@@ -2435,6 +2435,10 @@ class RFC3280CertPathUtilities
                 ((PKIXCertPathChecker)tmpIter.next()).check(cert, criticalExtensions);
             }
             catch (CertPathValidatorException e)
+            {
+                throw new CertPathValidatorException(e.getMessage(), e, certPath, index);
+            }
+            catch (Exception e)
             {
                 throw new CertPathValidatorException("Additional certificate path checker failed.", e, certPath,
                     index);

@@ -5,15 +5,16 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 
+import javax.security.auth.Destroyable;
+
 import org.bouncycastle.crypto.Algorithm;
 import org.bouncycastle.crypto.asymmetric.AsymmetricDSTU4145PrivateKey;
 import org.bouncycastle.jcajce.interfaces.DSTU4145PrivateKey;
 import org.bouncycastle.jcajce.spec.DSTU4145ParameterSpec;
 import org.bouncycastle.jcajce.spec.DSTU4145PrivateKeySpec;
-import org.bouncycastle.util.Strings;
 
 class ProvDSTU4145PrivateKey
-    implements DSTU4145PrivateKey, ProvKey<AsymmetricDSTU4145PrivateKey>
+    implements Destroyable, DSTU4145PrivateKey, ProvKey<AsymmetricDSTU4145PrivateKey>
 {
     private static final long serialVersionUID = 7245981689601667138L;
 
@@ -22,11 +23,11 @@ class ProvDSTU4145PrivateKey
     ProvDSTU4145PrivateKey(
         Algorithm algorithm,
         DSTU4145PrivateKey key)
-     {
-         DSTU4145ParameterSpec params = key.getParams();
+    {
+        DSTU4145ParameterSpec params = key.getParams();
 
-         this.baseKey = new AsymmetricDSTU4145PrivateKey(algorithm, DSTU4145Util.convertToECParams(params), key.getS());
-     }
+        this.baseKey = new AsymmetricDSTU4145PrivateKey(algorithm, DSTU4145Util.convertToECParams(params), key.getS());
+    }
 
     ProvDSTU4145PrivateKey(
         Algorithm algorithm,
@@ -43,6 +44,8 @@ class ProvDSTU4145PrivateKey
 
     public AsymmetricDSTU4145PrivateKey getBaseKey()
     {
+        KeyUtil.checkDestroyed(this);
+        
         return baseKey;
     }
 
@@ -58,6 +61,8 @@ class ProvDSTU4145PrivateKey
      */
     public String getFormat()
     {
+        KeyUtil.checkDestroyed(this);
+
         return "PKCS#8";
     }
 
@@ -104,23 +109,31 @@ class ProvDSTU4145PrivateKey
         return baseKey.hashCode();
     }
 
+    public void destroy()
+    {
+        baseKey.destroy();
+    }
+
+    public boolean isDestroyed()
+    {
+        return baseKey.isDestroyed();
+    }
+
     public String toString()
     {
-        StringBuilder   buf = new StringBuilder();
-        String          nl = Strings.lineSeparator();
+        if (isDestroyed())
+        {
+            return KeyUtil.destroyedPrivateKeyToString("DSTU4145");
+        }
 
-        buf.append("DSTU4145 Private Key").append(nl);
         try
         {
-            buf.append("    S: ").append(this.getS().toString(16)).append(nl);
+            return KeyUtil.privateKeyToString("DSTU4145", baseKey.getS(), baseKey.getParameters().getDomainParameters());
         }
         catch (Exception e)
         {
-            buf.append("RESTRICTED").append(nl);
+            return KeyUtil.restrictedToString("DSTU4145");
         }
-
-        return buf.toString();
-
     }
 
     private void readObject(
@@ -140,6 +153,11 @@ class ProvDSTU4145PrivateKey
         ObjectOutputStream out)
         throws IOException
     {
+        if (isDestroyed())
+        {
+            throw new IOException("key has been destroyed");
+        }
+
         out.defaultWriteObject();
 
         out.writeObject(baseKey.getAlgorithm());

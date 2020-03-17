@@ -12,10 +12,11 @@ import org.bouncycastle.util.Arrays;
 public final class AgreedKeyWithMacKey
     implements SecretKey
 {
-    private final SecretKey secretKey;
-    private final byte[] macKey;
-    private final String macAlgorithm;
+    private SecretKey secretKey;
+    private byte[] macKey;
+    private String macAlgorithm;
 
+    private final AtomicBoolean hasBeenDestroyed = new AtomicBoolean(false);
     private final AtomicBoolean isZeroed = new AtomicBoolean(false);
 
     /**
@@ -49,6 +50,11 @@ public final class AgreedKeyWithMacKey
      */
     public String getAlgorithm()
     {
+        if (isDestroyed())
+        {
+            throw new IllegalStateException("key has been destroyed");
+        }
+
         return secretKey.getAlgorithm();
     }
 
@@ -59,6 +65,11 @@ public final class AgreedKeyWithMacKey
      */
     public String getFormat()
     {
+        if (isDestroyed())
+        {
+            throw new IllegalStateException("key has been destroyed");
+        }
+
         return secretKey.getFormat();
     }
 
@@ -69,12 +80,40 @@ public final class AgreedKeyWithMacKey
      */
     public byte[] getEncoded()
     {
+        if (isDestroyed())
+        {
+            throw new IllegalStateException("key has been destroyed");
+        }
+
         return secretKey.getEncoded();
+    }
+
+    public void destroy()
+    {
+        if (!hasBeenDestroyed.getAndSet(true))
+        {
+             secretKey = null;
+        }
+    }
+
+    public boolean isDestroyed()
+    {
+        return hasBeenDestroyed.get();
     }
 
     public boolean equals(Object o)
     {
-        return secretKey.equals(o);
+        if (o == this)
+        {
+            return true;
+        }
+
+        if (o instanceof SecretKey)
+        {
+            return secretKey.equals(o);
+        }
+
+        return false;
     }
 
     public int hashCode()
@@ -99,6 +138,11 @@ public final class AgreedKeyWithMacKey
      */
     public ZeroizableSecretKey getMacKey()
     {
+        if (isDestroyed())
+        {
+            throw new IllegalStateException("key has been destroyed");
+        }
+
         if (macKey == null)
         {
             return null;
@@ -117,6 +161,16 @@ public final class AgreedKeyWithMacKey
                 {
                     Arrays.fill(macKey, (byte)0);
                 }
+            }
+
+            public void destroy()
+            {
+                zeroize();
+            }
+
+            public boolean isDestroyed()
+            {
+                return isZeroed.get();
             }
 
             public String getAlgorithm()

@@ -486,8 +486,6 @@ class Tnaf
             u2 = s.subtract(u0.shiftLeft(1));
             u0 = u1;
             u1 = u2;
-//            System.out.println(i + ": " + u2);
-//            System.out.println();
         }
 
         BigInteger[] retVal = {u0, u1};
@@ -524,8 +522,6 @@ class Tnaf
             BigInteger u1invert = us[1].modInverse(twoToW);
             BigInteger tw;
             tw = ECConstants.TWO.multiply(us[0]).multiply(u1invert).mod(twoToW);
-//            System.out.println("mu = " + mu);
-//            System.out.println("tw = " + tw);
             return tw;
         }
     }

@@ -66,7 +66,8 @@ public class GeneralAlgorithm
 
     public final boolean requiresAlgorithmParameters()
     {
-        return basicVariation instanceof Mode && ((Mode)basicVariation).getBaseMode().expectsIV();
+        return (basicVariation instanceof Mode && ((Mode)basicVariation).getBaseMode().expectsIV())
+            || name.equals("ChaCha20");
     }
 
     @Override

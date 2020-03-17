@@ -24,19 +24,6 @@ class ClassUtil
         }
     }
 
-
-    private static Constructor findConstructor(Class clazz)
-    {
-        try
-        {
-            return clazz.getConstructor();
-        }
-        catch (Exception e)
-        {
-            return null;
-        }
-    }
-
     private static Constructor findExceptionConstructor(Class clazz)
     {
         try

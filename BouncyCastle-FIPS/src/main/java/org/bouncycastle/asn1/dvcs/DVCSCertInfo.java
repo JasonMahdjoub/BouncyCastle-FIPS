@@ -236,29 +236,14 @@ public class DVCSCertInfo
         return version;
     }
 
-    private void setVersion(int version)
-    {
-        this.version = version;
-    }
-
     public DVCSRequestInformation getDvReqInfo()
     {
         return dvReqInfo;
     }
 
-    private void setDvReqInfo(DVCSRequestInformation dvReqInfo)
-    {
-        this.dvReqInfo = dvReqInfo;
-    }
-
     public DigestInfo getMessageImprint()
     {
         return messageImprint;
-    }
-
-    private void setMessageImprint(DigestInfo messageImprint)
-    {
-        this.messageImprint = messageImprint;
     }
 
     public ASN1Integer getSerialNumber()

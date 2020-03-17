@@ -120,6 +120,33 @@ class ProvCamellia
             }
         }));
 
+        GuardedEngineCreator camellia128Fact = new GuardedEngineCreator(new EngineCreator()
+        {
+                public Object createInstance(Object constructorParameter)
+                {
+                    return createFixedFactory(128);
+                }
+        });
+        addSecretKeyFactoryForOIDs(provider, PREFIX + "SKF", camellia128Fact, NTTObjectIdentifiers.id_camellia128_cbc, NTTObjectIdentifiers.id_camellia128_wrap);
+
+        GuardedEngineCreator camellia192Fact = new GuardedEngineCreator(new EngineCreator()
+        {
+                public Object createInstance(Object constructorParameter)
+                {
+                    return createFixedFactory(192);
+                }
+        });
+        addSecretKeyFactoryForOIDs(provider, PREFIX + "SKF", camellia192Fact, NTTObjectIdentifiers.id_camellia192_cbc, NTTObjectIdentifiers.id_camellia192_wrap);
+
+        GuardedEngineCreator camellia256Fact = new GuardedEngineCreator(new EngineCreator()
+        {
+                public Object createInstance(Object constructorParameter)
+                {
+                    return createFixedFactory(256);
+                }
+        });
+        addSecretKeyFactoryForOIDs(provider, PREFIX + "SKF", camellia256Fact, NTTObjectIdentifiers.id_camellia256_cbc, NTTObjectIdentifiers.id_camellia256_wrap);
+
         provider.addAlgorithmImplementation("Cipher.CAMELLIA", PREFIX + "$ECB", new GuardedEngineCreator(new EngineCreator()
         {
             public Object createInstance(Object constructorParameter)
@@ -306,5 +333,23 @@ class ProvCamellia
             }
         }));
         provider.addAlias("Mac", "CAMELLIACCMMAC", "CAMELLIA-CCMMAC");
+    }
+
+    private BaseSecretKeyFactory createFixedFactory(final int keySize)
+    {
+        return new BaseSecretKeyFactory("Camellia", Camellia.ALGORITHM, new BaseSecretKeyFactory.Validator()
+        {
+            public byte[] validated(byte[] keyBytes)
+                throws InvalidKeySpecException
+            {
+                int size = keyBytes.length * 8;
+                if (size != keySize)
+                {
+                    throw new InvalidKeySpecException("Provided key data wrong size for Camellia-" + keySize);
+                }
+
+                return keyBytes;
+            }
+        });
     }
 }

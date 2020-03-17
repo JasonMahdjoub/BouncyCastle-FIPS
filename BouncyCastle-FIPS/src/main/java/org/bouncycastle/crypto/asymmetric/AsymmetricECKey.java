@@ -13,8 +13,9 @@ public abstract class AsymmetricECKey
     implements AsymmetricKey
 {
     private final boolean    approvedModeOnly;
-    private final Algorithm algorithm;
-    private final ECDomainParameters domainParameters;
+
+    private Algorithm algorithm;
+    private ECDomainParameters domainParameters;
 
     AsymmetricECKey(Algorithm algorithm, ECDomainParameters domainParameters)
     {
@@ -38,13 +39,8 @@ public abstract class AsymmetricECKey
       *
       * @return the key's algorithm.
       */
-    public final Algorithm getAlgorithm()
+    public Algorithm getAlgorithm()
     {
-        if (this instanceof AsymmetricECPrivateKey)
-        {
-            checkApprovedOnlyModeStatus();
-        }
-
         return algorithm;
     }
 
@@ -53,14 +49,15 @@ public abstract class AsymmetricECKey
      *
      * @return the EC domain parameters for the key.
      */
-    public final ECDomainParameters getDomainParameters()
+    public ECDomainParameters getDomainParameters()
     {
-        if (this instanceof AsymmetricECPrivateKey)
-        {
-            checkApprovedOnlyModeStatus();
-        }
-
         return domainParameters;
+    }
+
+    protected void zeroize()
+    {
+        this.algorithm = null;
+        this.domainParameters = null;
     }
 
     protected final void checkApprovedOnlyModeStatus()

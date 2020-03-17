@@ -22,7 +22,9 @@ public class ECDomainParameters
     private final byte[]  seed;
     private final ECPoint G;
     private final BigInteger n;
-    private final BigInteger  h;
+    private final BigInteger h;
+    
+    private volatile BigInteger hInv = null;
 
     /**
      * Constructor that assumes the co-factor h is 1.
@@ -72,8 +74,18 @@ public class ECDomainParameters
         BigInteger h,
         byte[] seed)
     {
+        if (curve == null)
+        {
+            throw new NullPointerException("curve");
+        }
+        if (n == null)
+        {
+            throw new NullPointerException("n");
+        }
+        // we can't check for h == null here as h is optional in X9.62 as it is not required for ECDSA
+
         this.curve = curve;
-        this.G = G.normalize();
+        this.G = KeyUtils.validated(curve, G);
         this.n = n;
         this.h = h;
         this.seed = Arrays.clone(seed);
@@ -117,6 +129,33 @@ public class ECDomainParameters
     public BigInteger getH()
     {
         return h;
+    }
+
+    /**
+     * Return the multiplicative inverse of H over the order N.
+     *
+     * @return inverse of H.
+     */
+    public BigInteger getInverseH()
+    {
+        // this works as expected in 1.5 and later...
+        if (hInv == null)
+        {
+            if (h == null)
+            {
+                throw new IllegalStateException("no H provided for these parameters");
+            }
+
+            synchronized (this)
+            {
+                if (hInv == null)
+                {
+                    hInv = h.modInverse(n);
+                }
+            }
+        }
+
+        return hInv;
     }
 
     /**

@@ -95,7 +95,7 @@ public class ASN1StreamParser
             }
         }
 
-        throw new ASN1Exception("Implicit tagging not implemented");
+        throw new ASN1Exception("implicit tagging not implemented");
     }
 
     ASN1Primitive readTaggedObject(boolean constructed, int tag) throws IOException
@@ -175,7 +175,7 @@ public class ASN1StreamParser
 
             if ((tag & BERTags.APPLICATION) != 0)
             {
-                return new DERApplicationSpecific(isConstructed, tagNo, defIn.toByteArray());
+                return new DLApplicationSpecific(isConstructed, tagNo, defIn.toByteArray());
             }
 
             if ((tag & BERTags.TAGGED) != 0)

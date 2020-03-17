@@ -36,8 +36,7 @@ public class BaseX931Signer
     private byte[]      block;
 
     /**
-     * Generate a signer for the with either implicit or explicit trailers
-     * for X9.31
+     * Generate a signer with either implicit or explicit trailers for X9.31
      *
      * @param cipher base cipher to use for signature creation/verification
      * @param digest digest to use.
@@ -139,24 +138,17 @@ public class BaseX931Signer
     public byte[] generateSignature()
         throws CryptoException
     {
-        createSignatureBlock();
+        createSignatureBlock(trailer);
 
         BigInteger t = new BigInteger(1, cipher.processBlock(block, 0, block.length));
-        BigInteger nSubT = kParam.getModulus().subtract(t);
-
         clearBlock(block);
 
-        if (t.compareTo(nSubT) > 0)
-        {
-            return BigIntegers.asUnsignedByteArray((kParam.getModulus().bitLength() + 7) / 8, nSubT);
-        }
-        else
-        {
-            return BigIntegers.asUnsignedByteArray((kParam.getModulus().bitLength() + 7) / 8, t);
-        }
+        t = t.min(kParam.getModulus().subtract(t));
+
+        return BigIntegers.asUnsignedByteArray((kParam.getModulus().bitLength() + 7) / 8, t);
     }
 
-    private void createSignatureBlock()
+    private void createSignatureBlock(int trailer)
     {
         int     digSize = digest.getDigestSize();
 
@@ -185,7 +177,7 @@ public class BaseX931Signer
     }
 
     /**
-     * return true if the signature represents a ISO9796-2 signature
+     * return true if the signature represents a X9.31 signature
      * for the passed in message.
      */
     public boolean verifySignature(
@@ -203,14 +195,14 @@ public class BaseX931Signer
         BigInteger t = new BigInteger(1, block);
         BigInteger f;
 
-        if (t.mod(BigInteger.valueOf(16)).equals(BigInteger.valueOf(12)))
+        if ((t.intValue() & 15) == 12)
         {
              f = t;
         }
         else
         {
             t = kParam.getModulus().subtract(t);
-            if (t.mod(BigInteger.valueOf(16)).equals(BigInteger.valueOf(12)))
+            if ((t.intValue() & 15) == 12)
             {
                  f = t;
             }
@@ -220,12 +212,19 @@ public class BaseX931Signer
             }
         }
 
-        createSignatureBlock();
+        createSignatureBlock(trailer);
 
         byte[] fBlock = BigIntegers.asUnsignedByteArray(block.length, f);
 
         boolean rv = Arrays.constantTimeAreEqual(block, fBlock);
 
+        // check for old NIST tool value
+        if (trailer == ISOTrailers.TRAILER_SHA512_256 && !rv)
+        {
+            block[block.length - 2] = (byte)0x40;   // old NIST CAVP tool value
+            rv = Arrays.constantTimeAreEqual(block, fBlock);
+        }
+        
         clearBlock(block);
         clearBlock(fBlock);
 

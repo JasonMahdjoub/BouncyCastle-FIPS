@@ -237,7 +237,7 @@ public final class FipsRSA
         {
             if (CryptoServicesRegistrar.isInApprovedOnlyMode())
             {
-                if (this.keySize != 2048 && this.keySize != 3072)
+                if (this.keySize < 2048)
                 {
                     throw new FipsUnapprovedOperationError("Attempt to use RSA key size outside of accepted range - requested keySize " + keySize + " bits", getAlgorithm());
                 }
@@ -656,7 +656,7 @@ public final class FipsRSA
             if (CryptoServicesRegistrar.isInApprovedOnlyMode())
             {
                 int bitLength = k.getModulus().bitLength();
-                if (bitLength != 2048 && bitLength != 3072)
+                if (bitLength < 2048)
                 {
                     throw new FipsUnapprovedOperationError("Attempt to use RSA key with non-approved size: " + bitLength, key.getAlgorithm());
                 }
@@ -703,8 +703,8 @@ public final class FipsRSA
             if (CryptoServicesRegistrar.isInApprovedOnlyMode())
             {
                 int bitLength = k.getModulus().bitLength();
-                // 186-4 key sizes                             // 186-2 legacy key sizes
-                if (bitLength != 2048 && bitLength != 3072 && bitLength != 1024 && bitLength != 4096 && bitLength != 1536)
+                // 186-4 key sizes      // 186-2 legacy key sizes
+                if (bitLength < 2048 && bitLength != 1024 && bitLength != 1536)
                 {
                     throw new FipsUnapprovedOperationError("Attempt to use RSA key with non-approved size: " + bitLength, key.getAlgorithm());
                 }
@@ -1465,11 +1465,6 @@ public final class FipsRSA
                         "e13fde6847f56c939aedfed9d24c2e6a7c661c461b436ade0a9afd6457be92af33c2626b319e060e943561221509" +
                         "9f9369aaca72351dad4dc14a4c418dbe7fd3b273e91d45fa615c15be8d5e0b97b6aca713cbc549ed4ef2d82f5f8e" +
                         "03b0d0d95d6ce7c7695f8bba938746eff19b70d2c2d56fab");
-
-                byte[] rngData2 = Hex.decode(
-                    "0051aa809e02ec73545c336b709903f01478e2c6bafde09dda4f6fd2401f64accf95df631b65488724223cb03cb30add" +
-                        "f7a5385c7282090fe3a171d915dde703e384b0b9de529ae3a45d8db4f5c2ddb74b550f1b8efc9bb99a6c2c07ff51" +
-                        "2a66f307b6ba3e6db67daa2eb7440683b994e67ae574ec8b2e1253cb8b7f6241de19");
 
                 byte[] zVal = Hex.decode(
                     "697140a15ddcb8dc01b7f97d929c20c99f9b1348fa80d67350183e44ca9a90d958758d0299b95fb442338e7c3d359507" +

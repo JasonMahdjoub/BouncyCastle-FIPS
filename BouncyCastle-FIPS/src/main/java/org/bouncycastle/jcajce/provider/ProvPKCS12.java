@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
@@ -55,6 +56,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.BEROctetString;
 import org.bouncycastle.asn1.BEROutputStream;
+import org.bouncycastle.asn1.BERTags;
 import org.bouncycastle.asn1.DERBMPString;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
@@ -91,7 +93,9 @@ import org.bouncycastle.crypto.fips.FipsDigestAlgorithm;
 import org.bouncycastle.crypto.fips.FipsSHS;
 import org.bouncycastle.crypto.general.PBKD;
 import org.bouncycastle.crypto.general.SecureHash;
+import org.bouncycastle.jcajce.BCLoadStoreParameter;
 import org.bouncycastle.jcajce.ConsistentKeyPair;
+import org.bouncycastle.jcajce.PKCS12Key;
 import org.bouncycastle.jcajce.PKCS12KeyWithParameters;
 import org.bouncycastle.jcajce.PKCS12StoreParameter;
 import org.bouncycastle.jcajce.spec.GOST28147ParameterSpec;
@@ -103,6 +107,8 @@ import org.bouncycastle.util.encoders.Hex;
 class ProvPKCS12
     extends AsymmetricAlgorithmProvider
 {
+    private static final Logger LOG = Logger.getLogger(ProvPKCS12.class.getName());
+
     private static final KeyIvSizeProvider sizeProvider = new KeyIvSizeProvider();
 
     static class KeyFactory
@@ -136,7 +142,7 @@ class ProvPKCS12
 
                 if (pbeKeySpec.getSalt() == null)
                 {
-                    throw new InvalidKeySpecException("Missing required salt");
+                    return new PKCS12Key(((PBEKeySpec)keySpec).getPassword());
                 }
 
                 return getSecretKey(prf, algName, pbeKeySpec, keyType, keySizeInBits);
@@ -170,7 +176,7 @@ class ProvPKCS12
 
                 if (pbeKeySpec.getSalt() == null)
                 {
-                    throw new InvalidKeySpecException("Missing required salt");
+                    return new PKCS12Key(pbeKeySpec.getPassword());
                 }
 
                 return getSecretKey(prf, algName, pbeKeySpec, keyType, pbeKeySpec.getKeyLength());
@@ -310,11 +316,12 @@ class ProvPKCS12
 
         // use of final causes problems with JDK 1.2 compiler
         private java.security.cert.CertificateFactory certFact;
+        private final boolean matchOnProbe;
         private BouncyCastleFipsProvider fipsProvider;
         private ASN1ObjectIdentifier keyAlgorithm;
         private ASN1ObjectIdentifier certAlgorithm;
 
-        private class CertId
+        private static class CertId
         {
             byte[] id;
 
@@ -361,6 +368,17 @@ class ProvPKCS12
             ASN1ObjectIdentifier keyAlgorithm,
             ASN1ObjectIdentifier certAlgorithm)
         {
+            this(false, fipsProvider, certProvider, keyAlgorithm, certAlgorithm);
+        }
+
+        public PKCS12KeyStoreSpi(
+            boolean matchOnProbe,
+            BouncyCastleFipsProvider fipsProvider,
+            Provider certProvider,
+            ASN1ObjectIdentifier keyAlgorithm,
+            ASN1ObjectIdentifier certAlgorithm)
+        {
+            this.matchOnProbe = matchOnProbe;
             this.fipsProvider = fipsProvider;
             this.keyAlgorithm = keyAlgorithm;
             this.certAlgorithm = certAlgorithm;
@@ -383,7 +401,7 @@ class ProvPKCS12
             }
         }
 
-        private SubjectKeyIdentifier createSubjectKeyId(
+        private static SubjectKeyIdentifier createSubjectKeyId(
             PublicKey pubKey)
             throws IOException
         {
@@ -392,13 +410,56 @@ class ProvPKCS12
             return new SubjectKeyIdentifier(getDigest(info));
         }
 
-        private byte[] getDigest(SubjectPublicKeyInfo spki)
+        private static byte[] getDigest(SubjectPublicKeyInfo spki)
         {
             OutputDigestCalculator calculator = new FipsSHS.OperatorFactory<FipsSHS.Parameters>().createOutputDigestCalculator(FipsSHS.SHA1);
 
             calculator.getDigestStream().update(spki.getPublicKeyData().getBytes());
 
             return calculator.getDigest();
+        }
+
+        public boolean engineProbe(InputStream stream)
+            throws IOException
+        {
+            if (!matchOnProbe)
+            {
+                return false;
+            }
+
+            BufferedInputStream storeStream;
+            if (stream instanceof BufferedInputStream)
+            {
+                storeStream = (BufferedInputStream)stream;
+            }
+            else
+            {
+                storeStream = new BufferedInputStream(stream);
+            }
+
+            storeStream.mark(10);
+
+            int hdr = storeStream.read();
+
+            if (hdr != (BERTags.CONSTRUCTED | BERTags.SEQUENCE))
+            {
+                return false;
+            }
+
+            storeStream.reset();
+
+            ASN1InputStream asn1Stream = new ASN1InputStream(storeStream);
+
+            try
+            {
+                Pfx.getInstance(asn1Stream.readObject());
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+            return asn1Stream.available() == 0;
         }
 
         public Enumeration engineAliases()
@@ -1172,8 +1233,8 @@ class ProvPKCS12
                             }
                             else
                             {
-                                System.out.println("extra in data " + b.getBagId());
-                                System.out.println(ASN1Dump.dumpAsString(b));
+                                LOG.info("extra in data " + b.getBagId());
+                                LOG.fine(ASN1Dump.dumpAsString(b));
                             }
                         }
                     }
@@ -1298,15 +1359,15 @@ class ProvPKCS12
                             }
                             else
                             {
-                                System.out.println("extra in encryptedData " + b.getBagId());
-                                System.out.println(ASN1Dump.dumpAsString(b));
+                                LOG.info("extra in encryptedData " + b.getBagId());
+                                LOG.fine(ASN1Dump.dumpAsString(b));
                             }
                         }
                     }
                     else
                     {
-                        System.out.println("extra " + c[i].getContentType().getId());
-                        System.out.println("extra " + ASN1Dump.dumpAsString(c[i].getContent()));
+                        LOG.info("extra " + c[i].getContentType().getId());
+                        LOG.fine("extra " + ASN1Dump.dumpAsString(c[i].getContent()));
                     }
                 }
             }
@@ -1414,31 +1475,25 @@ class ProvPKCS12
                 throw new IllegalArgumentException("'param' arg cannot be null");
             }
 
-            if (!(param instanceof PKCS12StoreParameter))
+            if (param instanceof BCLoadStoreParameter)
             {
-                throw new IllegalArgumentException(
-                    "No support for 'param' of type " + param.getClass().getName());
-            }
+                BCLoadStoreParameter bcParam = (BCLoadStoreParameter)param;
 
-            PKCS12StoreParameter bcParam = (PKCS12StoreParameter)param;
-
-            char[] password;
-            KeyStore.ProtectionParameter protParam = param.getProtectionParameter();
-            if (protParam == null)
-            {
-                password = null;
+                engineLoad(bcParam.getInputStream(), Utils.extractPassword(param));
             }
-            else if (protParam instanceof KeyStore.PasswordProtection)
+            else if (param instanceof PKCS12StoreParameter)
             {
-                password = ((KeyStore.PasswordProtection)protParam).getPassword();
+                PKCS12StoreParameter bcParam = (PKCS12StoreParameter)param;
+
+                char[] password = Utils.extractPassword(param);
+
+                doStore(bcParam.getOutputStream(), password, bcParam.isForDEREncoding());
             }
             else
             {
                 throw new IllegalArgumentException(
-                    "No support for protection parameter of type " + protParam.getClass().getName());
+                    "no support for 'param' of type " + param.getClass().getName());
             }
-
-            doStore(bcParam.getOutputStream(), password, bcParam.isForDEREncoding());
         }
 
         public void engineStore(OutputStream stream, char[] password)
@@ -1888,9 +1943,9 @@ class ProvPKCS12
     private static class BCPKCS12KeyStore3DES
         extends PKCS12KeyStoreSpi
     {
-        public BCPKCS12KeyStore3DES(BouncyCastleFipsProvider fipsProvider)
+        public BCPKCS12KeyStore3DES(boolean matchOnProbe, BouncyCastleFipsProvider fipsProvider)
         {
-            super(fipsProvider, fipsProvider, pbeWithSHAAnd3_KeyTripleDES_CBC, pbeWithSHAAnd3_KeyTripleDES_CBC);
+            super(true, fipsProvider, fipsProvider, pbeWithSHAAnd3_KeyTripleDES_CBC, pbeWithSHAAnd3_KeyTripleDES_CBC);
         }
     }
 
@@ -1920,7 +1975,7 @@ class ProvPKCS12
         {
             public Object createInstance(Object constructorParameter)
             {
-                return new BCPKCS12KeyStore3DES(provider);
+                return new BCPKCS12KeyStore3DES(true, provider);
             }
         });
         provider.addAlias("Alg.Alias.KeyStore.BCPKCS12", "PKCS12");

@@ -129,8 +129,8 @@ class DsaParametersGenerator
 // 3. n = ceiling(L / outlen) - 1.
         int n = (L - 1) / outlen;
 
-// 4. b = L - 1 - (n * outlen).
-        int b = (L - 1) % outlen;
+// 4. b = L - 1 - (n * outlen).  (used inline below)
+//        int b = (L - 1) % outlen;
 
         byte[] w = new byte[L / 8];
         byte[] output = new byte[d.getDigestSize()];

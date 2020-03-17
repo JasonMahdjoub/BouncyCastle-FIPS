@@ -1,3 +1,6 @@
+/***************************************************************/
+/******    DO NOT EDIT THIS CLASS bc-java SOURCE FILE     ******/
+/***************************************************************/
 package org.bouncycastle.crypto.fips;
 
 import java.math.BigInteger;
@@ -8,6 +11,7 @@ import org.bouncycastle.crypto.internal.CipherParameters;
 import org.bouncycastle.crypto.internal.params.EcDomainParameters;
 import org.bouncycastle.crypto.internal.params.EcPrivateKeyParameters;
 import org.bouncycastle.crypto.internal.params.EcPublicKeyParameters;
+import org.bouncycastle.math.ec.ECAlgorithms;
 import org.bouncycastle.math.ec.ECPoint;
 
 /**
@@ -49,17 +53,22 @@ class EcDhcBasicAgreement
         CipherParameters pubKey)
     {
         EcPublicKeyParameters pub = (EcPublicKeyParameters)pubKey;
-
-        if (!pub.getParameters().equals(key.getParameters()))
+        EcDomainParameters params = key.getParameters();
+        if (!params.equals(pub.getParameters()))
         {
             throw new IllegalKeyException("ECCDH public key has wrong domain parameters");
         }
 
-        EcDomainParameters params = pub.getParameters();
-
         BigInteger hd = params.getH().multiply(key.getD()).mod(params.getN());
 
-        ECPoint P = pub.getQ().multiply(hd).normalize();
+        // Always perform calculations on the exact curve specified by our private key's parameters
+        ECPoint pubPoint = ECAlgorithms.cleanPoint(params.getCurve(), pub.getQ());
+        if (pubPoint.isInfinity())
+        {
+            throw new IllegalStateException("Infinity is not a valid public key for ECCDH");
+        }
+
+        ECPoint P = pubPoint.multiply(hd).normalize();
 
         if (P.isInfinity())
         {

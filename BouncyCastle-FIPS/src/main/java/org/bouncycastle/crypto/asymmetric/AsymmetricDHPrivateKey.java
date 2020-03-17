@@ -2,6 +2,7 @@ package org.bouncycastle.crypto.asymmetric;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DERBitString;
@@ -25,8 +26,9 @@ public final class AsymmetricDHPrivateKey
     extends AsymmetricDHKey
     implements AsymmetricPrivateKey
 {
-    private final int hashCode;
+    private final AtomicBoolean hasBeenDestroyed = new AtomicBoolean(false);
 
+    private int hashCode;
     private BigInteger x;
 
     public AsymmetricDHPrivateKey(Algorithm algorithm, DHDomainParameters params, BigInteger x)
@@ -60,6 +62,30 @@ public final class AsymmetricDHPrivateKey
         {
             throw new IllegalArgumentException("Unable to parse DSA private key: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Return the algorithm this Diffie-Hellman key is for.
+     *
+     * @return the key's algorithm.
+     */
+    public final Algorithm getAlgorithm()
+    {
+        KeyUtils.checkDestroyed(this);
+
+        return super.getAlgorithm();
+    }
+
+    /**
+     * Return the Diffie-Hellman domain parameters associated with this key.
+     *
+     * @return the Diffie-Hellman domain parameters for this key.
+     */
+    public final DHDomainParameters getDomainParameters()
+    {
+        KeyUtils.checkDestroyed(this);
+
+        return super.getDomainParameters();
     }
 
     public final byte[] getEncoded()
@@ -96,12 +122,30 @@ public final class AsymmetricDHPrivateKey
 
         KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
 
+        KeyUtils.checkDestroyed(this);
+        
         return x;
     }
 
-    private void zeroize()
+    public void destroy()
     {
-        this.x = null;
+        checkApprovedOnlyModeStatus();
+
+        KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
+
+        if (!hasBeenDestroyed.getAndSet(true))
+        {
+            this.x = null;
+            this.hashCode = -1;
+            super.zeroize();
+        }
+    }
+
+    public boolean isDestroyed()
+    {
+        checkApprovedOnlyModeStatus();
+
+        return hasBeenDestroyed.get();
     }
 
     @Override
@@ -121,7 +165,9 @@ public final class AsymmetricDHPrivateKey
     protected void finalize()
         throws Throwable
     {
-        zeroize();
+        destroy();
+
+        super.finalize();
     }
 
     @Override
@@ -138,6 +184,11 @@ public final class AsymmetricDHPrivateKey
         }
 
         AsymmetricDHPrivateKey other = (AsymmetricDHPrivateKey)o;
+
+        if (this.isDestroyed() || other.isDestroyed())
+        {
+            return false;
+        }
 
         return x.equals(other.x) && this.getDomainParameters().equals(other.getDomainParameters());
     }

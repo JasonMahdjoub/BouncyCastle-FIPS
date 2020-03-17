@@ -2,6 +2,7 @@ package org.bouncycastle.crypto.asymmetric;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -22,7 +23,9 @@ public final class AsymmetricECGOST3410PrivateKey
     extends AsymmetricGOST3410Key<ECDomainParameters>
     implements AsymmetricPrivateKey
 {
-    private final int hashCode;
+    private final AtomicBoolean hasBeenDestroyed = new AtomicBoolean(false);
+
+    private int hashCode;
 
     private BigInteger x;
 
@@ -110,18 +113,58 @@ public final class AsymmetricECGOST3410PrivateKey
         }
     }
 
+    /**
+     * Return the algorithm this GOST R 34.10 key is for.
+     *
+     * @return the key's algorithm.
+     */
+    public final Algorithm getAlgorithm()
+    {
+        KeyUtils.checkDestroyed(this);
+
+        return super.getAlgorithm();
+    }
+
+    /**
+     * Return the domain parameters associated with this key.These will either
+     * be for GOST R 34.10-1994 or GOST R 34.10-2001 depending on the key type.
+     *
+     * @return the GOST3410 domain parameters.
+     */
+    public final GOST3410Parameters<ECDomainParameters> getParameters()
+    {
+        KeyUtils.checkDestroyed(this);
+
+        return super.getParameters();
+    }
+
     public BigInteger getS()
+    {
+        KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
+
+        KeyUtils.checkDestroyed(this);
+
+        return x;
+    }
+
+    public void destroy()
     {
         checkApprovedOnlyModeStatus();
 
         KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
 
-        return x;
+        if (!hasBeenDestroyed.getAndSet(true))
+        {
+            this.x = null;
+            this.hashCode = -1;
+
+            super.zeroize();
+        }
     }
 
-    private void zeroize()
+    public boolean isDestroyed()
     {
-        this.x = null;
+        return hasBeenDestroyed.get();
     }
 
     @Override
@@ -143,7 +186,7 @@ public final class AsymmetricECGOST3410PrivateKey
     {
         super.finalize();
 
-        zeroize();
+        destroy();
     }
 
     @Override
@@ -161,6 +204,11 @@ public final class AsymmetricECGOST3410PrivateKey
 
         AsymmetricECGOST3410PrivateKey other = (AsymmetricECGOST3410PrivateKey)o;
 
+        if (this.isDestroyed() || other.isDestroyed())
+        {
+            return false;
+        }
+        
         return x.equals(other.x) && this.getParameters().equals(other.getParameters());
     }
 }
