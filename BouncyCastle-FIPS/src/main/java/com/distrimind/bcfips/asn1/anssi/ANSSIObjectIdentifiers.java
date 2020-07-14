@@ -1,0 +1,14 @@
+/***************************************************************/
+/******    DO NOT EDIT THIS CLASS bc-java SOURCE FILE     ******/
+/***************************************************************/
+package com.distrimind.bcfips.asn1.anssi;
+
+import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
+
+/**
+ * Object Identifiers belong to the French Agency, ANSSI.
+ */
+public interface ANSSIObjectIdentifiers
+{
+    ASN1ObjectIdentifier FRP256v1 = new ASN1ObjectIdentifier("1.2.250.1.223.101.256.1");
+}

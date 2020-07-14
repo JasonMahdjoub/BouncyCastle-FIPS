@@ -1,0 +1,28 @@
+package com.distrimind.bcfips.crypto.internal.io;
+
+import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
+import com.distrimind.bcfips.crypto.fips.FipsOperationError;
+import com.distrimind.bcfips.crypto.fips.FipsStatus;
+import com.distrimind.bcfips.crypto.fips.FipsUnapprovedOperationError;
+
+class Utils
+{
+    static void approvedModeCheck(boolean approvedMode, String algorithmName)
+    {
+        if (approvedMode != CryptoServicesRegistrar.isInApprovedOnlyMode())
+        {
+            if (approvedMode)
+            {
+                throw new FipsUnapprovedOperationError("Attempt to use approved implementation in unapproved thread: " + algorithmName);
+            }
+            else
+            {
+                throw new FipsUnapprovedOperationError("Attempt to use unapproved implementation in approved thread: " + algorithmName);
+            }
+        }
+        if (FipsStatus.isErrorStatus())
+        {
+            throw new FipsOperationError(FipsStatus.getStatusMessage());
+        }
+    }
+}

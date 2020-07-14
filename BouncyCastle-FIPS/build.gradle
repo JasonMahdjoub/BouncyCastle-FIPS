@@ -14,10 +14,10 @@ apply plugin: 'java-library'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'idea'
+apply plugin: 'signing'
 
 
-
-def Properties props = new Properties()
+Properties props = new Properties()
 def propFile = file('gradle.properties')
 def artifactory_Url="https://artifactory.distri-mind.fr/artifactory"
 def user=""
@@ -67,7 +67,7 @@ repositories {
 dependencies {
 }
 
-def javaVersion=7
+def javaVersion="8"
 sourceCompatibility = javaVersion
 targetCompatibility= javaVersion
 version='1.0.2-DMRECOMPILE'
@@ -80,12 +80,11 @@ idea {
 }
 
 allprojects {
-	group='org.bouncycastle'
-  
+	group='com.distrimind.bcfips'
+
     //compileJava.options.compilerArgs << "-Xlint"
     //compileJava.options.compilerArgs.addAll(['--release', javaVersion])
-    if (project.hasProperty('javaHomeVersion') && javaHomeVersion.toFloat()>1.8)
-    	javadoc.options.addStringOption("html5", "-quiet")
+
 
 
 	
@@ -94,20 +93,20 @@ allprojects {
 
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
+    archiveClassifier.set('sources')
     from sourceSets.main.allSource
     from "../LICENSE"
 }
 
-/*task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier.set('javadoc')
     from javadoc.destinationDir
     from "../LICENSE"
-}*/
+}
 
 artifacts {
     archives sourcesJar
-    //archives javadocJar
+    archives javadocJar
 }
 
 jar {
@@ -124,22 +123,60 @@ jar {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-        	artifactId 'bc-fips'
-        	
             from components.java
             artifact sourcesJar
-            //artifact javadocJar
-            
+            artifact javadocJar
+            pom {
+                name = 'BouncyCastle-Fips recompiled By DistriMind'
+                description = 'Encryption tools'
+                url = 'https://github.com/JazZ51/BouncyCastle-FIPS'
+                developers {
+                    developer {
+                        id = 'mahdjoub'
+                        name = 'Jason Mahdjoub'
+                        email = 'jason.mahdjoub@distri-mind.fr'
+                    }
+                }
+                organization {
+                    name = 'DistriMind'
+                    url = 'https://github.com/JazZ51'
+                }
+                issueManagement {
+                    system = 'GitHub'
+                    url = 'https://github.com/JazZ51/BouncyCastle-FIPS/issues'
+                }
+                scm {
+                    connection = 'https://github.com/JazZ51/BouncyCastle-FIPS'
+                }
+                licenses {
+                    license {
+                        name = 'The Bouncy Castle License'
+                        url = 'http://www.bouncycastle.org'
+                    }
+                }
+
+            }
         }
     }
     repositories {
         maven {
             credentials {
-              username "${user}"
-              password "${pwd}"
+                username "${user}"
+                password "${pwd}"
             }
             url "${artifactory_Url}/DistriMind-Public"
         }
+    }
+}
+signing {
+    useGpgCmd()
+    sign configurations.archives
+    sign publishing.publications.mavenJava
+}
+
+javadoc {
+    if(JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
     }
 }
 
