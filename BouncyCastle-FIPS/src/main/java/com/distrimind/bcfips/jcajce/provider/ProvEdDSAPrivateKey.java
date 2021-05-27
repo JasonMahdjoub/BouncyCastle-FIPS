@@ -8,10 +8,10 @@ import java.security.PrivateKey;
 import javax.security.auth.Destroyable;
 
 import com.distrimind.bcfips.asn1.pkcs.PrivateKeyInfo;
-import com.distrimind.bcfips.crypto.asymmetric.AsymmetricEdDSAPrivateKey;
-import com.distrimind.bcfips.crypto.asymmetric.AsymmetricEdDSAPublicKey;
 import com.distrimind.bcfips.jcajce.interfaces.EdDSAKey;
 import com.distrimind.bcfips.util.Arrays;
+import com.distrimind.bcfips.crypto.asymmetric.AsymmetricEdDSAPrivateKey;
+import com.distrimind.bcfips.crypto.asymmetric.AsymmetricEdDSAPublicKey;
 
 class ProvEdDSAPrivateKey
     implements Destroyable, EdDSAKey, PrivateKey

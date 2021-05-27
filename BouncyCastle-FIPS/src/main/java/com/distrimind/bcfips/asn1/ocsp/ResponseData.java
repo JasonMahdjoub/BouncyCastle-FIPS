@@ -3,6 +3,7 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.ocsp;
 
+import com.distrimind.bcfips.asn1.x509.Extensions;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1GeneralizedTime;
 import com.distrimind.bcfips.asn1.ASN1Integer;
@@ -12,7 +13,6 @@ import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.DERTaggedObject;
-import com.distrimind.bcfips.asn1.x509.Extensions;
 
 public class ResponseData
     extends ASN1Object
@@ -25,7 +25,7 @@ public class ResponseData
     private ResponderID         responderID;
     private ASN1GeneralizedTime  producedAt;
     private ASN1Sequence        responses;
-    private Extensions      responseExtensions;
+    private Extensions responseExtensions;
 
     public ResponseData(
         ASN1Integer          version,

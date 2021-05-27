@@ -4,8 +4,8 @@
 package com.distrimind.bcfips.jcajce.provider;
 
 
-import com.distrimind.bcfips.crypto.internal.digests.GeneralDigest;
 import com.distrimind.bcfips.util.Memoable;
+import com.distrimind.bcfips.crypto.internal.digests.GeneralDigest;
 
 /**
  * implementation of MD5 as outlined in "Handbook of Applied Cryptography", pages 346 - 347.

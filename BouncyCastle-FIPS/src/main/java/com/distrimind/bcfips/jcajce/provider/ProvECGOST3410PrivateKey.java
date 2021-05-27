@@ -8,8 +8,8 @@ import java.math.BigInteger;
 import javax.security.auth.Destroyable;
 
 import com.distrimind.bcfips.crypto.Algorithm;
-import com.distrimind.bcfips.crypto.asymmetric.AsymmetricECGOST3410PrivateKey;
 import com.distrimind.bcfips.jcajce.interfaces.ECGOST3410PrivateKey;
+import com.distrimind.bcfips.crypto.asymmetric.AsymmetricECGOST3410PrivateKey;
 import com.distrimind.bcfips.jcajce.spec.ECDomainParameterSpec;
 import com.distrimind.bcfips.jcajce.spec.ECGOST3410PrivateKeySpec;
 import com.distrimind.bcfips.jcajce.spec.GOST3410ParameterSpec;

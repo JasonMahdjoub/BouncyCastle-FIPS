@@ -3,8 +3,8 @@ package com.distrimind.bcfips.jcajce.spec;
 import java.security.spec.ECParameterSpec;
 
 import com.distrimind.bcfips.asn1.ua.DSTU4145Params;
-import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
 import com.distrimind.bcfips.util.Arrays;
+import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
 
 /**
  * ParameterSpec for a DSTU4145 key.

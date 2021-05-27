@@ -5,6 +5,9 @@ import java.security.PrivilegedAction;
 import java.security.SecureRandom;
 
 import com.distrimind.bcfips.crypto.*;
+import com.distrimind.bcfips.crypto.AgreementFactory;
+import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
+import com.distrimind.bcfips.crypto.PlainInputProcessingException;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricEdDSAPrivateKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricEdDSAPublicKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricKeyPair;

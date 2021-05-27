@@ -3,9 +3,9 @@ package com.distrimind.bcfips.math.internal;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.BigIntegers;
+import com.distrimind.bcfips.crypto.internal.Digest;
 
 /**
  * Utility methods for generating primes and testing for primality.

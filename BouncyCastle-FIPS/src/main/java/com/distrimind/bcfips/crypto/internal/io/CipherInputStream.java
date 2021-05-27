@@ -6,11 +6,11 @@ import java.io.InputStream;
 
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.InvalidCipherTextException;
+import com.distrimind.bcfips.crypto.internal.modes.AEADBlockCipher;
+import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.crypto.internal.BufferedBlockCipher;
 import com.distrimind.bcfips.crypto.internal.SkippingCipher;
 import com.distrimind.bcfips.crypto.internal.StreamCipher;
-import com.distrimind.bcfips.crypto.internal.modes.AEADBlockCipher;
-import com.distrimind.bcfips.util.Arrays;
 
 /**
  * A CipherInputStream is composed of an InputStream and a cipher so that read() methods return data

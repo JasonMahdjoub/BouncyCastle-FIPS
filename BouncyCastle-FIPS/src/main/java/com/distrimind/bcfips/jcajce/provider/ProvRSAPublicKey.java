@@ -8,9 +8,9 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAPublicKeySpec;
 
 import com.distrimind.bcfips.crypto.Algorithm;
-import com.distrimind.bcfips.crypto.asymmetric.AsymmetricRSAPublicKey;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Strings;
+import com.distrimind.bcfips.crypto.asymmetric.AsymmetricRSAPublicKey;
 
 class ProvRSAPublicKey
     implements RSAPublicKey, ProvKey<AsymmetricRSAPublicKey>

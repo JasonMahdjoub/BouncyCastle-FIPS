@@ -24,12 +24,12 @@ import com.distrimind.bcfips.asn1.x509.SubjectPublicKeyInfo;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AsymmetricKeyPairGenerator;
 import com.distrimind.bcfips.crypto.Parameters;
+import com.distrimind.bcfips.crypto.general.EdEC;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricEdDSAPrivateKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricEdDSAPublicKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricKeyPair;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricXDHPrivateKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricXDHPublicKey;
-import com.distrimind.bcfips.crypto.general.EdEC;
 import com.distrimind.bcfips.jcajce.spec.EdDSAParameterSpec;
 import com.distrimind.bcfips.jcajce.spec.XDHParameterSpec;
 

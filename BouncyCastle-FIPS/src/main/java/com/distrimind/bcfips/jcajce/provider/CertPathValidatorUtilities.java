@@ -39,6 +39,11 @@ import java.util.Set;
 
 import javax.security.auth.x500.X500Principal;
 
+import com.distrimind.bcfips.asn1.isismtt.ISISMTTObjectIdentifiers;
+import com.distrimind.bcfips.asn1.x500.X500Name;
+import com.distrimind.bcfips.util.Selector;
+import com.distrimind.bcfips.util.Store;
+import com.distrimind.bcfips.util.StoreException;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1Enumerated;
 import com.distrimind.bcfips.asn1.ASN1GeneralizedTime;
@@ -48,8 +53,6 @@ import com.distrimind.bcfips.asn1.ASN1OctetString;
 import com.distrimind.bcfips.asn1.ASN1OutputStream;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
-import com.distrimind.bcfips.asn1.isismtt.ISISMTTObjectIdentifiers;
-import com.distrimind.bcfips.asn1.x500.X500Name;
 import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 import com.distrimind.bcfips.asn1.x509.CRLDistPoint;
 import com.distrimind.bcfips.asn1.x509.CRLReason;
@@ -64,9 +67,6 @@ import com.distrimind.bcfips.jcajce.PKIXCRLStoreSelector;
 import com.distrimind.bcfips.jcajce.PKIXCertStore;
 import com.distrimind.bcfips.jcajce.PKIXCertStoreSelector;
 import com.distrimind.bcfips.jcajce.PKIXExtendedParameters;
-import com.distrimind.bcfips.util.Selector;
-import com.distrimind.bcfips.util.Store;
-import com.distrimind.bcfips.util.StoreException;
 
 class CertPathValidatorUtilities
 {

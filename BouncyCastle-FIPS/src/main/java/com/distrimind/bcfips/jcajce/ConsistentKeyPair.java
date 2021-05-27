@@ -21,6 +21,11 @@ import javax.crypto.interfaces.DHPrivateKey;
 import javax.crypto.interfaces.DHPublicKey;
 import javax.crypto.spec.DHParameterSpec;
 
+import com.distrimind.bcfips.jcajce.spec.DSTU4145ParameterSpec;
+import com.distrimind.bcfips.jcajce.spec.ECDomainParameterSpec;
+import com.distrimind.bcfips.jcajce.spec.GOST3410DomainParameterSpec;
+import com.distrimind.bcfips.jcajce.spec.GOST3410ParameterSpec;
+import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.jcajce.interfaces.DSTU4145Key;
 import com.distrimind.bcfips.jcajce.interfaces.DSTU4145PrivateKey;
 import com.distrimind.bcfips.jcajce.interfaces.DSTU4145PublicKey;
@@ -31,11 +36,6 @@ import com.distrimind.bcfips.jcajce.interfaces.GOST3410Key;
 import com.distrimind.bcfips.jcajce.interfaces.GOST3410PrivateKey;
 import com.distrimind.bcfips.jcajce.interfaces.GOST3410PublicKey;
 import com.distrimind.bcfips.jcajce.interfaces.XDHKey;
-import com.distrimind.bcfips.jcajce.spec.DSTU4145ParameterSpec;
-import com.distrimind.bcfips.jcajce.spec.ECDomainParameterSpec;
-import com.distrimind.bcfips.jcajce.spec.GOST3410DomainParameterSpec;
-import com.distrimind.bcfips.jcajce.spec.GOST3410ParameterSpec;
-import com.distrimind.bcfips.util.Arrays;
 
 /**
  * Carrier class for a key pair which validates the consistency of the keys at construction time.

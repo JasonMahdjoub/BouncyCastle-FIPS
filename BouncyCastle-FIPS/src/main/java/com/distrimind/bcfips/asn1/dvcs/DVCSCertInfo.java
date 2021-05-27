@@ -3,6 +3,9 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.dvcs;
 
+import com.distrimind.bcfips.asn1.x509.DigestInfo;
+import com.distrimind.bcfips.asn1.x509.Extensions;
+import com.distrimind.bcfips.asn1.x509.PolicyInformation;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Integer;
@@ -14,9 +17,6 @@ import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.DERTaggedObject;
 import com.distrimind.bcfips.asn1.cmp.PKIStatusInfo;
-import com.distrimind.bcfips.asn1.x509.DigestInfo;
-import com.distrimind.bcfips.asn1.x509.Extensions;
-import com.distrimind.bcfips.asn1.x509.PolicyInformation;
 
 /**
  * <pre>

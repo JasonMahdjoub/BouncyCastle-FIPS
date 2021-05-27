@@ -1,9 +1,9 @@
 package com.distrimind.bcfips.crypto.fips;
 
+import com.distrimind.bcfips.crypto.UpdateOutputStream;
 import com.distrimind.bcfips.crypto.OutputSigner;
 import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.crypto.PlainInputProcessingException;
-import com.distrimind.bcfips.crypto.UpdateOutputStream;
 
 /**
  * Base class for a FIPS signature generator..

@@ -123,4 +123,37 @@ public final class BigIntegers
         }
         return new BigInteger(1, mag);
     }
+
+    /**
+     * Return a positive BigInteger in the range of 0 to 2**bitLength - 1.
+     *
+     * @param bitLength maximum bit length for the generated BigInteger.
+     * @param random a source of randomness.
+     * @return a positive BigInteger
+     */
+    public static BigInteger createRandomBigInteger(int bitLength, SecureRandom random)
+    {
+        return new BigInteger(1, createRandom(bitLength, random));
+    }
+
+    private static byte[] createRandom(int bitLength, SecureRandom random)
+        throws IllegalArgumentException
+    {
+        if (bitLength < 1)
+        {
+            throw new IllegalArgumentException("bitLength must be at least 1");
+        }
+
+        int nBytes = (bitLength + 7) / 8;
+
+        byte[] rv = new byte[nBytes];
+
+        random.nextBytes(rv);
+
+        // strip off any excess bits in the MSB
+        int xBits = 8 * nBytes - bitLength;
+        rv[0] &= (byte)(255 >>> xBits);
+
+        return rv;
+    }
 }

@@ -9,8 +9,8 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.spec.DSAPublicKeySpec;
 
 import com.distrimind.bcfips.crypto.Algorithm;
-import com.distrimind.bcfips.crypto.asymmetric.AsymmetricDSAPublicKey;
 import com.distrimind.bcfips.util.Arrays;
+import com.distrimind.bcfips.crypto.asymmetric.AsymmetricDSAPublicKey;
 
 class ProvDSAPublicKey
     implements DSAPublicKey, ProvKey<AsymmetricDSAPublicKey>

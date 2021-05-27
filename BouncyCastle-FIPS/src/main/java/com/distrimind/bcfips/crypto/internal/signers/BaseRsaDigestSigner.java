@@ -8,6 +8,7 @@ import com.distrimind.bcfips.asn1.DERNull;
 import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 import com.distrimind.bcfips.asn1.x509.DigestInfo;
 import com.distrimind.bcfips.crypto.InvalidSignatureException;
+import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.crypto.internal.AsymmetricBlockCipher;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.CryptoException;
@@ -16,7 +17,6 @@ import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.internal.Signer;
 import com.distrimind.bcfips.crypto.internal.params.AsymmetricKeyParameter;
 import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
-import com.distrimind.bcfips.util.Arrays;
 
 public class BaseRsaDigestSigner
     implements Signer

@@ -3,8 +3,8 @@
 /***************************************************************/
 package com.distrimind.bcfips.crypto.internal.digests;
 
-import com.distrimind.bcfips.crypto.internal.ExtendedDigest;
 import com.distrimind.bcfips.util.Memoable;
+import com.distrimind.bcfips.crypto.internal.ExtendedDigest;
 
 /**
  * base implementation of MD4 family style digest as outlined in

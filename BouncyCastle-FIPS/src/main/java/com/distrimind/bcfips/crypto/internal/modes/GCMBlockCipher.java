@@ -3,6 +3,11 @@
 /***************************************************************/
 package com.distrimind.bcfips.crypto.internal.modes;
 
+import com.distrimind.bcfips.crypto.internal.params.AEADParameters;
+import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
+import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
+import com.distrimind.bcfips.util.Arrays;
+import com.distrimind.bcfips.util.Pack;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.DataLengthException;
@@ -13,11 +18,6 @@ import com.distrimind.bcfips.crypto.internal.modes.gcm.GCMMultiplier;
 import com.distrimind.bcfips.crypto.internal.modes.gcm.GCMUtil;
 import com.distrimind.bcfips.crypto.internal.modes.gcm.Tables1kGCMExponentiator;
 import com.distrimind.bcfips.crypto.internal.modes.gcm.Tables8kGCMMultiplier;
-import com.distrimind.bcfips.crypto.internal.params.AEADParameters;
-import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
-import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
-import com.distrimind.bcfips.util.Arrays;
-import com.distrimind.bcfips.util.Pack;
 
 /**
  * Implements the Galois/Counter mode (GCM) detailed in

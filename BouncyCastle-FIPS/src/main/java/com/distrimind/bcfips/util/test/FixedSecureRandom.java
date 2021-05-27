@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.security.Provider;
 import java.security.SecureRandom;
 
-import com.distrimind.bcfips.util.Pack;
 import com.distrimind.bcfips.util.encoders.Hex;
+import com.distrimind.bcfips.util.Pack;
 
 /**
  * A secure random that returns pre-seeded data to calls of nextBytes() or generateSeed().

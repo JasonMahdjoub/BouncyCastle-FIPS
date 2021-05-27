@@ -22,7 +22,6 @@ import java.security.spec.KeySpec;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.asn1.ASN1Encoding;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
@@ -32,6 +31,8 @@ import com.distrimind.bcfips.asn1.pkcs.PrivateKeyInfo;
 import com.distrimind.bcfips.asn1.x509.DSAParameter;
 import com.distrimind.bcfips.asn1.x509.SubjectPublicKeyInfo;
 import com.distrimind.bcfips.asn1.x9.X9ObjectIdentifiers;
+import com.distrimind.bcfips.crypto.*;
+import com.distrimind.bcfips.crypto.general.DSA;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AsymmetricKeyPairGenerator;
 import com.distrimind.bcfips.crypto.AsymmetricPrivateKey;
@@ -49,7 +50,6 @@ import com.distrimind.bcfips.crypto.fips.FipsDSA;
 import com.distrimind.bcfips.crypto.fips.FipsDigestAlgorithm;
 import com.distrimind.bcfips.crypto.fips.FipsSHS;
 import com.distrimind.bcfips.crypto.fips.FipsUnapprovedOperationError;
-import com.distrimind.bcfips.crypto.general.DSA;
 import com.distrimind.bcfips.jcajce.spec.DSADomainParameterSpec;
 import com.distrimind.bcfips.jcajce.spec.DSADomainParametersGenerationParameterSpec;
 

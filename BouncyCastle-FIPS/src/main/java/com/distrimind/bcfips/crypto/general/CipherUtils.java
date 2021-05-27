@@ -2,12 +2,12 @@ package com.distrimind.bcfips.crypto.general;
 
 import java.security.SecureRandom;
 
+import com.distrimind.bcfips.crypto.internal.params.*;
 import com.distrimind.bcfips.crypto.AuthenticationParameters;
 import com.distrimind.bcfips.crypto.AuthenticationParametersWithIV;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.crypto.ParametersWithIV;
-import com.distrimind.bcfips.crypto.internal.params.AEADParameters;
 import com.distrimind.bcfips.crypto.fips.FipsDRBG;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.BufferedBlockCipher;
@@ -40,9 +40,6 @@ import com.distrimind.bcfips.crypto.internal.paddings.PKCS7Padding;
 import com.distrimind.bcfips.crypto.internal.paddings.PaddedBufferedBlockCipher;
 import com.distrimind.bcfips.crypto.internal.paddings.TBCPadding;
 import com.distrimind.bcfips.crypto.internal.paddings.X923Padding;
-import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
-import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
-import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
 import com.distrimind.bcfips.crypto.internal.wrappers.SP80038FWrapEngine;
 import com.distrimind.bcfips.crypto.internal.wrappers.SP80038FWrapWithPaddingEngine;
 import com.distrimind.bcfips.util.Pack;

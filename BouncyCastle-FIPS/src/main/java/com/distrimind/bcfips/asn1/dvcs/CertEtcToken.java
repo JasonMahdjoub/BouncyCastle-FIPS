@@ -3,6 +3,13 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.dvcs;
 
+import com.distrimind.bcfips.asn1.ocsp.CertID;
+import com.distrimind.bcfips.asn1.ocsp.CertStatus;
+import com.distrimind.bcfips.asn1.ocsp.OCSPResponse;
+import com.distrimind.bcfips.asn1.smime.SMIMECapabilities;
+import com.distrimind.bcfips.asn1.x509.Certificate;
+import com.distrimind.bcfips.asn1.x509.CertificateList;
+import com.distrimind.bcfips.asn1.x509.Extension;
 import com.distrimind.bcfips.asn1.ASN1Choice;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1Object;
@@ -13,13 +20,6 @@ import com.distrimind.bcfips.asn1.DERTaggedObject;
 import com.distrimind.bcfips.asn1.cmp.PKIStatusInfo;
 import com.distrimind.bcfips.asn1.cms.ContentInfo;
 import com.distrimind.bcfips.asn1.ess.ESSCertID;
-import com.distrimind.bcfips.asn1.ocsp.CertID;
-import com.distrimind.bcfips.asn1.ocsp.CertStatus;
-import com.distrimind.bcfips.asn1.ocsp.OCSPResponse;
-import com.distrimind.bcfips.asn1.smime.SMIMECapabilities;
-import com.distrimind.bcfips.asn1.x509.Certificate;
-import com.distrimind.bcfips.asn1.x509.CertificateList;
-import com.distrimind.bcfips.asn1.x509.Extension;
 
 /**
  * <pre>

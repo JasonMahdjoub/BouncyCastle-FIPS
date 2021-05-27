@@ -3,11 +3,11 @@ package com.distrimind.bcfips.jcajce.provider;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
 
+import com.distrimind.bcfips.math.ec.ECCurve;
 import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
 import com.distrimind.bcfips.crypto.asymmetric.ECImplicitDomainParameters;
 import com.distrimind.bcfips.jcajce.spec.ECDomainParameterSpec;
 import com.distrimind.bcfips.jcajce.spec.ECImplicitDomainParameterSpec;
-import com.distrimind.bcfips.math.ec.ECCurve;
 
 class ECUtil
 {

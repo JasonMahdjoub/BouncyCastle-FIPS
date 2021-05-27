@@ -3,6 +3,7 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.dvcs;
 
+import com.distrimind.bcfips.asn1.x509.DigestInfo;
 import com.distrimind.bcfips.asn1.ASN1Choice;
 import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1OctetString;
@@ -12,7 +13,6 @@ import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.DEROctetString;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.DERTaggedObject;
-import com.distrimind.bcfips.asn1.x509.DigestInfo;
 
 /**
  * <pre>

@@ -3,6 +3,8 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.tsp;
 
+import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
+import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1OctetString;
@@ -10,8 +12,6 @@ import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.DEROctetString;
 import com.distrimind.bcfips.asn1.DERSequence;
-import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
-import com.distrimind.bcfips.util.Arrays;
 
 public class MessageImprint
     extends ASN1Object

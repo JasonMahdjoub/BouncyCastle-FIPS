@@ -5,6 +5,9 @@ package com.distrimind.bcfips.crypto.internal.modes;
 
 import java.io.ByteArrayOutputStream;
 
+import com.distrimind.bcfips.crypto.internal.params.AEADParameters;
+import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
+import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.DataLengthException;
@@ -12,9 +15,6 @@ import com.distrimind.bcfips.crypto.internal.InvalidCipherTextException;
 import com.distrimind.bcfips.crypto.internal.Mac;
 import com.distrimind.bcfips.crypto.internal.OutputLengthException;
 import com.distrimind.bcfips.crypto.internal.macs.CBCBlockCipherMac;
-import com.distrimind.bcfips.crypto.internal.params.AEADParameters;
-import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
-import com.distrimind.bcfips.util.Arrays;
 
 /**
  * Implements the Counter with Cipher Block Chaining mode (CCM) detailed in

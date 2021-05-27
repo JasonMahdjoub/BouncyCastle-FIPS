@@ -6,10 +6,10 @@ package com.distrimind.bcfips.asn1.x509;
 import java.math.BigInteger;
 import java.util.Hashtable;
 
+import com.distrimind.bcfips.util.Integers;
 import com.distrimind.bcfips.asn1.ASN1Enumerated;
 import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
-import com.distrimind.bcfips.util.Integers;
 
 /**
  * The CRLReason enumeration.

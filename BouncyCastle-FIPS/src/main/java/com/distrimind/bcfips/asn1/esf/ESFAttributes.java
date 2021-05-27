@@ -3,8 +3,8 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.esf;
 
-import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.pkcs.PKCSObjectIdentifiers;
+import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 
 public interface ESFAttributes
 {

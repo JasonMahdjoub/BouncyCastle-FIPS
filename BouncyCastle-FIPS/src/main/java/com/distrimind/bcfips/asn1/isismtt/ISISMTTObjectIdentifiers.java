@@ -3,12 +3,12 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.isismtt;
 
-import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.isismtt.ocsp.CertHash;
 import com.distrimind.bcfips.asn1.isismtt.ocsp.RequestedCertificate;
 import com.distrimind.bcfips.asn1.isismtt.x509.AdditionalInformationSyntax;
 import com.distrimind.bcfips.asn1.isismtt.x509.Restriction;
 import com.distrimind.bcfips.asn1.x509.SubjectDirectoryAttributes;
+import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 
 /**
  * ISISMT -- Industrial Signature Interoperability Specification

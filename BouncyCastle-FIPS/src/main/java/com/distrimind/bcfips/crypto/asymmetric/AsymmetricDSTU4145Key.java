@@ -3,11 +3,6 @@ package com.distrimind.bcfips.crypto.asymmetric;
 import java.math.BigInteger;
 
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
-import com.distrimind.bcfips.asn1.ua.DSTU4145BinaryField;
-import com.distrimind.bcfips.asn1.ua.DSTU4145ECBinary;
-import com.distrimind.bcfips.asn1.ua.DSTU4145Params;
-import com.distrimind.bcfips.asn1.ua.DSTU4145PointEncoder;
-import com.distrimind.bcfips.asn1.ua.UAObjectIdentifiers;
 import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AsymmetricKey;
@@ -15,6 +10,11 @@ import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.fips.FipsUnapprovedOperationError;
 import com.distrimind.bcfips.math.ec.ECConstants;
 import com.distrimind.bcfips.math.ec.ECCurve;
+import com.distrimind.bcfips.asn1.ua.DSTU4145BinaryField;
+import com.distrimind.bcfips.asn1.ua.DSTU4145ECBinary;
+import com.distrimind.bcfips.asn1.ua.DSTU4145Params;
+import com.distrimind.bcfips.asn1.ua.DSTU4145PointEncoder;
+import com.distrimind.bcfips.asn1.ua.UAObjectIdentifiers;
 
 /**
  * Base class for DSTU-4145 keys.

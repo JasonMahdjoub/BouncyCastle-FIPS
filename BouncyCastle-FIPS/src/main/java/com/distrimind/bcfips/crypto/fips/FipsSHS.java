@@ -4,13 +4,13 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.distrimind.bcfips.crypto.general.FipsRegister;
 import com.distrimind.bcfips.crypto.AuthenticationParameters;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.IllegalKeyException;
 import com.distrimind.bcfips.crypto.SymmetricKey;
 import com.distrimind.bcfips.crypto.SymmetricSecretKey;
 import com.distrimind.bcfips.crypto.UpdateOutputStream;
-import com.distrimind.bcfips.crypto.general.FipsRegister;
 import com.distrimind.bcfips.crypto.internal.CipherKeyGenerator;
 import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.internal.ExtendedDigest;

@@ -5,13 +5,13 @@ package com.distrimind.bcfips.asn1.bc;
 
 import java.util.Iterator;
 
+import com.distrimind.bcfips.util.Arrays;
+import com.distrimind.bcfips.util.Iterable;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.DERSequence;
-import com.distrimind.bcfips.util.Arrays;
-import com.distrimind.bcfips.util.Iterable;
 
 /**
  * <pre>

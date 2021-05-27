@@ -16,7 +16,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.distrimind.bcfips.crypto.KDFCalculator;
 import com.distrimind.bcfips.crypto.fips.FipsKDF;
-import com.distrimind.bcfips.crypto.fips.FipsKDF.TLSPRF;
 import com.distrimind.bcfips.util.Arrays;
 import sun.security.internal.spec.TlsKeyMaterialParameterSpec;
 import sun.security.internal.spec.TlsKeyMaterialSpec;
@@ -178,7 +177,7 @@ class ProvSunTLSKDF
             FipsKDF.TLSParametersBuilder pBld;
             if (hasPrfMethods)
             {
-                TLSPRF prf = getPRF(spec.getPRFHashAlg());
+                FipsKDF.TLSPRF prf = getPRF(spec.getPRFHashAlg());
                 pBld = (prf == null)
                     ? FipsKDF.TLS1_1
                     : FipsKDF.TLS1_2.withPRF(prf);

@@ -14,8 +14,8 @@ import com.distrimind.bcfips.asn1.x9.X962Parameters;
 import com.distrimind.bcfips.asn1.x9.X9ObjectIdentifiers;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AsymmetricPrivateKey;
-import com.distrimind.bcfips.crypto.internal.Permissions;
 import com.distrimind.bcfips.math.ec.ECPoint;
+import com.distrimind.bcfips.crypto.internal.Permissions;
 
 /**
  * Class for Elliptic Curve (EC) private keys.

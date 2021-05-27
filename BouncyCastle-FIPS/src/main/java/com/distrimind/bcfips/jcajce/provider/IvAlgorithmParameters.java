@@ -52,7 +52,7 @@ class IvAlgorithmParameters
     {
         try
         {
-            ASN1OctetString oct = (ASN1OctetString)ASN1Primitive.fromByteArray(params);
+            ASN1OctetString oct = (ASN1OctetString) ASN1Primitive.fromByteArray(params);
 
             this.iv = oct.getOctets();
         }

@@ -9,8 +9,8 @@ import java.security.spec.AlgorithmParameterSpec;
 import javax.crypto.spec.DHGenParameterSpec;
 
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
-import com.distrimind.bcfips.crypto.asymmetric.DHDomainParameters;
 import com.distrimind.bcfips.crypto.fips.FipsDH;
+import com.distrimind.bcfips.crypto.asymmetric.DHDomainParameters;
 import com.distrimind.bcfips.jcajce.spec.DHDomainParameterSpec;
 
 class DHAlgorithmParameterGeneratorSpi

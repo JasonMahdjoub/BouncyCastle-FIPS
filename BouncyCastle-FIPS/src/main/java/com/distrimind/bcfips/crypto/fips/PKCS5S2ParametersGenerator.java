@@ -1,7 +1,6 @@
 package com.distrimind.bcfips.crypto.fips;
 
 import com.distrimind.bcfips.crypto.Parameters;
-import com.distrimind.bcfips.crypto.PasswordBasedDeriver;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.Mac;
 import com.distrimind.bcfips.crypto.internal.PBEParametersGenerator;
@@ -106,7 +105,7 @@ class PKCS5S2ParametersGenerator<T extends Parameters>
     {
         keySize = keySize / 8;
 
-        byte[] material = deriveKey(PasswordBasedDeriver.KeyType.CIPHER, keySize);
+        byte[] material = deriveKey(KeyType.CIPHER, keySize);
 
         return new KeyParameterImpl(material);
     }
@@ -127,7 +126,7 @@ class PKCS5S2ParametersGenerator<T extends Parameters>
         keySize = keySize / 8;
         ivSize = ivSize / 8;
 
-        byte[][] material = deriveKeyAndIV(PasswordBasedDeriver.KeyType.CIPHER, keySize, ivSize);
+        byte[][] material = deriveKeyAndIV(KeyType.CIPHER, keySize, ivSize);
 
         return new ParametersWithIV(new KeyParameterImpl(material[0]), material[1], keySize, ivSize);
     }
@@ -145,7 +144,7 @@ class PKCS5S2ParametersGenerator<T extends Parameters>
         return generateDerivedParameters(keySize);
     }
 
-    public byte[] deriveKey(PasswordBasedDeriver.KeyType keyType, int keySizeInBytes)
+    public byte[] deriveKey(KeyType keyType, int keySizeInBytes)
     {
         switch (keyType)
         {
@@ -157,7 +156,7 @@ class PKCS5S2ParametersGenerator<T extends Parameters>
         }
     }
 
-    public byte[][] deriveKeyAndIV(PasswordBasedDeriver.KeyType keyType, int keySizeInBytes, int ivSizeInBytes)
+    public byte[][] deriveKeyAndIV(KeyType keyType, int keySizeInBytes, int ivSizeInBytes)
     {
         byte[][] rv = new byte[2][];
 

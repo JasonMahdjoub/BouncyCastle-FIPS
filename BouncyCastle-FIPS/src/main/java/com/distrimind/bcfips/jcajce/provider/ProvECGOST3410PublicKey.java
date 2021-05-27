@@ -6,8 +6,8 @@ import java.io.ObjectOutputStream;
 import java.security.spec.ECPoint;
 
 import com.distrimind.bcfips.crypto.Algorithm;
-import com.distrimind.bcfips.crypto.asymmetric.AsymmetricECGOST3410PublicKey;
 import com.distrimind.bcfips.jcajce.interfaces.ECGOST3410PublicKey;
+import com.distrimind.bcfips.crypto.asymmetric.AsymmetricECGOST3410PublicKey;
 import com.distrimind.bcfips.jcajce.spec.ECDomainParameterSpec;
 import com.distrimind.bcfips.jcajce.spec.ECGOST3410PublicKeySpec;
 import com.distrimind.bcfips.jcajce.spec.GOST3410ParameterSpec;

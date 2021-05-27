@@ -5,14 +5,14 @@ package com.distrimind.bcfips.asn1.cms;
 
 import java.math.BigInteger;
 
+import com.distrimind.bcfips.asn1.x500.X500Name;
+import com.distrimind.bcfips.asn1.x509.Certificate;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.DERSequence;
-import com.distrimind.bcfips.asn1.x500.X500Name;
-import com.distrimind.bcfips.asn1.x509.Certificate;
 
 /**
  * <a href="http://tools.ietf.org/html/rfc5652#section-10.2.4">RFC 5652</a>: IssuerAndSerialNumber object.
@@ -29,7 +29,7 @@ import com.distrimind.bcfips.asn1.x509.Certificate;
 public class IssuerAndSerialNumber
     extends ASN1Object
 {
-    private X500Name    name;
+    private X500Name name;
     private ASN1Integer  serialNumber;
 
     /**

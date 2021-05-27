@@ -1,6 +1,11 @@
 package com.distrimind.bcfips.crypto.general;
 
-import com.distrimind.bcfips.crypto.*;
+import com.distrimind.bcfips.crypto.AuthenticationParameters;
+import com.distrimind.bcfips.crypto.UpdateOutputStream;
+import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
+import com.distrimind.bcfips.crypto.MACOperatorFactory;
+import com.distrimind.bcfips.crypto.OutputMACCalculator;
+import com.distrimind.bcfips.crypto.SymmetricKey;
 import com.distrimind.bcfips.crypto.fips.FipsStatus;
 import com.distrimind.bcfips.crypto.fips.FipsUnapprovedOperationError;
 import com.distrimind.bcfips.crypto.internal.Mac;

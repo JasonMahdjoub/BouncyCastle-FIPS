@@ -3,11 +3,11 @@
 /***************************************************************/
 package com.distrimind.bcfips.crypto.internal.modes;
 
+import com.distrimind.bcfips.crypto.InvalidCipherTextException;
+import com.distrimind.bcfips.crypto.internal.params.AEADParameters;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.DataLengthException;
-import com.distrimind.bcfips.crypto.internal.InvalidCipherTextException;
-import com.distrimind.bcfips.crypto.internal.params.AEADParameters;
 
 /**
  * A block cipher mode that includes authenticated encryption with a streaming mode and optional associated data.
@@ -99,10 +99,10 @@ public interface AEADBlockCipher
      * @param outOff offset into out to start copying the data at.
      * @return number of bytes written into out.
      * @throws IllegalStateException if the cipher is in an inappropriate state.
-     * @throws com.distrimind.bcfips.crypto.InvalidCipherTextException if the MAC fails to match.
+     * @throws InvalidCipherTextException if the MAC fails to match.
      */
     public int doFinal(byte[] out, int outOff)
-        throws IllegalStateException, InvalidCipherTextException;
+        throws IllegalStateException, com.distrimind.bcfips.crypto.internal.InvalidCipherTextException;
 
     /**
      * Return the value of the MAC associated with the last stream processed.

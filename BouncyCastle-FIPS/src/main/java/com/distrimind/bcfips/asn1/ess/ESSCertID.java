@@ -3,6 +3,7 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.ess;
 
+import com.distrimind.bcfips.asn1.x509.IssuerSerial;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1OctetString;
@@ -10,7 +11,6 @@ import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.DEROctetString;
 import com.distrimind.bcfips.asn1.DERSequence;
-import com.distrimind.bcfips.asn1.x509.IssuerSerial;
 
 public class ESSCertID
     extends ASN1Object

@@ -69,7 +69,7 @@ public final class FipsStatus
 
                 // FSM_STATE:3.1, "FIRMWARE INTEGRITY - HMAC-SHA256", "The module is performing the Firmware Integrity Check: HMAC-SHA256"
                 // FSM_TRANS:3.3
-                //checksumValidate();
+                checksumValidate();
                 // FSM_TRANS:3.4
             }
             else if (statusException != null)

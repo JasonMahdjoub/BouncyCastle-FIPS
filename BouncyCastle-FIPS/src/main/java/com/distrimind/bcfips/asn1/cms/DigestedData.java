@@ -3,6 +3,7 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.cms;
 
+import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1Object;
@@ -12,7 +13,6 @@ import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.BERSequence;
 import com.distrimind.bcfips.asn1.DEROctetString;
-import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 
 /** 
  * <a href="http://tools.ietf.org/html/rfc5652#section-7">RFC 5652</a> DigestedData object.
@@ -28,7 +28,7 @@ public class DigestedData
     extends ASN1Object
 {
     private ASN1Integer           version;
-    private AlgorithmIdentifier  digestAlgorithm;
+    private AlgorithmIdentifier digestAlgorithm;
     private ContentInfo          encapContentInfo;
     private ASN1OctetString      digest;
 

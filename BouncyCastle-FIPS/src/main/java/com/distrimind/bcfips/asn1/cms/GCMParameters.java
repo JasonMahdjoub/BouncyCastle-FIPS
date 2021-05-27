@@ -3,6 +3,7 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.cms;
 
+import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1Object;
@@ -11,7 +12,6 @@ import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.DEROctetString;
 import com.distrimind.bcfips.asn1.DERSequence;
-import com.distrimind.bcfips.util.Arrays;
 
 /**
  * <a href="http://tools.ietf.org/html/rfc5084">RFC 5084</a>: GCMParameters object.

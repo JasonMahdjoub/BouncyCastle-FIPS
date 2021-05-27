@@ -5,6 +5,8 @@ package com.distrimind.bcfips.asn1.esf;
 
 import java.util.Enumeration;
 
+import com.distrimind.bcfips.asn1.x509.DisplayText;
+import com.distrimind.bcfips.asn1.x509.NoticeReference;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Object;
@@ -12,14 +14,12 @@ import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.ASN1String;
 import com.distrimind.bcfips.asn1.DERSequence;
-import com.distrimind.bcfips.asn1.x509.DisplayText;
-import com.distrimind.bcfips.asn1.x509.NoticeReference;
 
 public class SPUserNotice
     extends ASN1Object
 {
     private NoticeReference noticeRef;
-    private DisplayText     explicitText;
+    private DisplayText explicitText;
 
     public static SPUserNotice getInstance(
         Object obj)

@@ -1,9 +1,9 @@
 package com.distrimind.bcfips.crypto.fips;
 
 import com.distrimind.bcfips.crypto.AuthenticationParameters;
+import com.distrimind.bcfips.crypto.UpdateOutputStream;
 import com.distrimind.bcfips.crypto.MACOperatorFactory;
 import com.distrimind.bcfips.crypto.SymmetricKey;
-import com.distrimind.bcfips.crypto.UpdateOutputStream;
 import com.distrimind.bcfips.crypto.internal.Mac;
 import com.distrimind.bcfips.crypto.internal.io.MacOutputStream;
 

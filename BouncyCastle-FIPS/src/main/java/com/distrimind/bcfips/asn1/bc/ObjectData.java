@@ -6,6 +6,7 @@ package com.distrimind.bcfips.asn1.bc;
 import java.math.BigInteger;
 import java.util.Date;
 
+import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1GeneralizedTime;
 import com.distrimind.bcfips.asn1.ASN1Integer;
@@ -17,7 +18,6 @@ import com.distrimind.bcfips.asn1.DERGeneralizedTime;
 import com.distrimind.bcfips.asn1.DEROctetString;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.DERUTF8String;
-import com.distrimind.bcfips.util.Arrays;
 
 /**
  * <pre>

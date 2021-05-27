@@ -4,13 +4,13 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.distrimind.bcfips.crypto.util.BasicEntropySourceProvider;
 import com.distrimind.bcfips.crypto.EntropySource;
 import com.distrimind.bcfips.crypto.EntropySourceProvider;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.internal.Mac;
 import com.distrimind.bcfips.crypto.internal.macs.HMac;
-import com.distrimind.bcfips.crypto.util.BasicEntropySourceProvider;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Strings;
 import com.distrimind.bcfips.util.encoders.Hex;

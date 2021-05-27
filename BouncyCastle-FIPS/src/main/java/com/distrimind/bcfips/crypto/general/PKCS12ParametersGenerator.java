@@ -1,7 +1,6 @@
 package com.distrimind.bcfips.crypto.general;
 
 import com.distrimind.bcfips.crypto.Parameters;
-import com.distrimind.bcfips.crypto.PasswordBasedDeriver;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.internal.PBEParametersGenerator;
@@ -217,7 +216,7 @@ class PKCS12ParametersGenerator<T extends Parameters>
         return new KeyParameterImpl(dKey);
     }
 
-    public byte[] deriveKey(PasswordBasedDeriver.KeyType keyType, int keySizeInBytes)
+    public byte[] deriveKey(KeyType keyType, int keySizeInBytes)
     {
         switch (keyType)
         {
@@ -230,7 +229,7 @@ class PKCS12ParametersGenerator<T extends Parameters>
         }
     }
 
-    public byte[][] deriveKeyAndIV(PasswordBasedDeriver.KeyType keyType, int keySizeInBytes, int ivSizeInBytes)
+    public byte[][] deriveKeyAndIV(KeyType keyType, int keySizeInBytes, int ivSizeInBytes)
     {
         byte[][] rv = new byte[2][];
 

@@ -37,6 +37,9 @@ import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
 
 import com.distrimind.bcfips.asn1.pkcs.PKCSObjectIdentifiers;
+import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
+import com.distrimind.bcfips.crypto.fips.FipsKeyWrapOperatorFactory;
+import com.distrimind.bcfips.util.Strings;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AsymmetricKey;
 import com.distrimind.bcfips.crypto.AsymmetricOperatorFactory;
@@ -50,9 +53,6 @@ import com.distrimind.bcfips.crypto.PlainInputProcessingException;
 import com.distrimind.bcfips.crypto.SingleBlockCipher;
 import com.distrimind.bcfips.crypto.SingleBlockDecryptor;
 import com.distrimind.bcfips.crypto.SingleBlockEncryptor;
-import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
-import com.distrimind.bcfips.crypto.fips.FipsKeyWrapOperatorFactory;
-import com.distrimind.bcfips.util.Strings;
 
 class BaseSingleBlockCipher
     extends CipherSpi

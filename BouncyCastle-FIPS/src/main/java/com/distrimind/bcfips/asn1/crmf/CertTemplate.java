@@ -5,16 +5,16 @@ package com.distrimind.bcfips.asn1.crmf;
 
 import java.util.Enumeration;
 
+import com.distrimind.bcfips.asn1.x500.X500Name;
+import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
+import com.distrimind.bcfips.asn1.x509.Extensions;
+import com.distrimind.bcfips.asn1.x509.SubjectPublicKeyInfo;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.DERBitString;
-import com.distrimind.bcfips.asn1.x500.X500Name;
-import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
-import com.distrimind.bcfips.asn1.x509.Extensions;
-import com.distrimind.bcfips.asn1.x509.SubjectPublicKeyInfo;
 
 public class CertTemplate
     extends ASN1Object

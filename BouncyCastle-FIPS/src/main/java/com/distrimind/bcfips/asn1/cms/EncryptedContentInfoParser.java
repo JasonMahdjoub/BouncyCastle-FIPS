@@ -5,11 +5,11 @@ package com.distrimind.bcfips.asn1.cms;
 
 import java.io.IOException;
 
+import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.ASN1SequenceParser;
 import com.distrimind.bcfips.asn1.ASN1TaggedObjectParser;
-import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 
 /**
  * Parser for <a href="http://tools.ietf.org/html/rfc5652#section-6.1">RFC 5652</a> EncryptedContentInfo object.
@@ -25,7 +25,7 @@ import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 public class EncryptedContentInfoParser
 {
     private ASN1ObjectIdentifier    _contentType;
-    private AlgorithmIdentifier     _contentEncryptionAlgorithm;
+    private AlgorithmIdentifier _contentEncryptionAlgorithm;
     private ASN1TaggedObjectParser _encryptedContent;
 
     public EncryptedContentInfoParser(

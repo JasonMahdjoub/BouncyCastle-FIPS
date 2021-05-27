@@ -33,6 +33,14 @@ import com.distrimind.bcfips.asn1.x509.SubjectPublicKeyInfo;
 import com.distrimind.bcfips.asn1.x9.X962Parameters;
 import com.distrimind.bcfips.asn1.x9.X9ECParameters;
 import com.distrimind.bcfips.asn1.x9.X9ObjectIdentifiers;
+import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
+import com.distrimind.bcfips.crypto.fips.FipsEC;
+import com.distrimind.bcfips.crypto.fips.FipsKDF;
+import com.distrimind.bcfips.crypto.fips.FipsSHS;
+import com.distrimind.bcfips.crypto.general.EC;
+import com.distrimind.bcfips.crypto.general.SecureHash;
+import com.distrimind.bcfips.util.Integers;
+import com.distrimind.bcfips.util.Properties;
 import com.distrimind.bcfips.crypto.AgreementFactory;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AsymmetricKeyPairGenerator;
@@ -47,18 +55,10 @@ import com.distrimind.bcfips.crypto.asymmetric.ECDomainParametersID;
 import com.distrimind.bcfips.crypto.asymmetric.ECDomainParametersIndex;
 import com.distrimind.bcfips.crypto.asymmetric.ECImplicitDomainParameters;
 import com.distrimind.bcfips.crypto.asymmetric.NamedECDomainParameters;
-import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
-import com.distrimind.bcfips.crypto.fips.FipsEC;
-import com.distrimind.bcfips.crypto.fips.FipsKDF;
-import com.distrimind.bcfips.crypto.fips.FipsSHS;
-import com.distrimind.bcfips.crypto.general.EC;
-import com.distrimind.bcfips.crypto.general.SecureHash;
 import com.distrimind.bcfips.jcajce.spec.DHUParameterSpec;
 import com.distrimind.bcfips.jcajce.spec.ECDomainParameterSpec;
 import com.distrimind.bcfips.jcajce.spec.MQVParameterSpec;
 import com.distrimind.bcfips.jcajce.spec.UserKeyingMaterialSpec;
-import com.distrimind.bcfips.util.Integers;
-import com.distrimind.bcfips.util.Properties;
 
 class ProvEC
     extends AsymmetricAlgorithmProvider

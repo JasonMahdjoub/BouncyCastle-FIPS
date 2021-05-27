@@ -44,7 +44,7 @@ class CSHAKEDigest
         int blockSize = rate / 8;
         absorb(diff, 0, diff.length * 8);
 
-        int required = blockSize - (diff.length % blockSize);
+        int required = (blockSize - (diff.length % blockSize)) % blockSize;
 
         while (required > padding.length)
         {

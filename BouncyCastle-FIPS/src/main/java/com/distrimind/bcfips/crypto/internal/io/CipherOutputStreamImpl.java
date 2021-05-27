@@ -7,9 +7,9 @@ import com.distrimind.bcfips.crypto.CipherOutputStream;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.InvalidCipherTextException;
 import com.distrimind.bcfips.crypto.StreamException;
+import com.distrimind.bcfips.crypto.internal.modes.AEADBlockCipher;
 import com.distrimind.bcfips.crypto.internal.BufferedBlockCipher;
 import com.distrimind.bcfips.crypto.internal.StreamCipher;
-import com.distrimind.bcfips.crypto.internal.modes.AEADBlockCipher;
 
 /**
  * A CipherOutputStream is composed of an OutputStream and a cipher so that write() methods process

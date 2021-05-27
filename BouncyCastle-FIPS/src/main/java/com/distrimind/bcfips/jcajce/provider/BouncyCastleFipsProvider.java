@@ -68,7 +68,7 @@ import com.distrimind.bcfips.util.Strings;
 public final class BouncyCastleFipsProvider
     extends Provider
 {
-    private static final String info = "BouncyCastle Security Provider (FIPS edition) v1.0.2";
+    private static final String info = "BouncyCastle Security Provider (FIPS edition) v1.0.2.1";
 
     public static final String PROVIDER_NAME = "BCFIPS";
 
@@ -161,7 +161,7 @@ public final class BouncyCastleFipsProvider
      */
     public BouncyCastleFipsProvider(String config, SecureRandom entropySource)
     {
-        super(PROVIDER_NAME, 1.0002, info);
+        super(PROVIDER_NAME, 1.000201, info);
 
         // TODO: add support for file parsing, selective disable.
 

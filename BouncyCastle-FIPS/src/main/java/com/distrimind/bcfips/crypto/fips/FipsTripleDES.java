@@ -6,6 +6,9 @@ import java.security.SecureRandom;
 
 import com.distrimind.bcfips.crypto.*;
 import com.distrimind.bcfips.crypto.general.FipsRegister;
+import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
+import com.distrimind.bcfips.crypto.IllegalKeyException;
+import com.distrimind.bcfips.crypto.PlainInputProcessingException;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.BufferedBlockCipher;
 import com.distrimind.bcfips.crypto.internal.InvalidCipherTextException;

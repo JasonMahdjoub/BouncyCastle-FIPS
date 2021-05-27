@@ -3,12 +3,12 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.cms;
 
+import com.distrimind.bcfips.asn1.x509.CertificateList;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.DERSequence;
-import com.distrimind.bcfips.asn1.x509.CertificateList;
 
 /**
  * <a href="http://tools.ietf.org/html/rfc5544">RFC 5544</a>

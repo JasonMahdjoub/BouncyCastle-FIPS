@@ -3,6 +3,7 @@ package com.distrimind.bcfips.asn1.eac;
 import java.io.IOException;
 import java.util.Hashtable;
 
+import com.distrimind.bcfips.util.Integers;
 import com.distrimind.bcfips.asn1.ASN1ApplicationSpecific;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1InputStream;
@@ -10,7 +11,6 @@ import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.DERApplicationSpecific;
-import com.distrimind.bcfips.util.Integers;
 
 /**
  * an Iso7816CertificateHolderAuthorization structure.

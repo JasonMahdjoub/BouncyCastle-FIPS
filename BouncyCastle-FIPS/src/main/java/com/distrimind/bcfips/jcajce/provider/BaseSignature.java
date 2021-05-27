@@ -14,6 +14,9 @@ import java.security.spec.PSSParameterSpec;
 
 import com.distrimind.bcfips.asn1.pkcs.PKCSObjectIdentifiers;
 import com.distrimind.bcfips.asn1.x509.X509ObjectIdentifiers;
+import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
+import com.distrimind.bcfips.crypto.fips.FipsDigestAlgorithm;
+import com.distrimind.bcfips.crypto.fips.FipsRSA;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AsymmetricPrivateKey;
 import com.distrimind.bcfips.crypto.AsymmetricPublicKey;
@@ -22,9 +25,6 @@ import com.distrimind.bcfips.crypto.OutputVerifier;
 import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.crypto.SignatureOperatorFactory;
 import com.distrimind.bcfips.crypto.UpdateOutputStream;
-import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
-import com.distrimind.bcfips.crypto.fips.FipsDigestAlgorithm;
-import com.distrimind.bcfips.crypto.fips.FipsRSA;
 
 class BaseSignature
     extends SignatureSpi
@@ -38,9 +38,9 @@ class BaseSignature
     private final BouncyCastleFipsProvider fipsProvider;
     private final AlgorithmParameterSpec originalSpec;
 
-    protected Parameters     parameters;
+    protected Parameters parameters;
     protected OutputVerifier verifier;
-    protected OutputSigner   signer;
+    protected OutputSigner signer;
     protected UpdateOutputStream dataStream;
 
     protected AlgorithmParameters engineParams;

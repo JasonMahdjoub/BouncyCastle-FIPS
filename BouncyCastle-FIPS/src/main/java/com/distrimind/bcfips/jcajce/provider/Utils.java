@@ -21,14 +21,14 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.DERNull;
+import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
+import com.distrimind.bcfips.crypto.fips.FipsSHS;
+import com.distrimind.bcfips.crypto.general.SecureHash;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.DigestAlgorithm;
 import com.distrimind.bcfips.crypto.OperatorUsingSecureRandom;
 import com.distrimind.bcfips.crypto.SymmetricKey;
 import com.distrimind.bcfips.crypto.SymmetricSecretKey;
-import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
-import com.distrimind.bcfips.crypto.fips.FipsSHS;
-import com.distrimind.bcfips.crypto.general.SecureHash;
 
 class Utils
 {

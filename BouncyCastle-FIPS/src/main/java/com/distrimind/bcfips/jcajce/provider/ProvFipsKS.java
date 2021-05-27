@@ -16,8 +16,8 @@ import java.util.Date;
 import java.util.Enumeration;
 
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
-import com.distrimind.bcfips.jcajce.BCLoadStoreParameter;
 import com.distrimind.bcfips.util.io.Streams;
+import com.distrimind.bcfips.jcajce.BCLoadStoreParameter;
 
 class ProvFipsKS
     extends AlgorithmProvider

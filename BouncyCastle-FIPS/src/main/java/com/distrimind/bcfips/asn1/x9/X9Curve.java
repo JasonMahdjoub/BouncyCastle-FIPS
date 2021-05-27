@@ -5,6 +5,9 @@ package com.distrimind.bcfips.asn1.x9;
 
 import java.math.BigInteger;
 
+import com.distrimind.bcfips.math.ec.ECAlgorithms;
+import com.distrimind.bcfips.math.ec.ECCurve;
+import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1Object;
@@ -14,9 +17,6 @@ import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.DERBitString;
 import com.distrimind.bcfips.asn1.DERSequence;
-import com.distrimind.bcfips.math.ec.ECAlgorithms;
-import com.distrimind.bcfips.math.ec.ECCurve;
-import com.distrimind.bcfips.util.Arrays;
 
 /**
  * ASN.1 def for Elliptic-Curve Curve structure. See
@@ -26,7 +26,7 @@ public class X9Curve
     extends ASN1Object
     implements X9ObjectIdentifiers
 {
-    private ECCurve     curve;
+    private ECCurve curve;
     private byte[]      seed;
     private ASN1ObjectIdentifier fieldIdentifier = null;
 

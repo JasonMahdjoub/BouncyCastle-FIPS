@@ -1,7 +1,7 @@
 package com.distrimind.bcfips.crypto.internal.params;
 
-import com.distrimind.bcfips.crypto.internal.DerivationParameters;
 import com.distrimind.bcfips.util.Arrays;
+import com.distrimind.bcfips.crypto.internal.DerivationParameters;
 
 public final class KDFDoublePipelineIterationParameters
     implements DerivationParameters

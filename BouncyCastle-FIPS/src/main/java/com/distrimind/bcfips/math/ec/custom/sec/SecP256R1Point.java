@@ -3,11 +3,11 @@
 /***************************************************************/
 package com.distrimind.bcfips.math.ec.custom.sec;
 
+import com.distrimind.bcfips.math.internal.Nat;
+import com.distrimind.bcfips.math.internal.Nat256;
 import com.distrimind.bcfips.math.ec.ECCurve;
 import com.distrimind.bcfips.math.ec.ECFieldElement;
 import com.distrimind.bcfips.math.ec.ECPoint;
-import com.distrimind.bcfips.math.internal.Nat;
-import com.distrimind.bcfips.math.internal.Nat256;
 
 class SecP256R1Point extends ECPoint.AbstractFp
 {

@@ -2,10 +2,10 @@ package com.distrimind.bcfips.crypto.util;
 
 import java.security.SecureRandom;
 
+import com.distrimind.bcfips.crypto.general.GeneralSecureRandom;
 import com.distrimind.bcfips.crypto.EntropySource;
 import com.distrimind.bcfips.crypto.EntropySourceProvider;
 import com.distrimind.bcfips.crypto.fips.FipsSecureRandom;
-import com.distrimind.bcfips.crypto.general.GeneralSecureRandom;
 import com.distrimind.bcfips.jcajce.provider.BouncyCastleFipsProvider;
 
 /**

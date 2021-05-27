@@ -4,13 +4,34 @@
 package com.distrimind.bcfips.math.ec;
 
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.Map;
+
+import com.distrimind.bcfips.crypto.fips.FipsDRBG;
+import com.distrimind.bcfips.util.Pack;
+import com.distrimind.bcfips.util.Strings;
 
 /**
  * base class for points on elliptic curves.
  */
 public abstract class ECPoint
 {
+    /*
+     * Temporary code to provide randomness in the 1.0.2.X branch only
+     */
+    private static SecureRandom testRandom;
+    private static synchronized SecureRandom getTestRandom()
+    {
+        if (testRandom == null)
+        {
+            // SP 800-89 requires use of an approved DRBG.
+            testRandom = FipsDRBG.SHA256.fromEntropySource(new SecureRandom(), false).build(
+                Pack.longToBigEndian(System.currentTimeMillis()), false,
+                Strings.toByteArray(ECPoint.class.getName()));
+        }
+        return testRandom;
+    }
+
     protected final static ECFieldElement[] EMPTY_ZS = new ECFieldElement[0];
 
     protected static ECFieldElement[] getInitialZCoords(ECCurve curve)
@@ -228,7 +249,20 @@ public abstract class ECPoint
                 return this;
             }
 
-            return normalize(Z1.invert());
+            /*
+             * Use blinding to avoid the side-channel leak identified and analyzed in the paper
+             * "Yet another GCD based inversion side-channel affecting ECC implementations" by Nir
+             * Drucker and Shay Gueron.
+             *
+             * To blind the calculation of z^-1, choose a multiplicative (i.e. non-zero) field
+             * element 'b' uniformly at random, then calculate the result instead as (z * b)^-1 * b.
+             * Any side-channel in the implementation of 'inverse' now only leaks information about
+             * the value (z * b), and no longer reveals information about 'z' itself.
+             */
+            SecureRandom r = getTestRandom();
+            ECFieldElement b = curve.randomFieldElementMult(r);
+            ECFieldElement zInv = Z1.multiply(b).invert().multiply(b); 
+            return normalize(zInv);
         }
         }
     }

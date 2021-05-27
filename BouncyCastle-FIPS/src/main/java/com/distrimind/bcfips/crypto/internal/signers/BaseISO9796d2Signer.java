@@ -1,5 +1,6 @@
 package com.distrimind.bcfips.crypto.internal.signers;
 
+import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.crypto.internal.AsymmetricBlockCipher;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.CryptoException;
@@ -9,7 +10,6 @@ import com.distrimind.bcfips.crypto.internal.SignerWithRecovery;
 import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
 import com.distrimind.bcfips.crypto.internal.params.RsaKeyParameters;
 import com.distrimind.bcfips.crypto.internal.util.ISOTrailers;
-import com.distrimind.bcfips.util.Arrays;
 
 /**
  * ISO9796-2 - mechanism using a hash function with recovery (scheme 1)

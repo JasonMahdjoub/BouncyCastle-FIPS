@@ -3,8 +3,8 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.cms;
 
-import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.pkcs.PKCSObjectIdentifiers;
+import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 
 
 /**

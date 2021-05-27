@@ -3,6 +3,8 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.cmp;
 
+import com.distrimind.bcfips.asn1.crmf.EncryptedValue;
+import com.distrimind.bcfips.asn1.crmf.PKIPublicationInfo;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
@@ -10,8 +12,6 @@ import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.DERTaggedObject;
-import com.distrimind.bcfips.asn1.crmf.EncryptedValue;
-import com.distrimind.bcfips.asn1.crmf.PKIPublicationInfo;
 
 /**
  * <pre>
@@ -28,7 +28,7 @@ public class CertifiedKeyPair
 {
     private CertOrEncCert certOrEncCert;
     private EncryptedValue privateKey;
-    private PKIPublicationInfo  publicationInfo;
+    private PKIPublicationInfo publicationInfo;
 
     private CertifiedKeyPair(ASN1Sequence seq)
     {

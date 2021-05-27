@@ -17,6 +17,11 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
+import com.distrimind.bcfips.asn1.cms.SignedDataParser;
+import com.distrimind.bcfips.asn1.pkcs.PKCSObjectIdentifiers;
+import com.distrimind.bcfips.asn1.x509.Certificate;
+import com.distrimind.bcfips.asn1.x509.CertificateList;
+import com.distrimind.bcfips.util.io.Streams;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
@@ -28,11 +33,6 @@ import com.distrimind.bcfips.asn1.ASN1StreamParser;
 import com.distrimind.bcfips.asn1.BERTaggedObjectParser;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.DERSet;
-import com.distrimind.bcfips.asn1.cms.SignedDataParser;
-import com.distrimind.bcfips.asn1.pkcs.PKCSObjectIdentifiers;
-import com.distrimind.bcfips.asn1.x509.Certificate;
-import com.distrimind.bcfips.asn1.x509.CertificateList;
-import com.distrimind.bcfips.util.io.Streams;
 
 /**
  * class for dealing with X509 certificates.
@@ -52,7 +52,7 @@ class CertificateFactory
     private ASN1Set sData = null;
     private int                sDataObjectCount = 0;
     private InputStream currentStream = null;
-    private ASN1StreamParser  currentAsn1Parser = null;
+    private ASN1StreamParser currentAsn1Parser = null;
     private ASN1Set sCrlData = null;
     private int                sCrlDataObjectCount = 0;
     private InputStream currentCrlStream = null;

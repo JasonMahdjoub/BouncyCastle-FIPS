@@ -5,6 +5,7 @@ package com.distrimind.bcfips.asn1.x500.style;
 
 import java.util.Hashtable;
 
+import com.distrimind.bcfips.asn1.x509.X509ObjectIdentifiers;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1GeneralizedTime;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
@@ -14,7 +15,6 @@ import com.distrimind.bcfips.asn1.pkcs.PKCSObjectIdentifiers;
 import com.distrimind.bcfips.asn1.x500.RDN;
 import com.distrimind.bcfips.asn1.x500.X500Name;
 import com.distrimind.bcfips.asn1.x500.X500NameStyle;
-import com.distrimind.bcfips.asn1.x509.X509ObjectIdentifiers;
 
 /**
  * The default style, based on Bouncy Castle's orginal X509Name class.

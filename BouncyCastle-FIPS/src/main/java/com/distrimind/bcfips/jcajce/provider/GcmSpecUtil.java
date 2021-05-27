@@ -11,8 +11,8 @@ import javax.crypto.spec.IvParameterSpec;
 
 import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.cms.GCMParameters;
-import com.distrimind.bcfips.jcajce.spec.AEADParameterSpec;
 import com.distrimind.bcfips.util.Integers;
+import com.distrimind.bcfips.jcajce.spec.AEADParameterSpec;
 
 class GcmSpecUtil
 {

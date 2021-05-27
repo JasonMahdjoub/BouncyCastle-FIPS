@@ -5,9 +5,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.security.PublicKey;
 
-import com.distrimind.bcfips.crypto.asymmetric.AsymmetricEdDSAPublicKey;
 import com.distrimind.bcfips.jcajce.interfaces.EdDSAKey;
 import com.distrimind.bcfips.util.Arrays;
+import com.distrimind.bcfips.crypto.asymmetric.AsymmetricEdDSAPublicKey;
 
 class ProvEdDSAPublicKey
     implements EdDSAKey, PublicKey

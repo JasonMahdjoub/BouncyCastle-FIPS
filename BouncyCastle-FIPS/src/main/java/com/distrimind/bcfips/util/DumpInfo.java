@@ -14,8 +14,8 @@ import com.distrimind.bcfips.crypto.SymmetricSecretKey;
 import com.distrimind.bcfips.crypto.UpdateOutputStream;
 import com.distrimind.bcfips.crypto.fips.FipsSHS;
 import com.distrimind.bcfips.crypto.fips.FipsStatus;
-import com.distrimind.bcfips.jcajce.provider.BouncyCastleFipsProvider;
 import com.distrimind.bcfips.util.encoders.Hex;
+import com.distrimind.bcfips.jcajce.provider.BouncyCastleFipsProvider;
 
 /**
  * Executable class that displays information about the module

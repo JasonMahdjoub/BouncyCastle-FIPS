@@ -3,6 +3,7 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.crmf;
 
+import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
@@ -12,7 +13,6 @@ import com.distrimind.bcfips.asn1.DERBitString;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.cmp.CMPObjectIdentifiers;
 import com.distrimind.bcfips.asn1.cmp.PBMParameter;
-import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 
 /**
  * Password-based MAC value for use with POPOSigningKeyInput.
@@ -20,7 +20,7 @@ import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 public class PKMACValue
     extends ASN1Object
 {
-    private AlgorithmIdentifier  algId;
+    private AlgorithmIdentifier algId;
     private DERBitString        value;
 
     private PKMACValue(ASN1Sequence seq)

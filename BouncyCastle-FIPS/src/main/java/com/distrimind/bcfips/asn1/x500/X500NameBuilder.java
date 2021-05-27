@@ -5,9 +5,9 @@ package com.distrimind.bcfips.asn1.x500;
 
 import java.util.Vector;
 
+import com.distrimind.bcfips.asn1.x500.style.BCStyle;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
-import com.distrimind.bcfips.asn1.x500.style.BCStyle;
 
 /**
  * A builder class for making X.500 Name objects.

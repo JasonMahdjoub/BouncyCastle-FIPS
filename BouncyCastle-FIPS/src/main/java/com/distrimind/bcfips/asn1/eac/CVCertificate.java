@@ -6,6 +6,7 @@ package com.distrimind.bcfips.asn1.eac;
 
 import java.io.IOException;
 
+import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.asn1.ASN1ApplicationSpecific;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1InputStream;
@@ -15,7 +16,6 @@ import com.distrimind.bcfips.asn1.ASN1ParsingException;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.DERApplicationSpecific;
 import com.distrimind.bcfips.asn1.DEROctetString;
-import com.distrimind.bcfips.util.Arrays;
 
 
 /**

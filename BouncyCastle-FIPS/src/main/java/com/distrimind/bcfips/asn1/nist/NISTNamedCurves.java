@@ -6,11 +6,11 @@ package com.distrimind.bcfips.asn1.nist;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import com.distrimind.bcfips.util.Strings;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.sec.SECNamedCurves;
 import com.distrimind.bcfips.asn1.sec.SECObjectIdentifiers;
 import com.distrimind.bcfips.asn1.x9.X9ECParameters;
-import com.distrimind.bcfips.util.Strings;
 
 /**
  * Utility class for fetching curves using their NIST names as published in FIPS-PUB 186-3

@@ -3,13 +3,13 @@
 /***************************************************************/
 package com.distrimind.bcfips.crypto.internal.macs;
 
-import com.distrimind.bcfips.crypto.internal.BlockCipher;
-import com.distrimind.bcfips.crypto.internal.CipherParameters;
-import com.distrimind.bcfips.crypto.internal.Mac;
 import com.distrimind.bcfips.crypto.internal.modes.CBCBlockCipher;
 import com.distrimind.bcfips.crypto.internal.paddings.ISO7816d4Padding;
 import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
 import com.distrimind.bcfips.util.Pack;
+import com.distrimind.bcfips.crypto.internal.BlockCipher;
+import com.distrimind.bcfips.crypto.internal.CipherParameters;
+import com.distrimind.bcfips.crypto.internal.Mac;
 
 /**
  * CMAC - as specified at www.nuee.nagoya-u.ac.jp/labs/tiwata/omac/omac.html

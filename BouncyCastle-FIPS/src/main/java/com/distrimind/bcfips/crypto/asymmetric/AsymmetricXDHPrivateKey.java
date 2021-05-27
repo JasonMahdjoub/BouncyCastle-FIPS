@@ -15,8 +15,8 @@ import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AsymmetricPrivateKey;
 import com.distrimind.bcfips.crypto.general.EdEC;
-import com.distrimind.bcfips.crypto.internal.Permissions;
 import com.distrimind.bcfips.util.Arrays;
+import com.distrimind.bcfips.crypto.internal.Permissions;
 
 /**
  * Edwards Curve Diffie-Hellman (XDH) private keys.

@@ -3,6 +3,7 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.ocsp;
 
+import com.distrimind.bcfips.asn1.x509.CRLReason;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Enumerated;
 import com.distrimind.bcfips.asn1.ASN1GeneralizedTime;
@@ -12,13 +13,12 @@ import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.DERTaggedObject;
-import com.distrimind.bcfips.asn1.x509.CRLReason;
 
 public class RevokedInfo
     extends ASN1Object
 {
     private ASN1GeneralizedTime  revocationTime;
-    private CRLReason           revocationReason;
+    private CRLReason revocationReason;
 
     public RevokedInfo(
         ASN1GeneralizedTime  revocationTime,

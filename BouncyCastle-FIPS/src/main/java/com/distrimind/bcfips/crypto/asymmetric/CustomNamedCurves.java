@@ -14,6 +14,10 @@ import com.distrimind.bcfips.asn1.x9.X9ECParameters;
 import com.distrimind.bcfips.asn1.x9.X9ECParametersHolder;
 import com.distrimind.bcfips.asn1.x9.X9ECPoint;
 import com.distrimind.bcfips.math.ec.ECCurve;
+import com.distrimind.bcfips.math.ec.endo.GLVTypeBEndomorphism;
+import com.distrimind.bcfips.math.ec.endo.GLVTypeBParameters;
+import com.distrimind.bcfips.util.Strings;
+import com.distrimind.bcfips.util.encoders.Hex;
 import com.distrimind.bcfips.math.ec.custom.sec.SecP128R1Curve;
 import com.distrimind.bcfips.math.ec.custom.sec.SecP160K1Curve;
 import com.distrimind.bcfips.math.ec.custom.sec.SecP160R1Curve;
@@ -44,10 +48,6 @@ import com.distrimind.bcfips.math.ec.custom.sec.SecT409K1Curve;
 import com.distrimind.bcfips.math.ec.custom.sec.SecT409R1Curve;
 import com.distrimind.bcfips.math.ec.custom.sec.SecT571K1Curve;
 import com.distrimind.bcfips.math.ec.custom.sec.SecT571R1Curve;
-import com.distrimind.bcfips.math.ec.endo.GLVTypeBEndomorphism;
-import com.distrimind.bcfips.math.ec.endo.GLVTypeBParameters;
-import com.distrimind.bcfips.util.Strings;
-import com.distrimind.bcfips.util.encoders.Hex;
 
 class CustomNamedCurves
 {

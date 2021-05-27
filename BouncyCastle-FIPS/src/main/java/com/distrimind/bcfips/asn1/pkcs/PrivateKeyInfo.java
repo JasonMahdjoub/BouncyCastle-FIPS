@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Enumeration;
 
+import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
+import com.distrimind.bcfips.util.BigIntegers;
 import com.distrimind.bcfips.asn1.ASN1BitString;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
@@ -21,8 +23,6 @@ import com.distrimind.bcfips.asn1.DERBitString;
 import com.distrimind.bcfips.asn1.DEROctetString;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.DERTaggedObject;
-import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
-import com.distrimind.bcfips.util.BigIntegers;
 
 /**
  * RFC 5958
