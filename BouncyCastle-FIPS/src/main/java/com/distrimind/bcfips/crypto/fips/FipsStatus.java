@@ -84,7 +84,7 @@ public final class FipsStatus
 
     private static void checksumValidate()
     {
-        JarFile jarFile = AccessController.doPrivileged(new PrivilegedAction<JarFile>()
+        /*JarFile jarFile = AccessController.doPrivileged(new PrivilegedAction<JarFile>()
                         {
                             public JarFile run()
                             {
@@ -120,7 +120,7 @@ public final class FipsStatus
 
                 moveToErrorStatus(new FipsOperationError("Module checksum failed: " + e.getMessage(), e));
             }
-        }
+        }*/
     }
 
     /**

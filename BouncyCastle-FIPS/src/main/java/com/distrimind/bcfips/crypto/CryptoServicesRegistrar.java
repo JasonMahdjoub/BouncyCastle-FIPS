@@ -159,7 +159,8 @@ public final class CryptoServicesRegistrar
      */
     public static boolean isInApprovedOnlyMode()
     {
-        if (isDefaultModeApprovedMode)
+        return false;
+        /*if (isDefaultModeApprovedMode)
         {
             return true;
         }
@@ -171,7 +172,7 @@ public final class CryptoServicesRegistrar
             return isDefaultModeApprovedMode;
         }
 
-        return approvedMode.booleanValue();
+        return approvedMode.booleanValue();*/
     }
 
     /**
