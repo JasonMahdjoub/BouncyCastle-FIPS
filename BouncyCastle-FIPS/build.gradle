@@ -129,7 +129,7 @@ publishing {
             pom {
                 name = 'BouncyCastle-Fips recompiled By DistriMind'
                 description = 'Encryption tools'
-                url = 'https://github.com/JazZ51/BouncyCastle-FIPS'
+                url = 'https://github.com/JasonMahdjoub/BouncyCastle-FIPS'
                 developers {
                     developer {
                         id = 'mahdjoub'
@@ -139,14 +139,14 @@ publishing {
                 }
                 organization {
                     name = 'DistriMind'
-                    url = 'https://github.com/JazZ51'
+                    url = 'https://github.com/JasonMahdjoub'
                 }
                 issueManagement {
                     system = 'GitHub'
-                    url = 'https://github.com/JazZ51/BouncyCastle-FIPS/issues'
+                    url = 'https://github.com/JasonMahdjoub/BouncyCastle-FIPS/issues'
                 }
                 scm {
-                    connection = 'https://github.com/JazZ51/BouncyCastle-FIPS'
+                    connection = 'https://github.com/JasonMahdjoub/BouncyCastle-FIPS'
                 }
                 licenses {
                     license {
