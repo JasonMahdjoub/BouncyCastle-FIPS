@@ -140,9 +140,12 @@ publishing {
                 url = 'https://github.com/JasonMahdjoub/BouncyCastle-FIPS'
                 developers {
                     developer {
-                        id = 'mahdjoub'
+                        id = 'jmahdjoub'
                         name = 'Jason Mahdjoub'
                         email = 'jason.mahdjoub@distri-mind.fr'
+                        organization = 'DistriMind'
+                        roles.add('Entrepreneur')
+                        roles.add('Developer')
                     }
                 }
                 organization {
