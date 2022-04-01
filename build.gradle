@@ -86,7 +86,7 @@ idea {
         languageLevel = javaVersion
     }
 }
-
+version='1.0.2.1'
 allprojects {
 	group='com.distrimind.bcfips'
 
@@ -138,16 +138,6 @@ publishing {
                 name = 'BouncyCastle-Fips recompiled By DistriMind'
                 description = 'Encryption tools'
                 url = 'https://github.com/JasonMahdjoub/BouncyCastle-FIPS'
-                developers {
-                    developer {
-                        id = 'jmahdjoub'
-                        name = 'Jason Mahdjoub'
-                        email = 'jason.mahdjoub@distri-mind.fr'
-                        organization = 'DistriMind'
-                        roles.add('Entrepreneur')
-                        roles.add('Developer')
-                    }
-                }
                 organization {
                     name = 'DistriMind'
                     url = 'https://github.com/JasonMahdjoub'
