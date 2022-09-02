@@ -2,6 +2,7 @@ package com.distrimind.bcfips.crypto.general;
 
 import java.security.SecureRandom;
 
+import com.distrimind.bcfips.crypto.internal.modes.AEADBlockCipher;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.IllegalKeyException;
 import com.distrimind.bcfips.crypto.SymmetricKey;
@@ -12,7 +13,6 @@ import com.distrimind.bcfips.crypto.internal.BufferedBlockCipher;
 import com.distrimind.bcfips.crypto.internal.Mac;
 import com.distrimind.bcfips.crypto.internal.ValidatedSymmetricKey;
 import com.distrimind.bcfips.crypto.internal.Wrapper;
-import com.distrimind.bcfips.crypto.internal.modes.AEADBlockCipher;
 
 /**
  * Source class for non-FIPS approved-mode implementations of TripleDES based algorithms.

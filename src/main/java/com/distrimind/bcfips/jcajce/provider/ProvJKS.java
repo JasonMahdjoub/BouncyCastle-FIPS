@@ -23,10 +23,10 @@ import java.util.Map;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.fips.FipsOutputDigestCalculator;
 import com.distrimind.bcfips.crypto.fips.FipsSHS;
+import com.distrimind.bcfips.jcajce.BCLoadStoreParameter;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Strings;
 import com.distrimind.bcfips.util.io.Streams;
-import com.distrimind.bcfips.jcajce.BCLoadStoreParameter;
 
 /**
  * Reads a certificate only key store.

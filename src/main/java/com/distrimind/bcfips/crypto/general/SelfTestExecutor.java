@@ -1,8 +1,8 @@
 package com.distrimind.bcfips.crypto.general;
 
-import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.internal.test.BasicKatTest;
 import com.distrimind.bcfips.crypto.internal.test.ConsistencyTest;
+import com.distrimind.bcfips.crypto.Algorithm;
 
 class SelfTestExecutor
 {

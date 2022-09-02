@@ -32,10 +32,7 @@ import java.util.TimeZone;
 
 import javax.security.auth.x500.X500Principal;
 
-import com.distrimind.bcfips.asn1.x500.RDN;
-import com.distrimind.bcfips.asn1.x500.X500Name;
 import com.distrimind.bcfips.asn1.x500.style.BCStyle;
-import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Integer;
@@ -45,6 +42,8 @@ import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.ASN1String;
 import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.DERSequence;
+import com.distrimind.bcfips.asn1.x500.RDN;
+import com.distrimind.bcfips.asn1.x500.X500Name;
 import com.distrimind.bcfips.asn1.x509.BasicConstraints;
 import com.distrimind.bcfips.asn1.x509.CRLDistPoint;
 import com.distrimind.bcfips.asn1.x509.CRLReason;
@@ -64,6 +63,7 @@ import com.distrimind.bcfips.jcajce.PKIXCRLStoreSelector;
 import com.distrimind.bcfips.jcajce.PKIXCertStoreSelector;
 import com.distrimind.bcfips.jcajce.PKIXExtendedBuilderParameters;
 import com.distrimind.bcfips.jcajce.PKIXExtendedParameters;
+import com.distrimind.bcfips.util.Arrays;
 
 class RFC3280CertPathUtilities
 {

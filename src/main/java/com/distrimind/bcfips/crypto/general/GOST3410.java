@@ -5,6 +5,11 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.SecureRandom;
 
+import com.distrimind.bcfips.crypto.internal.AsymmetricCipherKeyPair;
+import com.distrimind.bcfips.crypto.internal.DSA;
+import com.distrimind.bcfips.crypto.internal.Digest;
+import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
+import com.distrimind.bcfips.crypto.internal.test.ConsistencyTest;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AsymmetricPrivateKey;
 import com.distrimind.bcfips.crypto.AsymmetricPublicKey;
@@ -16,11 +21,6 @@ import com.distrimind.bcfips.crypto.asymmetric.AsymmetricGOST3410PublicKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricKeyPair;
 import com.distrimind.bcfips.crypto.asymmetric.GOST3410DomainParameters;
 import com.distrimind.bcfips.crypto.asymmetric.GOST3410Parameters;
-import com.distrimind.bcfips.crypto.internal.AsymmetricCipherKeyPair;
-import com.distrimind.bcfips.crypto.internal.DSA;
-import com.distrimind.bcfips.crypto.internal.Digest;
-import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
-import com.distrimind.bcfips.crypto.internal.test.ConsistencyTest;
 import com.distrimind.bcfips.util.encoders.Hex;
 
 /**
@@ -155,7 +155,7 @@ public final class GOST3410
         @Override
         public OutputSignerUsingSecureRandom<SignatureParameters> doCreateSigner(AsymmetricPrivateKey key, final SignatureParameters parameters)
         {
-            final DSA gost3410Signer = new Gost3410Signer();
+            final com.distrimind.bcfips.crypto.internal.DSA gost3410Signer = new Gost3410Signer();
             final Digest digest = Register.createDigest(parameters.getDigestAlgorithm());
 
             AsymmetricGOST3410PrivateKey k = (AsymmetricGOST3410PrivateKey)key;
@@ -164,7 +164,7 @@ public final class GOST3410
 
             return new DSAOutputSigner<SignatureParameters>(gost3410Signer, digest, parameters, new DSAOutputSigner.Initializer()
             {
-                  public void initialize(DSA signer, SecureRandom random)
+                  public void initialize(com.distrimind.bcfips.crypto.internal.DSA signer, SecureRandom random)
                   {
                        signer.init(true, new ParametersWithRandom(privateKeyParameters, random));
                   }

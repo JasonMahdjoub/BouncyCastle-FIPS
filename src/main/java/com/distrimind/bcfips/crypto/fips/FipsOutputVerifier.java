@@ -1,7 +1,7 @@
 package com.distrimind.bcfips.crypto.fips;
 
-import com.distrimind.bcfips.crypto.InvalidSignatureException;
 import com.distrimind.bcfips.crypto.UpdateOutputStream;
+import com.distrimind.bcfips.crypto.InvalidSignatureException;
 import com.distrimind.bcfips.crypto.OutputVerifier;
 import com.distrimind.bcfips.crypto.Parameters;
 

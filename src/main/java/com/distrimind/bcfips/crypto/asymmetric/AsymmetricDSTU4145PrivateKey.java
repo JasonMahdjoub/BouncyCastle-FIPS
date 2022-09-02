@@ -14,8 +14,8 @@ import com.distrimind.bcfips.asn1.ua.UAObjectIdentifiers;
 import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AsymmetricPrivateKey;
-import com.distrimind.bcfips.math.ec.ECCurve;
 import com.distrimind.bcfips.crypto.internal.Permissions;
+import com.distrimind.bcfips.math.ec.ECCurve;
 
 /**
  * Class for DSTU-4145 private keys.

@@ -6,8 +6,8 @@ import java.io.ObjectOutputStream;
 import java.security.PublicKey;
 
 import com.distrimind.bcfips.jcajce.interfaces.XDHKey;
-import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricXDHPublicKey;
+import com.distrimind.bcfips.util.Arrays;
 
 class ProvXDHPublicKey
     implements XDHKey, PublicKey

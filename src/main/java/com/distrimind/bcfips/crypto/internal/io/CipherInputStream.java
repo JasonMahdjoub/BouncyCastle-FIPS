@@ -4,13 +4,13 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
-import com.distrimind.bcfips.crypto.InvalidCipherTextException;
+import com.distrimind.bcfips.crypto.internal.InvalidCipherTextException;
 import com.distrimind.bcfips.crypto.internal.modes.AEADBlockCipher;
-import com.distrimind.bcfips.util.Arrays;
+import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.internal.BufferedBlockCipher;
 import com.distrimind.bcfips.crypto.internal.SkippingCipher;
 import com.distrimind.bcfips.crypto.internal.StreamCipher;
+import com.distrimind.bcfips.util.Arrays;
 
 /**
  * A CipherInputStream is composed of an InputStream and a cipher so that read() methods return data
@@ -157,9 +157,9 @@ public class CipherInputStream
                 maxBuf = 0; // a stream cipher
             }
         }
-        catch (final com.distrimind.bcfips.crypto.internal.InvalidCipherTextException e)
+        catch (final InvalidCipherTextException e)
         {
-            throw new InvalidCipherTextException("Error finalising cipher", e);
+            throw new com.distrimind.bcfips.crypto.InvalidCipherTextException("Error finalising cipher", e);
         }
         catch (Exception e)
         {
@@ -174,7 +174,7 @@ public class CipherInputStream
      * If the underlying stream is exhausted by this call, the cipher will be finalised.
      * </p>
      * @throws IOException if there was an error closing the input stream.
-     * @throws InvalidCipherTextException if the data read from the stream was invalid ciphertext
+     * @throws com.distrimind.bcfips.crypto.InvalidCipherTextException if the data read from the stream was invalid ciphertext
      * (e.g. the cipher is an AEAD cipher and the ciphertext tag check fails).
      */
     public int read()
@@ -203,7 +203,7 @@ public class CipherInputStream
      * @return the total number of bytes read into the buffer, or <code>-1</code> if there is no
      *         more data because the end of the stream has been reached.
      * @throws IOException if there was an error closing the input stream.
-     * @throws InvalidCipherTextException if the data read from the stream was invalid ciphertext
+     * @throws com.distrimind.bcfips.crypto.InvalidCipherTextException if the data read from the stream was invalid ciphertext
      * (e.g. the cipher is an AEAD cipher and the ciphertext tag check fails).
      */
     public int read(
@@ -225,7 +225,7 @@ public class CipherInputStream
      * @return the total number of bytes read into the buffer, or <code>-1</code> if there is no
      *         more data because the end of the stream has been reached.
      * @throws IOException if there was an error closing the input stream.
-     * @throws InvalidCipherTextException if the data read from the stream was invalid ciphertext
+     * @throws com.distrimind.bcfips.crypto.InvalidCipherTextException if the data read from the stream was invalid ciphertext
      * (e.g. the cipher is an AEAD cipher and the ciphertext tag check fails).
      */
     public int read(
@@ -341,7 +341,7 @@ public class CipherInputStream
      * Closes the underlying input stream and finalises the processing of the data by the cipher.
      *
      * @throws IOException if there was an error closing the input stream.
-     * @throws InvalidCipherTextException if the data read from the stream was invalid ciphertext
+     * @throws com.distrimind.bcfips.crypto.InvalidCipherTextException if the data read from the stream was invalid ciphertext
      *             (e.g. the cipher is an AEAD cipher and the ciphertext tag check fails).
      */
     public void close()

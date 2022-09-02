@@ -10,8 +10,8 @@ import java.security.spec.RSAPrivateKeySpec;
 import javax.security.auth.Destroyable;
 
 import com.distrimind.bcfips.crypto.Algorithm;
-import com.distrimind.bcfips.util.Strings;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricRSAPrivateKey;
+import com.distrimind.bcfips.util.Strings;
 
 class ProvRSAPrivateKey
     implements Destroyable, RSAPrivateKey, ProvKey<AsymmetricRSAPrivateKey>

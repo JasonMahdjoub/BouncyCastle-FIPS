@@ -8,8 +8,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import com.distrimind.bcfips.util.Strings;
-import com.distrimind.bcfips.util.encoders.Hex;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1Encoding;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
@@ -20,6 +18,8 @@ import com.distrimind.bcfips.asn1.x500.AttributeTypeAndValue;
 import com.distrimind.bcfips.asn1.x500.RDN;
 import com.distrimind.bcfips.asn1.x500.X500NameBuilder;
 import com.distrimind.bcfips.asn1.x500.X500NameStyle;
+import com.distrimind.bcfips.util.Strings;
+import com.distrimind.bcfips.util.encoders.Hex;
 
 /**
  * Utility classes that attempt to conform to the practices given in the RFCs published by the IETF.

@@ -2,15 +2,15 @@ package com.distrimind.bcfips.crypto.fips;
 
 import java.util.Hashtable;
 
+import com.distrimind.bcfips.crypto.internal.AsymmetricBlockCipher;
+import com.distrimind.bcfips.crypto.internal.Digest;
+import com.distrimind.bcfips.crypto.internal.encodings.PKCS1Encoding;
+import com.distrimind.bcfips.crypto.internal.signers.BaseRsaDigestSigner;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.nist.NISTObjectIdentifiers;
 import com.distrimind.bcfips.asn1.pkcs.PKCSObjectIdentifiers;
 import com.distrimind.bcfips.asn1.teletrust.TeleTrusTObjectIdentifiers;
 import com.distrimind.bcfips.asn1.x509.X509ObjectIdentifiers;
-import com.distrimind.bcfips.crypto.internal.AsymmetricBlockCipher;
-import com.distrimind.bcfips.crypto.internal.Digest;
-import com.distrimind.bcfips.crypto.internal.encodings.PKCS1Encoding;
-import com.distrimind.bcfips.crypto.internal.signers.BaseRsaDigestSigner;
 
 class RsaDigestSigner
     extends BaseRsaDigestSigner

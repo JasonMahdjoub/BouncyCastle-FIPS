@@ -10,8 +10,8 @@ import javax.crypto.spec.DHParameterSpec;
 import javax.crypto.spec.DHPublicKeySpec;
 
 import com.distrimind.bcfips.crypto.Algorithm;
-import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricDHPublicKey;
+import com.distrimind.bcfips.util.Arrays;
 
 class ProvDHPublicKey
     implements DHPublicKey

@@ -2,6 +2,7 @@ package com.distrimind.bcfips.crypto.general;
 
 import java.security.SecureRandom;
 
+import com.distrimind.bcfips.crypto.internal.Wrapper;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.InvalidWrappingException;
@@ -13,7 +14,6 @@ import com.distrimind.bcfips.crypto.KeyWrapperUsingSecureRandom;
 import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.crypto.fips.FipsStatus;
 import com.distrimind.bcfips.crypto.fips.FipsUnapprovedOperationError;
-import com.distrimind.bcfips.crypto.internal.Wrapper;
 
 abstract class GuardedKeyWrapOperatorFactory<T extends Parameters, K extends Key>
     implements KeyWrapOperatorFactory<T, K>

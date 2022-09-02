@@ -11,12 +11,12 @@ import com.distrimind.bcfips.math.ec.ECConstants;
 import com.distrimind.bcfips.math.ec.ECCurve;
 import com.distrimind.bcfips.math.ec.endo.GLVTypeBEndomorphism;
 import com.distrimind.bcfips.math.ec.endo.GLVTypeBParameters;
-import com.distrimind.bcfips.util.Strings;
 import com.distrimind.bcfips.util.encoders.Hex;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.x9.X9ECParameters;
 import com.distrimind.bcfips.asn1.x9.X9ECParametersHolder;
 import com.distrimind.bcfips.asn1.x9.X9ECPoint;
+import com.distrimind.bcfips.util.Strings;
 
 public class SECNamedCurves
 {

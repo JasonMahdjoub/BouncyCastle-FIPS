@@ -2,6 +2,8 @@ package com.distrimind.bcfips.crypto.general;
 
 import java.security.SecureRandom;
 
+import com.distrimind.bcfips.crypto.internal.BlockCipher;
+import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.EntropySourceProvider;
 import com.distrimind.bcfips.crypto.IllegalKeyException;
@@ -9,8 +11,6 @@ import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.crypto.SymmetricKey;
 import com.distrimind.bcfips.crypto.fips.FipsAES;
 import com.distrimind.bcfips.crypto.fips.FipsTripleDES;
-import com.distrimind.bcfips.crypto.internal.BlockCipher;
-import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
 import com.distrimind.bcfips.crypto.util.BasicEntropySourceProvider;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Pack;

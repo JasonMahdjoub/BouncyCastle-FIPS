@@ -3,8 +3,8 @@ package com.distrimind.bcfips.crypto.general;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-import com.distrimind.bcfips.crypto.internal.DSA;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
+import com.distrimind.bcfips.crypto.internal.DSA;
 import com.distrimind.bcfips.crypto.internal.params.EcDomainParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcKeyParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcPrivateKeyParameters;

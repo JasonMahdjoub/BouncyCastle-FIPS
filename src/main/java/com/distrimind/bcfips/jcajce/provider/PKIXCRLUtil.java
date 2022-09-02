@@ -11,10 +11,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import com.distrimind.bcfips.util.Store;
-import com.distrimind.bcfips.util.StoreException;
 import com.distrimind.bcfips.jcajce.PKIXCRLStore;
 import com.distrimind.bcfips.jcajce.PKIXCRLStoreSelector;
+import com.distrimind.bcfips.util.Store;
+import com.distrimind.bcfips.util.StoreException;
 
 class PKIXCRLUtil
 {

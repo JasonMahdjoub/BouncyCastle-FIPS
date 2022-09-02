@@ -4,13 +4,13 @@
 package com.distrimind.bcfips.crypto.internal.modes;
 
 import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
-import com.distrimind.bcfips.util.Arrays;
-import com.distrimind.bcfips.util.Pack;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.DataLengthException;
 import com.distrimind.bcfips.crypto.internal.SkippingStreamCipher;
 import com.distrimind.bcfips.crypto.internal.StreamBlockCipher;
+import com.distrimind.bcfips.util.Arrays;
+import com.distrimind.bcfips.util.Pack;
 
 /**
  * Implements the Segmented Integer Counter (SIC) mode on top of a simple

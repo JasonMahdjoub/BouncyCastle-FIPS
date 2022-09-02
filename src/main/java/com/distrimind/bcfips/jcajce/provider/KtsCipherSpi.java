@@ -21,11 +21,11 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.ShortBufferException;
 
-import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.jcajce.KTSKeyWithEncapsulation;
 import com.distrimind.bcfips.jcajce.spec.KTSExtractKeySpec;
 import com.distrimind.bcfips.jcajce.spec.KTSGenerateKeySpec;
 import com.distrimind.bcfips.jcajce.spec.KTSParameterSpec;
+import com.distrimind.bcfips.util.Arrays;
 
 class KtsCipherSpi
     extends CipherSpi

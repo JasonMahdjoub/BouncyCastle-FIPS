@@ -16,17 +16,17 @@ import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
  * class must be changed to protected  
  */
 class ISO9797Alg3Mac
-    implements Mac 
+    implements Mac
 {
     private byte[]              mac;
     
     private byte[]              buf;
     private int                 bufOff;
-    private BlockCipher         cipher;
-    private BlockCipherPadding  padding;
+    private BlockCipher cipher;
+    private BlockCipherPadding padding;
     
     private int                 macSize;
-    private KeyParameter        lastKey2;
+    private KeyParameter lastKey2;
     private KeyParameter        lastKey3;
     
     /**

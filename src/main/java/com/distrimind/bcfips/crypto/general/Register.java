@@ -1,9 +1,9 @@
 package com.distrimind.bcfips.crypto.general;
 
-import com.distrimind.bcfips.crypto.Algorithm;
-import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
 import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.internal.Mac;
+import com.distrimind.bcfips.crypto.Algorithm;
+import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
 
 class Register
 {

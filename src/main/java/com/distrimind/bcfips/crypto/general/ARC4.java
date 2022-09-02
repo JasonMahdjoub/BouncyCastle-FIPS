@@ -2,6 +2,8 @@ package com.distrimind.bcfips.crypto.general;
 
 import java.security.SecureRandom;
 
+import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
+import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.IllegalKeyException;
 import com.distrimind.bcfips.crypto.SymmetricKey;
@@ -10,8 +12,6 @@ import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.KeyGenerationParameters;
 import com.distrimind.bcfips.crypto.internal.StreamCipher;
 import com.distrimind.bcfips.crypto.internal.ValidatedSymmetricKey;
-import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
-import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.encoders.Hex;
 

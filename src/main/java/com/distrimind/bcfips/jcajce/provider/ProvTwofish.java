@@ -8,12 +8,12 @@ import java.security.spec.InvalidKeySpecException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEParameterSpec;
 
-import com.distrimind.bcfips.crypto.general.Twofish;
 import com.distrimind.bcfips.crypto.AuthenticationParametersWithIV;
 import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.crypto.ParametersWithIV;
 import com.distrimind.bcfips.crypto.PasswordBasedDeriver;
 import com.distrimind.bcfips.crypto.SymmetricKeyGenerator;
+import com.distrimind.bcfips.crypto.general.Twofish;
 import com.distrimind.bcfips.jcajce.spec.WrapParameterSpec;
 
 class ProvTwofish

@@ -31,17 +31,8 @@ import java.util.Set;
 
 import javax.security.auth.x500.X500Principal;
 
-import com.distrimind.bcfips.asn1.misc.MiscObjectIdentifiers;
-import com.distrimind.bcfips.asn1.misc.NetscapeCertType;
-import com.distrimind.bcfips.asn1.misc.NetscapeRevocationURL;
-import com.distrimind.bcfips.asn1.misc.VerisignCzagExtension;
-import com.distrimind.bcfips.asn1.util.ASN1Dump;
-import com.distrimind.bcfips.asn1.x500.X500Name;
 import com.distrimind.bcfips.asn1.x500.style.RFC4519Style;
 import com.distrimind.bcfips.asn1.x509.*;
-import com.distrimind.bcfips.util.Integers;
-import com.distrimind.bcfips.util.Strings;
-import com.distrimind.bcfips.util.encoders.Hex;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1Encoding;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
@@ -53,19 +44,23 @@ import com.distrimind.bcfips.asn1.DERBitString;
 import com.distrimind.bcfips.asn1.DERIA5String;
 import com.distrimind.bcfips.asn1.DERNull;
 import com.distrimind.bcfips.asn1.DEROctetString;
+import com.distrimind.bcfips.asn1.misc.MiscObjectIdentifiers;
+import com.distrimind.bcfips.asn1.misc.NetscapeCertType;
+import com.distrimind.bcfips.asn1.misc.NetscapeRevocationURL;
+import com.distrimind.bcfips.asn1.misc.VerisignCzagExtension;
+import com.distrimind.bcfips.asn1.util.ASN1Dump;
+import com.distrimind.bcfips.asn1.x500.X500Name;
 import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
-import com.distrimind.bcfips.asn1.x509.BasicConstraints;
-import com.distrimind.bcfips.asn1.x509.Extension;
-import com.distrimind.bcfips.asn1.x509.Extensions;
-import com.distrimind.bcfips.asn1.x509.GeneralName;
-import com.distrimind.bcfips.asn1.x509.KeyUsage;
+import com.distrimind.bcfips.util.Integers;
+import com.distrimind.bcfips.util.Strings;
+import com.distrimind.bcfips.util.encoders.Hex;
 
 class X509CertificateObject
     extends X509Certificate
 {
     private final BouncyCastleFipsProvider fipsProvider;
     private final Certificate c;
-    private final BasicConstraints basicConstraints;
+    private final BasicConstraints            basicConstraints;
     private final boolean[]                   keyUsage;
 
     private volatile PublicKey          publicKeyValue;
@@ -103,7 +98,7 @@ class X509CertificateObject
             byte[] bytes = this.getExtensionBytes("2.5.29.15");
             if (bytes != null)
             {
-                DERBitString bits = DERBitString.getInstance(ASN1Primitive.fromByteArray(bytes));
+                DERBitString    bits = DERBitString.getInstance(ASN1Primitive.fromByteArray(bytes));
 
                 bytes = bits.getBytes();
                 int length = (bytes.length * 8) - bits.getPadBits();
@@ -167,7 +162,7 @@ class X509CertificateObject
         try
         {
             ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-            ASN1OutputStream aOut = new ASN1OutputStream(bOut);
+            ASN1OutputStream        aOut = new ASN1OutputStream(bOut);
 
             aOut.writeObject(c.getIssuer());
 
@@ -348,7 +343,7 @@ class X509CertificateObject
         {
             try
             {
-                ASN1Sequence seq = ASN1Sequence.getInstance(bytes);
+                ASN1Sequence    seq = ASN1Sequence.getInstance(bytes);
                 List list = new ArrayList();
 
                 for (int i = 0; i != seq.size(); i++)
@@ -408,7 +403,7 @@ class X509CertificateObject
         if (this.getVersion() == 3)
         {
             Set set = new HashSet();
-            Extensions extensions = c.getTBSCertificate().getExtensions();
+            Extensions  extensions = c.getTBSCertificate().getExtensions();
 
             if (extensions != null)
             {

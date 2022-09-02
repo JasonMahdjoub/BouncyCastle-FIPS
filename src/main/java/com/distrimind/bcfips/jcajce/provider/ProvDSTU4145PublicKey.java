@@ -5,8 +5,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.security.spec.ECPoint;
 
-import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.jcajce.interfaces.DSTU4145PublicKey;
+import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricDSTU4145PublicKey;
 import com.distrimind.bcfips.jcajce.spec.DSTU4145ParameterSpec;
 import com.distrimind.bcfips.jcajce.spec.DSTU4145PublicKeySpec;

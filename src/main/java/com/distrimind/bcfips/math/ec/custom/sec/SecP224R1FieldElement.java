@@ -5,11 +5,11 @@ package com.distrimind.bcfips.math.ec.custom.sec;
 
 import java.math.BigInteger;
 
+import com.distrimind.bcfips.math.ec.ECFieldElement;
 import com.distrimind.bcfips.math.internal.Mod;
 import com.distrimind.bcfips.math.internal.Nat;
 import com.distrimind.bcfips.math.internal.Nat224;
 import com.distrimind.bcfips.util.Arrays;
-import com.distrimind.bcfips.math.ec.ECFieldElement;
 
 class SecP224R1FieldElement extends ECFieldElement.AbstractFp
 {

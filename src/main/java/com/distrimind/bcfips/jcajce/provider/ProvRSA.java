@@ -37,6 +37,12 @@ import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.distrimind.bcfips.asn1.ASN1Encoding;
+import com.distrimind.bcfips.asn1.ASN1Integer;
+import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
+import com.distrimind.bcfips.asn1.ASN1OctetString;
+import com.distrimind.bcfips.asn1.DERNull;
+import com.distrimind.bcfips.asn1.DEROctetString;
 import com.distrimind.bcfips.asn1.cms.GenericHybridParameters;
 import com.distrimind.bcfips.asn1.cms.RsaKemParameters;
 import com.distrimind.bcfips.asn1.iso.ISOIECObjectIdentifiers;
@@ -52,16 +58,6 @@ import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 import com.distrimind.bcfips.asn1.x509.SubjectPublicKeyInfo;
 import com.distrimind.bcfips.asn1.x509.X509ObjectIdentifiers;
 import com.distrimind.bcfips.asn1.x9.X9ObjectIdentifiers;
-import com.distrimind.bcfips.crypto.general.GeneralAlgorithm;
-import com.distrimind.bcfips.crypto.general.RSA;
-import com.distrimind.bcfips.crypto.general.SecureHash;
-import com.distrimind.bcfips.util.Arrays;
-import com.distrimind.bcfips.asn1.ASN1Encoding;
-import com.distrimind.bcfips.asn1.ASN1Integer;
-import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
-import com.distrimind.bcfips.asn1.ASN1OctetString;
-import com.distrimind.bcfips.asn1.DERNull;
-import com.distrimind.bcfips.asn1.DEROctetString;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AsymmetricKeyPairGenerator;
 import com.distrimind.bcfips.crypto.AsymmetricOperatorFactory;
@@ -91,6 +87,9 @@ import com.distrimind.bcfips.crypto.fips.FipsParameters;
 import com.distrimind.bcfips.crypto.fips.FipsRSA;
 import com.distrimind.bcfips.crypto.fips.FipsSHS;
 import com.distrimind.bcfips.crypto.fips.FipsUnapprovedOperationError;
+import com.distrimind.bcfips.crypto.general.GeneralAlgorithm;
+import com.distrimind.bcfips.crypto.general.RSA;
+import com.distrimind.bcfips.crypto.general.SecureHash;
 import com.distrimind.bcfips.jcajce.AgreedKeyWithMacKey;
 import com.distrimind.bcfips.jcajce.KTSKeyWithEncapsulation;
 import com.distrimind.bcfips.jcajce.ZeroizableSecretKey;
@@ -100,6 +99,7 @@ import com.distrimind.bcfips.jcajce.spec.KTSKeySpec;
 import com.distrimind.bcfips.jcajce.spec.KTSParameterSpec;
 import com.distrimind.bcfips.jcajce.spec.KTSWithKEMKWSKeySpec;
 import com.distrimind.bcfips.jcajce.util.MessageDigestUtils;
+import com.distrimind.bcfips.util.Arrays;
 
 class ProvRSA
     extends AsymmetricAlgorithmProvider
@@ -285,7 +285,7 @@ class ProvRSA
                 return new PSSAlgorithmParameters();
             }
         });
-        provider.addAlias("AlgorithmParameters", "PSS", "RSAPSS", "RSA-PSS");
+        provider.addAlias("AlgorithmParameters", "PSS", "RSAPSS", "RSA-PSS", "RSASSA-PSS");
         provider.addAlias("AlgorithmParameters", "PSS", PKCSObjectIdentifiers.id_RSASSA_PSS);
 
         EngineCreator rsaCreator = new EngineCreator()
@@ -634,7 +634,7 @@ class ProvRSA
         });
         provider.addAttributes("Signature.PSS", generalRsaAttributes);
         provider.addAlias("Signature", "PSS", PKCSObjectIdentifiers.id_RSASSA_PSS);
-        provider.addAlias("Signature", "PSS", "RSAPSS", "RSA-PSS");
+        provider.addAlias("Signature", "PSS", "RSAPSS", "RSA-PSS", "RSASSA-PSS");
 
         provider.addAlgorithmImplementation("Signature.NONEWITHRSA", PREFIX + "SignatureSpi$NONEwithRSA", new EngineCreator()
         {

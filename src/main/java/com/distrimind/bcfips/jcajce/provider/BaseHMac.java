@@ -11,11 +11,6 @@ import javax.crypto.interfaces.PBEKey;
 import javax.crypto.spec.PBEParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
-import com.distrimind.bcfips.crypto.fips.FipsMACOperatorFactory;
-import com.distrimind.bcfips.crypto.fips.FipsSHS;
-import com.distrimind.bcfips.crypto.general.GeneralAlgorithm;
-import com.distrimind.bcfips.crypto.general.SecureHash;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AuthenticationParameters;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
@@ -23,6 +18,11 @@ import com.distrimind.bcfips.crypto.MACOperatorFactory;
 import com.distrimind.bcfips.crypto.OutputMACCalculator;
 import com.distrimind.bcfips.crypto.PasswordBasedDeriver;
 import com.distrimind.bcfips.crypto.UpdateOutputStream;
+import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
+import com.distrimind.bcfips.crypto.fips.FipsMACOperatorFactory;
+import com.distrimind.bcfips.crypto.fips.FipsSHS;
+import com.distrimind.bcfips.crypto.general.GeneralAlgorithm;
+import com.distrimind.bcfips.crypto.general.SecureHash;
 import com.distrimind.bcfips.jcajce.PKCS12Key;
 
 class BaseHMac
@@ -38,7 +38,7 @@ class BaseHMac
     private UpdateOutputStream macStream;
 
     protected BaseHMac(
-			FipsAlgorithm algorithm, MacParametersCreator parametersCreator)
+        FipsAlgorithm algorithm, MacParametersCreator parametersCreator)
     {
         this.algorithm = algorithm;
         this.factory = fipsFactory;
@@ -46,7 +46,7 @@ class BaseHMac
     }
 
     protected BaseHMac(
-			GeneralAlgorithm algorithm, MacParametersCreator parametersCreator)
+        GeneralAlgorithm algorithm, MacParametersCreator parametersCreator)
     {
         this.algorithm = algorithm;
         this.factory = getGeneralMACFactory();

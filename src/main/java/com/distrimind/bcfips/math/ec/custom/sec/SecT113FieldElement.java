@@ -5,9 +5,9 @@ package com.distrimind.bcfips.math.ec.custom.sec;
 
 import java.math.BigInteger;
 
+import com.distrimind.bcfips.math.ec.ECFieldElement;
 import com.distrimind.bcfips.math.internal.Nat128;
 import com.distrimind.bcfips.util.Arrays;
-import com.distrimind.bcfips.math.ec.ECFieldElement;
 
 class SecT113FieldElement extends ECFieldElement.AbstractF2m
 {

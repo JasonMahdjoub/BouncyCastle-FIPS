@@ -9,20 +9,20 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.PSSParameterSpec;
 
-import com.distrimind.bcfips.asn1.pkcs.PKCSObjectIdentifiers;
-import com.distrimind.bcfips.asn1.pkcs.RSASSAPSSparams;
-import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
-import com.distrimind.bcfips.asn1.x9.X9ObjectIdentifiers;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1Null;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.DERNull;
+import com.distrimind.bcfips.asn1.pkcs.PKCSObjectIdentifiers;
+import com.distrimind.bcfips.asn1.pkcs.RSASSAPSSparams;
+import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
+import com.distrimind.bcfips.asn1.x9.X9ObjectIdentifiers;
 import com.distrimind.bcfips.jcajce.util.MessageDigestUtils;
 
 class X509SignatureUtil
 {
-    private static final ASN1Null derNull = DERNull.INSTANCE;
+    private static final ASN1Null       derNull = DERNull.INSTANCE;
     
     static void setSignatureParameters(
         Signature signature,
@@ -57,7 +57,7 @@ class X509SignatureUtil
     }
     
     static String getSignatureName(
-        AlgorithmIdentifier sigAlgId)
+        AlgorithmIdentifier sigAlgId) 
     {
         ASN1Encodable params = sigAlgId.getParameters();
         

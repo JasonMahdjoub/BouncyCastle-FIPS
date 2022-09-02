@@ -14,11 +14,6 @@ import javax.crypto.spec.PBEParameterSpec;
 import com.distrimind.bcfips.asn1.bc.BCObjectIdentifiers;
 import com.distrimind.bcfips.asn1.cms.GCMParameters;
 import com.distrimind.bcfips.asn1.nist.NISTObjectIdentifiers;
-import com.distrimind.bcfips.crypto.fips.FipsAES;
-import com.distrimind.bcfips.crypto.fips.FipsParameters;
-import com.distrimind.bcfips.crypto.fips.FipsSHS;
-import com.distrimind.bcfips.crypto.fips.FipsSecureRandom;
-import com.distrimind.bcfips.crypto.general.AES;
 import com.distrimind.bcfips.crypto.AEADOperatorFactory;
 import com.distrimind.bcfips.crypto.AuthenticationParametersWithIV;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
@@ -26,6 +21,11 @@ import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.crypto.ParametersWithIV;
 import com.distrimind.bcfips.crypto.PasswordBasedDeriver;
 import com.distrimind.bcfips.crypto.SymmetricKeyGenerator;
+import com.distrimind.bcfips.crypto.fips.FipsAES;
+import com.distrimind.bcfips.crypto.fips.FipsParameters;
+import com.distrimind.bcfips.crypto.fips.FipsSHS;
+import com.distrimind.bcfips.crypto.fips.FipsSecureRandom;
+import com.distrimind.bcfips.crypto.general.AES;
 import com.distrimind.bcfips.jcajce.spec.WrapParameterSpec;
 
 final class ProvAES

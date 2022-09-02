@@ -4,15 +4,15 @@ import java.io.IOException;
 import java.math.BigInteger;
 
 import com.distrimind.bcfips.crypto.UpdateOutputStream;
+import com.distrimind.bcfips.crypto.internal.DSA;
+import com.distrimind.bcfips.crypto.internal.Digest;
+import com.distrimind.bcfips.crypto.internal.io.DigestOutputStream;
 import com.distrimind.bcfips.asn1.ASN1Encoding;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.crypto.InvalidSignatureException;
 import com.distrimind.bcfips.crypto.Parameters;
-import com.distrimind.bcfips.crypto.internal.DSA;
-import com.distrimind.bcfips.crypto.internal.Digest;
-import com.distrimind.bcfips.crypto.internal.io.DigestOutputStream;
 import com.distrimind.bcfips.util.Arrays;
 
 class DSAOutputVerifier<T extends Parameters>

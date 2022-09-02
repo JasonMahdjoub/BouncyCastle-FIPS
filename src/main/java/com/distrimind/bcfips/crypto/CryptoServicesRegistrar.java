@@ -12,14 +12,14 @@ import java.util.Map;
 import com.distrimind.bcfips.crypto.fips.FipsSecureRandom;
 import com.distrimind.bcfips.crypto.fips.FipsStatus;
 import com.distrimind.bcfips.crypto.fips.FipsUnapprovedOperationError;
+import com.distrimind.bcfips.jcajce.provider.BouncyCastleFipsProvider;
+import com.distrimind.bcfips.util.encoders.Hex;
 import com.distrimind.bcfips.crypto.asymmetric.DHDomainParameters;
 import com.distrimind.bcfips.crypto.asymmetric.DHValidationParameters;
 import com.distrimind.bcfips.crypto.asymmetric.DSADomainParameters;
 import com.distrimind.bcfips.crypto.asymmetric.DSAValidationParameters;
 import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
-import com.distrimind.bcfips.jcajce.provider.BouncyCastleFipsProvider;
 import com.distrimind.bcfips.util.Properties;
-import com.distrimind.bcfips.util.encoders.Hex;
 
 /**
  * Basic registrar class for providing defaults for cryptography services in this module.
@@ -159,8 +159,7 @@ public final class CryptoServicesRegistrar
      */
     public static boolean isInApprovedOnlyMode()
     {
-        return false;
-        /*if (isDefaultModeApprovedMode)
+        if (isDefaultModeApprovedMode)
         {
             return true;
         }
@@ -172,7 +171,7 @@ public final class CryptoServicesRegistrar
             return isDefaultModeApprovedMode;
         }
 
-        return approvedMode.booleanValue();*/
+        return approvedMode.booleanValue();
     }
 
     /**

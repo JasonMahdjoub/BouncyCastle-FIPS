@@ -5,12 +5,12 @@ package com.distrimind.bcfips.math.ec.custom.sec;
 
 import java.math.BigInteger;
 
-import com.distrimind.bcfips.math.internal.Nat256;
-import com.distrimind.bcfips.util.encoders.Hex;
 import com.distrimind.bcfips.math.ec.ECCurve;
 import com.distrimind.bcfips.math.ec.ECFieldElement;
 import com.distrimind.bcfips.math.ec.ECLookupTable;
 import com.distrimind.bcfips.math.ec.ECPoint;
+import com.distrimind.bcfips.math.internal.Nat256;
+import com.distrimind.bcfips.util.encoders.Hex;
 
 public class SecP256R1Curve extends ECCurve.AbstractFp
 {

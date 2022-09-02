@@ -2,6 +2,9 @@ package com.distrimind.bcfips.crypto.general;
 
 import java.security.SecureRandom;
 
+import com.distrimind.bcfips.crypto.internal.AsymmetricBlockCipher;
+import com.distrimind.bcfips.crypto.internal.encodings.OAEPEncoding;
+import com.distrimind.bcfips.crypto.internal.encodings.PKCS1Encoding;
 import com.distrimind.bcfips.crypto.AsymmetricKey;
 import com.distrimind.bcfips.crypto.AsymmetricOperatorFactory;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
@@ -10,9 +13,6 @@ import com.distrimind.bcfips.crypto.PlainInputProcessingException;
 import com.distrimind.bcfips.crypto.SingleBlockEncryptorUsingSecureRandom;
 import com.distrimind.bcfips.crypto.fips.FipsStatus;
 import com.distrimind.bcfips.crypto.fips.FipsUnapprovedOperationError;
-import com.distrimind.bcfips.crypto.internal.AsymmetricBlockCipher;
-import com.distrimind.bcfips.crypto.internal.encodings.OAEPEncoding;
-import com.distrimind.bcfips.crypto.internal.encodings.PKCS1Encoding;
 
 abstract class GuardedAsymmetricOperatorFactory<T extends Parameters>
     implements AsymmetricOperatorFactory<T>

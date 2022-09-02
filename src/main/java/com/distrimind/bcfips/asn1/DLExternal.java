@@ -56,12 +56,6 @@ public class DLExternal
         super(directReference, indirectReference, dataValueDescriptor, encoding, externalData);
     }
 
-    int encodedLength()
-        throws IOException
-    {
-        return this.getEncoded().length;
-    }
-
     /* (non-Javadoc)
      * @see com.distrimind.bcfips.asn1.ASN1Primitive#encode(com.distrimind.bcfips.asn1.DEROutputStream)
      */

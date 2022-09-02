@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.distrimind.bcfips.util.Integers;
 import com.distrimind.bcfips.crypto.internal.Digest;
+import com.distrimind.bcfips.util.Integers;
 
 public class ISOTrailers
 {

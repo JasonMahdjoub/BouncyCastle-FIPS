@@ -3,13 +3,13 @@
 /***************************************************************/
 package com.distrimind.bcfips.math.ec.custom.sec;
 
-import com.distrimind.bcfips.math.internal.Nat;
-import com.distrimind.bcfips.math.internal.Nat576;
 import com.distrimind.bcfips.math.ec.ECConstants;
 import com.distrimind.bcfips.math.ec.ECCurve;
 import com.distrimind.bcfips.math.ec.ECFieldElement;
 import com.distrimind.bcfips.math.ec.ECPoint;
 import com.distrimind.bcfips.math.ec.ECPoint.AbstractF2m;
+import com.distrimind.bcfips.math.internal.Nat;
+import com.distrimind.bcfips.math.internal.Nat576;
 
 class SecT571R1Point extends AbstractF2m
 {

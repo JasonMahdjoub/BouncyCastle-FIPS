@@ -9,7 +9,6 @@ import com.distrimind.bcfips.math.ec.ECAlgorithms;
 import com.distrimind.bcfips.math.ec.ECCurve;
 import com.distrimind.bcfips.math.ec.ECPoint;
 import com.distrimind.bcfips.math.field.PolynomialExtensionField;
-import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1Object;
@@ -17,6 +16,7 @@ import com.distrimind.bcfips.asn1.ASN1OctetString;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.DERSequence;
+import com.distrimind.bcfips.util.Arrays;
 
 /**
  * ASN.1 def for Elliptic-Curve ECParameters structure. See

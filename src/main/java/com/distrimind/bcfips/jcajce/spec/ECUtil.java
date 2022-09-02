@@ -15,14 +15,14 @@ import java.util.Set;
 
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.x9.ECNamedCurveTable;
+import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
+import com.distrimind.bcfips.crypto.asymmetric.ECDomainParametersIndex;
 import com.distrimind.bcfips.math.ec.ECAlgorithms;
 import com.distrimind.bcfips.math.ec.ECCurve;
 import com.distrimind.bcfips.math.field.FiniteField;
 import com.distrimind.bcfips.math.field.Polynomial;
 import com.distrimind.bcfips.math.field.PolynomialExtensionField;
 import com.distrimind.bcfips.util.Arrays;
-import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
-import com.distrimind.bcfips.crypto.asymmetric.ECDomainParametersIndex;
 
 class ECUtil
 {

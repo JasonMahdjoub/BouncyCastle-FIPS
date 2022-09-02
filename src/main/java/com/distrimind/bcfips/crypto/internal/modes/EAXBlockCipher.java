@@ -5,7 +5,6 @@ package com.distrimind.bcfips.crypto.internal.modes;
 
 import com.distrimind.bcfips.crypto.internal.params.AEADParameters;
 import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
-import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.DataLengthException;
@@ -13,6 +12,7 @@ import com.distrimind.bcfips.crypto.internal.InvalidCipherTextException;
 import com.distrimind.bcfips.crypto.internal.Mac;
 import com.distrimind.bcfips.crypto.internal.OutputLengthException;
 import com.distrimind.bcfips.crypto.internal.macs.CMac;
+import com.distrimind.bcfips.util.Arrays;
 
 /**
  * A Two-Pass Authenticated-Encryption Scheme Optimized for Simplicity and

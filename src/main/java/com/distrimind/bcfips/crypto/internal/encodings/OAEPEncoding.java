@@ -2,13 +2,13 @@ package com.distrimind.bcfips.crypto.internal.encodings;
 
 import java.security.SecureRandom;
 
-import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.crypto.internal.AsymmetricBlockCipher;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.DataLengthException;
 import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.internal.InvalidCipherTextException;
 import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
+import com.distrimind.bcfips.util.Arrays;
 
 /**
  * Optimal Asymmetric Encryption Padding (OAEP) - see PKCS 1 V 2.

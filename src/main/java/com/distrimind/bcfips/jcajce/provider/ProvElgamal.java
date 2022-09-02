@@ -31,12 +31,12 @@ import com.distrimind.bcfips.asn1.x509.SubjectPublicKeyInfo;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.DigestAlgorithm;
 import com.distrimind.bcfips.crypto.Parameters;
-import com.distrimind.bcfips.crypto.fips.FipsDH;
-import com.distrimind.bcfips.crypto.general.ElGamal;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricDHPrivateKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricDHPublicKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricKeyPair;
 import com.distrimind.bcfips.crypto.asymmetric.DHDomainParameters;
+import com.distrimind.bcfips.crypto.fips.FipsDH;
+import com.distrimind.bcfips.crypto.general.ElGamal;
 import com.distrimind.bcfips.jcajce.spec.DHDomainParameterSpec;
 
 /**

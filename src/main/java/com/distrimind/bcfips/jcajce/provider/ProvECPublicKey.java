@@ -9,9 +9,9 @@ import java.security.spec.ECPoint;
 import java.security.spec.ECPublicKeySpec;
 
 import com.distrimind.bcfips.crypto.Algorithm;
-import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricECPublicKey;
 import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
+import com.distrimind.bcfips.util.Arrays;
 
 class ProvECPublicKey
     implements ECPublicKey, ProvKey<AsymmetricECPublicKey>

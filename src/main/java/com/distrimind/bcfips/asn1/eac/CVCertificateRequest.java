@@ -6,7 +6,6 @@ package com.distrimind.bcfips.asn1.eac;
 import java.io.IOException;
 import java.util.Enumeration;
 
-import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.asn1.ASN1ApplicationSpecific;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Object;
@@ -16,6 +15,7 @@ import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.BERTags;
 import com.distrimind.bcfips.asn1.DERApplicationSpecific;
 import com.distrimind.bcfips.asn1.DEROctetString;
+import com.distrimind.bcfips.util.Arrays;
 
 public class CVCertificateRequest
     extends ASN1Object

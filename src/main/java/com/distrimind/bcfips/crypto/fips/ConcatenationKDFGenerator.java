@@ -12,7 +12,7 @@ import com.distrimind.bcfips.crypto.internal.params.KDFParameters;
 class ConcatenationKDFGenerator
     implements DerivationFunction
 {
-    private Digest  digest;
+    private Digest digest;
     private byte[]  shared;
     private byte[]  otherInfo;
     private int     hLen;
@@ -28,7 +28,7 @@ class ConcatenationKDFGenerator
     }
 
     public void init(
-        DerivationParameters    param)
+        DerivationParameters param)
     {
         if (param instanceof KDFParameters)
         {

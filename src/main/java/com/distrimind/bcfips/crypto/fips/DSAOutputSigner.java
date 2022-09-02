@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
+import com.distrimind.bcfips.crypto.internal.DSA;
+import com.distrimind.bcfips.crypto.internal.Digest;
+import com.distrimind.bcfips.crypto.internal.io.DigestOutputStream;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Encoding;
 import com.distrimind.bcfips.asn1.ASN1Integer;
@@ -12,9 +15,6 @@ import com.distrimind.bcfips.crypto.OperatorNotReadyException;
 import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.crypto.PlainInputProcessingException;
 import com.distrimind.bcfips.crypto.UpdateOutputStream;
-import com.distrimind.bcfips.crypto.internal.DSA;
-import com.distrimind.bcfips.crypto.internal.Digest;
-import com.distrimind.bcfips.crypto.internal.io.DigestOutputStream;
 
 class DSAOutputSigner<T extends Parameters>
     extends FipsOutputSignerUsingSecureRandom<T>

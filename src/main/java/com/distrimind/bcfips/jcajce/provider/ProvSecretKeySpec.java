@@ -11,8 +11,8 @@ import javax.security.auth.Destroyable;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.SymmetricKey;
 import com.distrimind.bcfips.crypto.SymmetricSecretKey;
-import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.crypto.internal.ValidatedSymmetricKey;
+import com.distrimind.bcfips.util.Arrays;
 
 final class ProvSecretKeySpec
     extends SecretKeySpec

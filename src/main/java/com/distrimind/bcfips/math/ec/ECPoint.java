@@ -8,6 +8,11 @@ import java.security.SecureRandom;
 import java.util.Map;
 
 import com.distrimind.bcfips.crypto.fips.FipsDRBG;
+import com.distrimind.bcfips.crypto.fips.FipsStatus;
+import com.distrimind.bcfips.util.encoders.Hex;
+import com.distrimind.bcfips.crypto.EntropySource;
+import com.distrimind.bcfips.crypto.EntropySourceProvider;
+import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Pack;
 import com.distrimind.bcfips.util.Strings;
 
@@ -24,12 +29,61 @@ public abstract class ECPoint
     {
         if (testRandom == null)
         {
-            // SP 800-89 requires use of an approved DRBG.
-            testRandom = FipsDRBG.SHA256.fromEntropySource(new SecureRandom(), false).build(
-                Pack.longToBigEndian(System.currentTimeMillis()), false,
-                Strings.toByteArray(ECPoint.class.getName()));
+            if (FipsStatus.isReady())
+            {
+                // SP 800-89 requires use of an approved DRBG.
+                testRandom = FipsDRBG.SHA256.fromEntropySource(new SecureRandom(), false).build(
+                    Pack.longToBigEndian(System.currentTimeMillis()), false,
+                    Strings.toByteArray(ECPoint.class.getName()));
+            }
+            else
+            {
+                // if we're still coming up don't invoke new SecureRandom as it will cause JCA provider search.
+                return FipsDRBG.SHA256.fromEntropySource(new KATEntropyProvider()).build(
+                    null, false,
+                    Strings.toByteArray("KAT Random Provider"));
+            }
         }
         return testRandom;
+    }
+
+    private static class KATEntropyProvider
+        implements EntropySourceProvider
+    {
+        static final byte[] data = Hex.decode(
+                                      "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F30313233343536"
+                                    + "808182838485868788898A8B8C8D8E8F909192939495969798999A9B9C9D9E9FA0A1A2A3A4A5A6A7A8A9AAABACADAEAFB0B1B2B3B4B5B6"
+                                    + "C0C1C2C3C4C5C6C7C8C9CACBCCCDCECFD0D1D2D3D4D5D6D7D8D9DADBDCDDDEDFE0E1E2E3E4E5E6E7E8E9EAEBECEDEEEFF0F1F2F3F4F5F6");
+        KATEntropyProvider()
+        {
+        }
+
+        public EntropySource get(final int bitsRequired)
+        {
+            return new EntropySource()
+            {
+                private int index = 0;
+
+                public boolean isPredictionResistant()
+                {
+                    return false;
+                }
+
+                public byte[] getEntropy()
+                {
+                    int i = Pack.bigEndianToInt(data, 0);
+                    System.arraycopy(data, 4, data, 0, data.length - 4);
+                    Pack.intToLittleEndian(i, data, data.length - 4);
+                    
+                    return Arrays.copyOf(data, (bitsRequired + 7) / 8);
+                }
+
+                public int entropySize()
+                {
+                    return bitsRequired;
+                }
+            };
+        }
     }
 
     protected final static ECFieldElement[] EMPTY_ZS = new ECFieldElement[0];

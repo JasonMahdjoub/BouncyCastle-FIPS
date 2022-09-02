@@ -5,7 +5,10 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.SecureRandom;
 
+import com.distrimind.bcfips.crypto.internal.AsymmetricCipherKeyPair;
 import com.distrimind.bcfips.crypto.internal.DSA;
+import com.distrimind.bcfips.crypto.internal.Digest;
+import com.distrimind.bcfips.crypto.internal.test.ConsistencyTest;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AsymmetricPrivateKey;
 import com.distrimind.bcfips.crypto.AsymmetricPublicKey;
@@ -18,14 +21,11 @@ import com.distrimind.bcfips.crypto.asymmetric.AsymmetricKeyPair;
 import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
 import com.distrimind.bcfips.crypto.asymmetric.GOST3410Parameters;
 import com.distrimind.bcfips.crypto.asymmetric.NamedECDomainParameters;
-import com.distrimind.bcfips.crypto.internal.AsymmetricCipherKeyPair;
-import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.internal.params.EcDomainParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcNamedDomainParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcPrivateKeyParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcPublicKeyParameters;
 import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
-import com.distrimind.bcfips.crypto.internal.test.ConsistencyTest;
 import com.distrimind.bcfips.util.encoders.Hex;
 
 /**

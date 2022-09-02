@@ -13,11 +13,9 @@ import javax.crypto.spec.DESedeKeySpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEParameterSpec;
 
+import com.distrimind.bcfips.crypto.internal.params.DesParameters;
 import com.distrimind.bcfips.asn1.oiw.OIWObjectIdentifiers;
 import com.distrimind.bcfips.asn1.pkcs.PKCSObjectIdentifiers;
-import com.distrimind.bcfips.crypto.fips.FipsParameters;
-import com.distrimind.bcfips.crypto.fips.FipsTripleDES;
-import com.distrimind.bcfips.crypto.general.TripleDES;
 import com.distrimind.bcfips.crypto.AuthenticationParameters;
 import com.distrimind.bcfips.crypto.AuthenticationParametersWithIV;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
@@ -25,8 +23,10 @@ import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.crypto.ParametersWithIV;
 import com.distrimind.bcfips.crypto.PasswordBasedDeriver;
 import com.distrimind.bcfips.crypto.SymmetricKeyGenerator;
+import com.distrimind.bcfips.crypto.fips.FipsParameters;
+import com.distrimind.bcfips.crypto.fips.FipsTripleDES;
+import com.distrimind.bcfips.crypto.general.TripleDES;
 import com.distrimind.bcfips.crypto.internal.ValidatedSymmetricKey;
-import com.distrimind.bcfips.crypto.internal.params.DesParameters;
 import com.distrimind.bcfips.jcajce.spec.WrapParameterSpec;
 
 final class ProvDESede

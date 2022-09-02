@@ -3,7 +3,6 @@ package com.distrimind.bcfips.crypto.general;
 import java.security.SecureRandom;
 
 import com.distrimind.bcfips.crypto.*;
-import com.distrimind.bcfips.crypto.IllegalKeyException;
 import com.distrimind.bcfips.crypto.internal.KeyGenerationParameters;
 import com.distrimind.bcfips.crypto.internal.Mac;
 import com.distrimind.bcfips.crypto.internal.ValidatedSymmetricKey;

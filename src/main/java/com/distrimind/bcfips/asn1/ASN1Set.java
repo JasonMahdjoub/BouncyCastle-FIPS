@@ -127,7 +127,7 @@ public abstract class ASN1Set
         {
             try
             {
-                return ASN1Set.getInstance(fromByteArray((byte[])obj));
+                return ASN1Set.getInstance(ASN1Primitive.fromByteArray((byte[])obj));
             }
             catch (IOException e)
             {

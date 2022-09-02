@@ -5,6 +5,8 @@ package com.distrimind.bcfips.crypto.fips;
 
 import java.security.SecureRandom;
 
+import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
+import com.distrimind.bcfips.crypto.internal.params.RsaKeyParameters;
 import com.distrimind.bcfips.crypto.InvalidSignatureException;
 import com.distrimind.bcfips.crypto.internal.AsymmetricBlockCipher;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
@@ -12,8 +14,6 @@ import com.distrimind.bcfips.crypto.internal.CryptoException;
 import com.distrimind.bcfips.crypto.internal.DataLengthException;
 import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.internal.Signer;
-import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
-import com.distrimind.bcfips.crypto.internal.params.RsaKeyParameters;
 
 /**
  * RSA-PSS as described in PKCS# 1 v 2.1.
@@ -26,9 +26,9 @@ class PSSSigner
 {
     static final public byte   TRAILER_IMPLICIT    = (byte)0xBC;
 
-    private Digest                      contentDigest;
+    private Digest contentDigest;
     private Digest                      mgfDigest;
-    private AsymmetricBlockCipher       cipher;
+    private AsymmetricBlockCipher cipher;
     private SecureRandom                random;
 
     private int                         hLen;
@@ -81,7 +81,7 @@ class PSSSigner
 
     public void init(
         boolean                 forSigning,
-        CipherParameters        param)
+        CipherParameters param)
     {
         CipherParameters  params;
 

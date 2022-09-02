@@ -3,6 +3,7 @@ package com.distrimind.bcfips.crypto.fips;
 import java.security.SecureRandom;
 
 import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
+import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.BufferedBlockCipher;
@@ -23,7 +24,6 @@ import com.distrimind.bcfips.crypto.internal.paddings.PKCS7Padding;
 import com.distrimind.bcfips.crypto.internal.paddings.PaddedBufferedBlockCipher;
 import com.distrimind.bcfips.crypto.internal.paddings.TBCPadding;
 import com.distrimind.bcfips.crypto.internal.paddings.X923Padding;
-import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
 import com.distrimind.bcfips.util.Pack;
 import com.distrimind.bcfips.util.Strings;
 

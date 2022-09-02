@@ -3,10 +3,10 @@ package com.distrimind.bcfips.crypto.util;
 import java.security.SecureRandom;
 
 import com.distrimind.bcfips.crypto.general.GeneralSecureRandom;
+import com.distrimind.bcfips.jcajce.provider.BouncyCastleFipsProvider;
 import com.distrimind.bcfips.crypto.EntropySource;
 import com.distrimind.bcfips.crypto.EntropySourceProvider;
 import com.distrimind.bcfips.crypto.fips.FipsSecureRandom;
-import com.distrimind.bcfips.jcajce.provider.BouncyCastleFipsProvider;
 
 /**
  * An EntropySourceProvider where entropy generation is based on a SecureRandom output using SecureRandom.generateSeed() in

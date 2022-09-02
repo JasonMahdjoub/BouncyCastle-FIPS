@@ -1,6 +1,5 @@
 package com.distrimind.bcfips.jcajce.provider;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.AlgorithmParameters;
@@ -31,7 +30,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 import com.distrimind.bcfips.asn1.DEROctetString;
 import com.distrimind.bcfips.asn1.cms.GCMParameters;
-import com.distrimind.bcfips.util.Strings;
 import com.distrimind.bcfips.crypto.AEADOperatorFactory;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AuthenticationParametersWithIV;
@@ -60,6 +58,7 @@ import com.distrimind.bcfips.jcajce.PBKDF2Key;
 import com.distrimind.bcfips.jcajce.PBKDFKey;
 import com.distrimind.bcfips.jcajce.PKCS12Key;
 import com.distrimind.bcfips.jcajce.spec.AEADParameterSpec;
+import com.distrimind.bcfips.util.Strings;
 
 class BaseCipher
     extends CipherSpi
@@ -203,7 +202,7 @@ class BaseCipher
 
     private UpdateOutputStream aadStream;
     private UpdateOutputStream processingStream;
-    private ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
+    private DataArrayOutputStream resultStream = new DataArrayOutputStream();
     private byte[] associatedData = null;
 
     private BaseCipher(BouncyCastleFipsProvider fipsProvider, int blockSizeInBits, int keySizeInBits, DigestAlgorithm prf, PBEScheme scheme,
@@ -941,7 +940,7 @@ class BaseCipher
 
         byte[] result = resultStream.toByteArray();
 
-        Utils.clearAndResetByteArrayOutputStream(resultStream);
+        resultStream.clearAndReset();
 
         if (associatedData != null)
         {

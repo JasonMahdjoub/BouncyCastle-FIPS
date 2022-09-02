@@ -5,9 +5,9 @@ package com.distrimind.bcfips.crypto.fips;
 
 import java.util.Hashtable;
 
-import com.distrimind.bcfips.crypto.EntropySource;
 import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.internal.Mac;
+import com.distrimind.bcfips.crypto.EntropySource;
 import com.distrimind.bcfips.util.Integers;
 import com.distrimind.bcfips.util.encoders.Hex;
 

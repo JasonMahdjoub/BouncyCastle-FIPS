@@ -27,11 +27,6 @@ import com.distrimind.bcfips.asn1.nist.NISTObjectIdentifiers;
 import com.distrimind.bcfips.asn1.ntt.NTTObjectIdentifiers;
 import com.distrimind.bcfips.asn1.oiw.OIWObjectIdentifiers;
 import com.distrimind.bcfips.asn1.pkcs.PKCSObjectIdentifiers;
-import com.distrimind.bcfips.crypto.fips.FipsDH;
-import com.distrimind.bcfips.crypto.fips.FipsKDF;
-import com.distrimind.bcfips.crypto.fips.FipsUnapprovedOperationError;
-import com.distrimind.bcfips.util.Arrays;
-import com.distrimind.bcfips.util.Strings;
 import com.distrimind.bcfips.crypto.Agreement;
 import com.distrimind.bcfips.crypto.AgreementFactory;
 import com.distrimind.bcfips.crypto.Algorithm;
@@ -43,10 +38,15 @@ import com.distrimind.bcfips.crypto.KDFOperatorFactory;
 import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricDHKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricDHPublicKey;
+import com.distrimind.bcfips.crypto.fips.FipsDH;
+import com.distrimind.bcfips.crypto.fips.FipsKDF;
+import com.distrimind.bcfips.crypto.fips.FipsUnapprovedOperationError;
 import com.distrimind.bcfips.jcajce.AgreedKeyWithMacKey;
 import com.distrimind.bcfips.jcajce.spec.DHUParameterSpec;
 import com.distrimind.bcfips.jcajce.spec.MQVParameterSpec;
 import com.distrimind.bcfips.jcajce.spec.UserKeyingMaterialSpec;
+import com.distrimind.bcfips.util.Arrays;
+import com.distrimind.bcfips.util.Strings;
 
 /**
  * Diffie-Hellman key agreement using elliptic curve keys, ala IEEE P1363

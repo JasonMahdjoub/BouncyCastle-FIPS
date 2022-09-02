@@ -44,7 +44,7 @@ public abstract class ASN1ApplicationSpecific
         {
             try
             {
-                return ASN1ApplicationSpecific.getInstance(ASN1Primitive.fromByteArray((byte[])obj));
+                return ASN1ApplicationSpecific.getInstance(fromByteArray((byte[])obj));
             }
             catch (IOException e)
             {
@@ -119,7 +119,7 @@ public abstract class ASN1ApplicationSpecific
     public ASN1Primitive getObject()
         throws IOException 
     {
-        return ASN1Primitive.fromByteArray(getContents());
+        return fromByteArray(getContents());
     }
 
     /**
@@ -145,7 +145,7 @@ public abstract class ASN1ApplicationSpecific
             tmp[0] |= BERTags.CONSTRUCTED;
         }
 
-        return ASN1Primitive.fromByteArray(tmp);
+        return fromByteArray(tmp);
     }
 
     int encodedLength()

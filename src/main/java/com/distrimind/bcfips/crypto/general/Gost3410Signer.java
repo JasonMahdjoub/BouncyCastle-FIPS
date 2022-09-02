@@ -22,7 +22,7 @@ class Gost3410Signer
 
         public void init(
             boolean                 forSigning,
-            CipherParameters        param)
+            CipherParameters param)
         {
             if (forSigning)
             {

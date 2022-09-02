@@ -10,9 +10,9 @@ import java.security.cert.X509CRLSelector;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 
+import com.distrimind.bcfips.asn1.x509.Extension;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1OctetString;
-import com.distrimind.bcfips.asn1.x509.Extension;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Selector;
 

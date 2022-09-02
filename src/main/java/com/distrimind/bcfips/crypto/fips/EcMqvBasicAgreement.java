@@ -5,9 +5,9 @@ package com.distrimind.bcfips.crypto.fips;
 
 import java.math.BigInteger;
 
-import com.distrimind.bcfips.crypto.IllegalKeyException;
 import com.distrimind.bcfips.crypto.internal.BasicAgreement;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
+import com.distrimind.bcfips.crypto.IllegalKeyException;
 import com.distrimind.bcfips.crypto.internal.params.EcDomainParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcMqvPrivateParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcMqvPublicParameters;
@@ -63,7 +63,7 @@ class EcMqvBasicAgreement
         EcDomainParameters      parameters,
         EcPrivateKeyParameters  d1U,
         EcPrivateKeyParameters  d2U,
-        EcPublicKeyParameters   Q2U,
+        EcPublicKeyParameters Q2U,
         EcPublicKeyParameters   Q1V,
         EcPublicKeyParameters   Q2V)
     {

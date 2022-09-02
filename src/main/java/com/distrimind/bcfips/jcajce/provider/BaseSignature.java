@@ -14,10 +14,8 @@ import java.security.spec.PSSParameterSpec;
 
 import com.distrimind.bcfips.asn1.pkcs.PKCSObjectIdentifiers;
 import com.distrimind.bcfips.asn1.x509.X509ObjectIdentifiers;
-import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
-import com.distrimind.bcfips.crypto.fips.FipsDigestAlgorithm;
-import com.distrimind.bcfips.crypto.fips.FipsRSA;
 import com.distrimind.bcfips.crypto.Algorithm;
+import com.distrimind.bcfips.crypto.AsymmetricKey;
 import com.distrimind.bcfips.crypto.AsymmetricPrivateKey;
 import com.distrimind.bcfips.crypto.AsymmetricPublicKey;
 import com.distrimind.bcfips.crypto.OutputSigner;
@@ -25,6 +23,9 @@ import com.distrimind.bcfips.crypto.OutputVerifier;
 import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.crypto.SignatureOperatorFactory;
 import com.distrimind.bcfips.crypto.UpdateOutputStream;
+import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
+import com.distrimind.bcfips.crypto.fips.FipsDigestAlgorithm;
+import com.distrimind.bcfips.crypto.fips.FipsRSA;
 
 class BaseSignature
     extends SignatureSpi
@@ -38,13 +39,15 @@ class BaseSignature
     private final BouncyCastleFipsProvider fipsProvider;
     private final AlgorithmParameterSpec originalSpec;
 
-    protected Parameters parameters;
+    protected Parameters     parameters;
     protected OutputVerifier verifier;
-    protected OutputSigner signer;
+    protected OutputSigner   signer;
     protected UpdateOutputStream dataStream;
 
     protected AlgorithmParameters engineParams;
     protected AlgorithmParameterSpec paramSpec;
+
+    protected AsymmetricKey key;
 
     protected BaseSignature(
         BouncyCastleFipsProvider fipsProvider,
@@ -81,9 +84,9 @@ class BaseSignature
     protected void engineInitVerify(PublicKey publicKey)
         throws InvalidKeyException
     {
-        AsymmetricPublicKey key = publicKeyConverter.convertKey(parameters.getAlgorithm(), publicKey);
+        key = publicKeyConverter.convertKey(parameters.getAlgorithm(), publicKey);
 
-        verifier = operatorFactory.createVerifier(key, parameters);
+        verifier = operatorFactory.createVerifier((AsymmetricPublicKey)key, parameters);
         dataStream = verifier.getVerifyingStream();
     }
 
@@ -91,11 +94,11 @@ class BaseSignature
         PrivateKey privateKey)
         throws InvalidKeyException
     {
-        AsymmetricPrivateKey key = privateKeyConverter.convertKey(parameters.getAlgorithm(), privateKey);
+        key = privateKeyConverter.convertKey(parameters.getAlgorithm(), privateKey);
 
         try
         {
-            signer = Utils.addRandomIfNeeded(operatorFactory.createSigner(key, parameters), fipsProvider.getDefaultSecureRandom());
+            signer = Utils.addRandomIfNeeded(operatorFactory.createSigner((AsymmetricPrivateKey)key, parameters), fipsProvider.getDefaultSecureRandom());
             dataStream = signer.getSigningStream();
         }
         catch (Exception e)
@@ -109,9 +112,9 @@ class BaseSignature
         SecureRandom random)
         throws InvalidKeyException
     {
-        AsymmetricPrivateKey key = privateKeyConverter.convertKey(parameters.getAlgorithm(), privateKey);
+        key = privateKeyConverter.convertKey(parameters.getAlgorithm(), privateKey);
               // TODO: should change addRandomIfNeeded in 1.1 (maybe? - it's correct in this case but is it always?
-        signer = Utils.addRandomIfNeeded(operatorFactory.createSigner(key, parameters), random != null ? random : fipsProvider.getDefaultSecureRandom());
+        signer = Utils.addRandomIfNeeded(operatorFactory.createSigner((AsymmetricPrivateKey)key, parameters), random != null ? random : fipsProvider.getDefaultSecureRandom());
         dataStream = signer.getSigningStream();
     }
 
@@ -181,7 +184,7 @@ class BaseSignature
             {
                 PSSParameterSpec origPssSpec = (PSSParameterSpec)originalSpec;
 
-                if (!DigestUtil.isSameDigest(origPssSpec.getDigestAlgorithm(), newParamSpec.getDigestAlgorithm()))
+                if (originalSpec != PSSParameterSpec.DEFAULT && !DigestUtil.isSameDigest(origPssSpec.getDigestAlgorithm(), newParamSpec.getDigestAlgorithm()))
                 {
                     throw new InvalidAlgorithmParameterException("Parameter must be using " + origPssSpec.getDigestAlgorithm());
                 }
@@ -219,6 +222,19 @@ class BaseSignature
                 throw new InvalidAlgorithmParameterException("Digest algorithm not supported: "+ mgfParams.getDigestAlgorithm());
             }
             this.paramSpec = newParamSpec;
+            if (dataStream != null)
+            {
+                if (key instanceof AsymmetricPrivateKey)
+                {
+                    signer = Utils.addRandomIfNeeded(operatorFactory.createSigner((AsymmetricPrivateKey)key, parameters), fipsProvider.getDefaultSecureRandom());
+                    dataStream = signer.getSigningStream();
+                }
+                else
+                {
+                    verifier = operatorFactory.createVerifier((AsymmetricPublicKey)key, parameters);
+                    dataStream = verifier.getVerifyingStream();
+                }
+            }
         }
         else
         {

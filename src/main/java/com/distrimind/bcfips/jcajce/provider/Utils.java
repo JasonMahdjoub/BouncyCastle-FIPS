@@ -1,6 +1,5 @@
 package com.distrimind.bcfips.jcajce.provider;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.AccessController;
 import java.security.InvalidKeyException;
@@ -21,14 +20,14 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.DERNull;
-import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
-import com.distrimind.bcfips.crypto.fips.FipsSHS;
-import com.distrimind.bcfips.crypto.general.SecureHash;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.DigestAlgorithm;
 import com.distrimind.bcfips.crypto.OperatorUsingSecureRandom;
 import com.distrimind.bcfips.crypto.SymmetricKey;
 import com.distrimind.bcfips.crypto.SymmetricSecretKey;
+import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
+import com.distrimind.bcfips.crypto.fips.FipsSHS;
+import com.distrimind.bcfips.crypto.general.SecureHash;
 
 class Utils
 {
@@ -137,20 +136,6 @@ class Utils
         }
 
         return activeSet;
-    }
-
-    static void clearAndResetByteArrayOutputStream(ByteArrayOutputStream bOut)
-    {
-        int size = bOut.size();
-
-        bOut.reset();
-
-        for (int i = 0; i != size; i++)
-        {
-            bOut.write(0);
-        }
-
-        bOut.reset();
     }
 
     static SymmetricKey convertKey(Algorithm algorithm, Key secretKey)

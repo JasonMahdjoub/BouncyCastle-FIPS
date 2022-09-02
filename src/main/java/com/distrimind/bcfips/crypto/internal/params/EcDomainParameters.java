@@ -12,9 +12,9 @@ import com.distrimind.bcfips.util.Arrays;
 public class EcDomainParameters
     implements ECConstants
 {
-    private final ECCurve curve;
+    private final ECCurve     curve;
     private final byte[]      seed;
-    private final ECPoint G;
+    private final ECPoint     G;
     private final BigInteger  n;
     private final BigInteger  h;
     private final BigInteger  hInv;

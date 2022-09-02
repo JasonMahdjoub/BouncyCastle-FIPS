@@ -17,6 +17,8 @@ public abstract class ASN1External
     protected int encoding;
     protected ASN1Primitive externalContent;
 
+    protected int encodedLen = -1;
+
     /**
      * Construct an EXTERNAL object, the input encoding vector must have exactly two elements on it.
      * <p>
@@ -148,7 +150,12 @@ public abstract class ASN1External
     int encodedLength()
         throws IOException
     {
-        return this.getEncoded().length;
+        if (encodedLen < 0)
+        {
+            encodedLen = this.getEncoded().length;
+        }
+
+        return encodedLen;
     }
 
     /* (non-Javadoc)

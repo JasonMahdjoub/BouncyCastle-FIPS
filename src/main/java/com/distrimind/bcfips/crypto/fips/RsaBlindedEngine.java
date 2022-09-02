@@ -34,7 +34,7 @@ class RsaBlindedEngine
      */
     public void init(
         boolean             forEncryption,
-        CipherParameters    param)
+        CipherParameters param)
     {
         core.init(forEncryption, param);
 

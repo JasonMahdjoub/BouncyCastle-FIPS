@@ -2,8 +2,8 @@ package com.distrimind.bcfips.crypto.general;
 
 import java.security.SecureRandom;
 
-import com.distrimind.bcfips.crypto.fips.FipsSecureRandom;
 import com.distrimind.bcfips.crypto.internal.KeyGenerationParameters;
+import com.distrimind.bcfips.crypto.fips.FipsSecureRandom;
 
 /**
  * The base class for symmetric, or secret, cipher key generators.

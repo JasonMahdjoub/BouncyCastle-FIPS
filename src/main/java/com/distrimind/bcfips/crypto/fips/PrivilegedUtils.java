@@ -4,8 +4,8 @@ import java.security.AccessController;
 import java.security.Permission;
 import java.security.PrivilegedAction;
 
-import com.distrimind.bcfips.crypto.SymmetricKey;
 import com.distrimind.bcfips.crypto.internal.ValidatedSymmetricKey;
+import com.distrimind.bcfips.crypto.SymmetricKey;
 
 class PrivilegedUtils
 {

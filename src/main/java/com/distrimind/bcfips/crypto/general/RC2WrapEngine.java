@@ -2,7 +2,6 @@ package com.distrimind.bcfips.crypto.general;
 
 import java.security.SecureRandom;
 
-import com.distrimind.bcfips.crypto.fips.FipsSHS;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.internal.InvalidCipherTextException;
@@ -10,6 +9,7 @@ import com.distrimind.bcfips.crypto.internal.Wrapper;
 import com.distrimind.bcfips.crypto.internal.modes.CBCBlockCipher;
 import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
 import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
+import com.distrimind.bcfips.crypto.fips.FipsSHS;
 import com.distrimind.bcfips.util.Arrays;
 
 /**

@@ -8,12 +8,12 @@ import java.security.spec.InvalidKeySpecException;
 import javax.crypto.spec.IvParameterSpec;
 
 import com.distrimind.bcfips.asn1.kisa.KISAObjectIdentifiers;
-import com.distrimind.bcfips.crypto.general.SEED;
 import com.distrimind.bcfips.crypto.AuthenticationParametersWithIV;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.crypto.ParametersWithIV;
 import com.distrimind.bcfips.crypto.SymmetricKeyGenerator;
+import com.distrimind.bcfips.crypto.general.SEED;
 import com.distrimind.bcfips.jcajce.spec.WrapParameterSpec;
 
 class ProvSEED

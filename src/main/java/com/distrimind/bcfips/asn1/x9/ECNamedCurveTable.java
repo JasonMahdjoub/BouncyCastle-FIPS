@@ -11,8 +11,8 @@ import com.distrimind.bcfips.asn1.cryptopro.ECGOST3410NamedCurves;
 import com.distrimind.bcfips.asn1.nist.NISTNamedCurves;
 import com.distrimind.bcfips.asn1.sec.SECNamedCurves;
 import com.distrimind.bcfips.asn1.teletrust.TeleTrusTNamedCurves;
-import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
+import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 
 /**
  * A general class that reads all X9.62 style EC curve tables.

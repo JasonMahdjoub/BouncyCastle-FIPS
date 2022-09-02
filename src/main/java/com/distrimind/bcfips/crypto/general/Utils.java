@@ -2,13 +2,13 @@ package com.distrimind.bcfips.crypto.general;
 
 import java.security.SecureRandom;
 
+import com.distrimind.bcfips.crypto.internal.ValidatedSymmetricKey;
+import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
+import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.IllegalKeyException;
 import com.distrimind.bcfips.crypto.fips.FipsUnapprovedOperationError;
-import com.distrimind.bcfips.crypto.internal.ValidatedSymmetricKey;
-import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
-import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
 
 class Utils
 {

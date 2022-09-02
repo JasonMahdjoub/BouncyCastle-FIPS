@@ -4,18 +4,18 @@ import java.math.BigInteger;
 
 import javax.security.auth.Destroyable;
 
-import com.distrimind.bcfips.math.ec.ECCurve;
-import com.distrimind.bcfips.math.ec.ECPoint;
-import com.distrimind.bcfips.util.Arrays;
-import com.distrimind.bcfips.util.Fingerprint;
-import com.distrimind.bcfips.util.Strings;
-import com.distrimind.bcfips.util.encoders.Hex;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricEdDSAPublicKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricXDHPublicKey;
 import com.distrimind.bcfips.crypto.asymmetric.DHDomainParameters;
 import com.distrimind.bcfips.crypto.asymmetric.DSADomainParameters;
 import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
 import com.distrimind.bcfips.crypto.asymmetric.GOST3410DomainParameters;
+import com.distrimind.bcfips.math.ec.ECCurve;
+import com.distrimind.bcfips.math.ec.ECPoint;
+import com.distrimind.bcfips.util.Arrays;
+import com.distrimind.bcfips.util.Fingerprint;
+import com.distrimind.bcfips.util.Strings;
+import com.distrimind.bcfips.util.encoders.Hex;
 
 class KeyUtil
 {

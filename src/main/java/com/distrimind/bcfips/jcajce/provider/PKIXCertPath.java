@@ -22,9 +22,6 @@ import java.util.ListIterator;
 
 import javax.security.auth.x500.X500Principal;
 
-import com.distrimind.bcfips.asn1.pkcs.ContentInfo;
-import com.distrimind.bcfips.asn1.pkcs.PKCSObjectIdentifiers;
-import com.distrimind.bcfips.asn1.pkcs.SignedData;
 import com.distrimind.bcfips.util.io.pem.PemObject;
 import com.distrimind.bcfips.util.io.pem.PemWriter;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
@@ -36,6 +33,9 @@ import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.DERSet;
+import com.distrimind.bcfips.asn1.pkcs.ContentInfo;
+import com.distrimind.bcfips.asn1.pkcs.PKCSObjectIdentifiers;
+import com.distrimind.bcfips.asn1.pkcs.SignedData;
 
 /**
  * CertPath implementation for X.509 certificates.

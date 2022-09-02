@@ -2,8 +2,6 @@ package com.distrimind.bcfips.crypto.internal.signers;
 
 import java.math.BigInteger;
 
-import com.distrimind.bcfips.util.Arrays;
-import com.distrimind.bcfips.util.BigIntegers;
 import com.distrimind.bcfips.crypto.internal.AsymmetricBlockCipher;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.CryptoException;
@@ -12,6 +10,8 @@ import com.distrimind.bcfips.crypto.internal.Signer;
 import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
 import com.distrimind.bcfips.crypto.internal.params.RsaKeyParameters;
 import com.distrimind.bcfips.crypto.internal.util.ISOTrailers;
+import com.distrimind.bcfips.util.Arrays;
+import com.distrimind.bcfips.util.BigIntegers;
 
 /**
  * X9.31-1998 - signing using a hash.

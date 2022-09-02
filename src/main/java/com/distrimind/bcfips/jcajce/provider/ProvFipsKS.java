@@ -16,8 +16,8 @@ import java.util.Date;
 import java.util.Enumeration;
 
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
-import com.distrimind.bcfips.util.io.Streams;
 import com.distrimind.bcfips.jcajce.BCLoadStoreParameter;
+import com.distrimind.bcfips.util.io.Streams;
 
 class ProvFipsKS
     extends AlgorithmProvider
@@ -195,6 +195,15 @@ class ProvFipsKS
                 {
                     throw new IOException("immutable keystore already loaded");
                 }
+            }
+
+            if (stream == null)
+            {
+                this.keyStore = new ProvBCFKS.BCFIPSKeyStoreSpi(false, provider);
+
+                keyStore.engineLoad(null, password);
+
+                return;
             }
 
             byte[] ksData = Streams.readAll(stream);

@@ -2,6 +2,9 @@ package com.distrimind.bcfips.crypto.fips;
 
 import java.math.BigInteger;
 
+import com.distrimind.bcfips.crypto.internal.macs.HMac;
+import com.distrimind.bcfips.crypto.internal.modes.SICBlockCipher;
+import com.distrimind.bcfips.crypto.internal.test.BasicKatTest;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.KDFCalculator;
 import com.distrimind.bcfips.crypto.KDFOperatorFactory;
@@ -12,15 +15,12 @@ import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.internal.EngineProvider;
 import com.distrimind.bcfips.crypto.internal.Mac;
 import com.distrimind.bcfips.crypto.internal.StreamCipher;
-import com.distrimind.bcfips.crypto.internal.macs.HMac;
-import com.distrimind.bcfips.crypto.internal.modes.SICBlockCipher;
 import com.distrimind.bcfips.crypto.internal.params.KDFCounterParameters;
 import com.distrimind.bcfips.crypto.internal.params.KDFDoublePipelineIterationParameters;
 import com.distrimind.bcfips.crypto.internal.params.KDFFeedbackParameters;
 import com.distrimind.bcfips.crypto.internal.params.KDFParameters;
 import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
 import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
-import com.distrimind.bcfips.crypto.internal.test.BasicKatTest;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Pack;
 import com.distrimind.bcfips.util.Strings;

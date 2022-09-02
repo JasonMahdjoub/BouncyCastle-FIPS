@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Iterator;
 
-import com.distrimind.bcfips.util.encoders.Base64;
 import com.distrimind.bcfips.util.Strings;
+import com.distrimind.bcfips.util.encoders.Base64;
 
 /**
  * A generic PEM writer, based on RFC 1421

@@ -2,7 +2,6 @@ package com.distrimind.bcfips.crypto.fips;
 
 import java.math.BigInteger;
 
-import com.distrimind.bcfips.crypto.AsymmetricPublicKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricECPublicKey;
 import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
 import com.distrimind.bcfips.crypto.asymmetric.NamedECDomainParameters;
@@ -11,6 +10,7 @@ import com.distrimind.bcfips.crypto.internal.params.EcDomainParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcMqvPublicParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcNamedDomainParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcPublicKeyParameters;
+import com.distrimind.bcfips.crypto.AsymmetricPublicKey;
 import com.distrimind.bcfips.util.BigIntegers;
 
 class EcDHAgreement<T extends FipsAgreementParameters>

@@ -10,13 +10,14 @@ import java.security.PrivilegedAction;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import com.distrimind.bcfips.LICENSE;
-import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.internal.macs.HMac;
 import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
+import com.distrimind.bcfips.LICENSE;
+import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Pack;
 import com.distrimind.bcfips.util.Strings;
@@ -35,6 +36,7 @@ public final class FipsStatus
     private static final String[] classes = new String[] { FipsAES.class.getName(), FipsTripleDES.class.getName(), FipsDH.class.getName(),
         FipsDRBG.class.getName(), FipsDSA.class.getName(), FipsEC.class.getName(),
         FipsKDF.class.getName(), FipsPBKD.class.getName(), FipsRSA.class.getName(), FipsSHS.class.getName() };
+    private static final AtomicBoolean readyStatus = new AtomicBoolean(false);
 
     private static volatile Loader loader;
     private static volatile Throwable statusException;
@@ -59,6 +61,8 @@ public final class FipsStatus
                 try
                 {
                     loader = new Loader();
+
+                    loader.run();
                 }
                 catch (Exception e)
                 {
@@ -71,6 +75,9 @@ public final class FipsStatus
                 // FSM_TRANS:3.3
                 checksumValidate();
                 // FSM_TRANS:3.4
+
+                // FSM_TRANS:3.1
+                readyStatus.set(true);
             }
             else if (statusException != null)
             {
@@ -78,8 +85,7 @@ public final class FipsStatus
             }
         }
 
-        // FSM_TRANS:3.1
-        return true;
+        return readyStatus.get();
     }
 
     private static void checksumValidate()
@@ -335,6 +341,10 @@ public final class FipsStatus
     static class Loader
     {
         Loader()
+        {
+        }
+
+        void run()
             throws Exception
         {
             // FSM_STATE:3.0, "POWER ON SELF-TEST", ""

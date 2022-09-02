@@ -1,7 +1,7 @@
 package com.distrimind.bcfips.crypto.internal.params;
 
-import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.crypto.internal.DerivationParameters;
+import com.distrimind.bcfips.util.Arrays;
 
 /**
  * Note that counter is only supported at the location presented in the

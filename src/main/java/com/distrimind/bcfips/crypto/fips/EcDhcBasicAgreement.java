@@ -5,12 +5,12 @@ package com.distrimind.bcfips.crypto.fips;
 
 import java.math.BigInteger;
 
-import com.distrimind.bcfips.crypto.IllegalKeyException;
 import com.distrimind.bcfips.crypto.internal.BasicAgreement;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcDomainParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcPrivateKeyParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcPublicKeyParameters;
+import com.distrimind.bcfips.crypto.IllegalKeyException;
 import com.distrimind.bcfips.math.ec.ECAlgorithms;
 import com.distrimind.bcfips.math.ec.ECPoint;
 

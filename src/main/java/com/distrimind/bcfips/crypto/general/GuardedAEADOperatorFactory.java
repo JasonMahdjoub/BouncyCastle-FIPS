@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import com.distrimind.bcfips.crypto.internal.io.CipherInputStream;
+import com.distrimind.bcfips.crypto.internal.io.CipherOutputStreamImpl;
+import com.distrimind.bcfips.crypto.internal.modes.AEADBlockCipher;
 import com.distrimind.bcfips.crypto.AEADOperatorFactory;
 import com.distrimind.bcfips.crypto.CipherOutputStream;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
@@ -15,9 +18,6 @@ import com.distrimind.bcfips.crypto.SymmetricKey;
 import com.distrimind.bcfips.crypto.UpdateOutputStream;
 import com.distrimind.bcfips.crypto.fips.FipsStatus;
 import com.distrimind.bcfips.crypto.fips.FipsUnapprovedOperationError;
-import com.distrimind.bcfips.crypto.internal.io.CipherInputStream;
-import com.distrimind.bcfips.crypto.internal.io.CipherOutputStreamImpl;
-import com.distrimind.bcfips.crypto.internal.modes.AEADBlockCipher;
 
 abstract class GuardedAEADOperatorFactory<T extends Parameters>
     implements AEADOperatorFactory<T>
@@ -49,7 +49,7 @@ abstract class GuardedAEADOperatorFactory<T extends Parameters>
             throw new FipsUnapprovedOperationError("Attempt to create unapproved algorithm in approved only mode", parameters.getAlgorithm());
         }
 
-        final AEADBlockCipher  cipher = createAEADCipher(false, key, parameters);
+        final AEADBlockCipher cipher = createAEADCipher(false, key, parameters);
 
         return new InputAEADDecryptor<T>()
         {

@@ -1,11 +1,11 @@
 package com.distrimind.bcfips.crypto.general;
 
+import com.distrimind.bcfips.crypto.asymmetric.AsymmetricKeyPair;
 import com.distrimind.bcfips.crypto.AsymmetricKeyPairGenerator;
 import com.distrimind.bcfips.crypto.AsymmetricPrivateKey;
 import com.distrimind.bcfips.crypto.AsymmetricPublicKey;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.Parameters;
-import com.distrimind.bcfips.crypto.asymmetric.AsymmetricKeyPair;
 import com.distrimind.bcfips.crypto.fips.FipsStatus;
 import com.distrimind.bcfips.crypto.fips.FipsUnapprovedOperationError;
 

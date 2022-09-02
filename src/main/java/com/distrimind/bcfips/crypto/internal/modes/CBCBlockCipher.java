@@ -4,10 +4,10 @@
 package com.distrimind.bcfips.crypto.internal.modes;
 
 import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
-import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.DataLengthException;
+import com.distrimind.bcfips.util.Arrays;
 
 /**
  * implements Cipher-Block-Chaining (CBC) mode on top of a simple cipher.

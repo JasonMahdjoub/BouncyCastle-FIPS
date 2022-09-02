@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
+import com.distrimind.bcfips.crypto.internal.DSA;
+import com.distrimind.bcfips.crypto.internal.Digest;
+import com.distrimind.bcfips.crypto.internal.io.DigestOutputStream;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Encoding;
 import com.distrimind.bcfips.asn1.ASN1Integer;
@@ -14,32 +17,29 @@ import com.distrimind.bcfips.crypto.OutputSignerUsingSecureRandom;
 import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.crypto.PlainInputProcessingException;
 import com.distrimind.bcfips.crypto.UpdateOutputStream;
-import com.distrimind.bcfips.crypto.internal.DSA;
-import com.distrimind.bcfips.crypto.internal.Digest;
-import com.distrimind.bcfips.crypto.internal.io.DigestOutputStream;
 
 class DSAOutputSigner<T extends Parameters>
     implements OutputSignerUsingSecureRandom<T>
 {
 
-    private final DSA dsa;
+    private final com.distrimind.bcfips.crypto.internal.DSA dsa;
     private final Digest digest;
     private final T parameter;
     private final Initializer initializer;
     private final boolean ready;
     private final boolean reverse;
 
-    DSAOutputSigner(DSA dsa, Digest digest, T parameter, Initializer initializer)
+    DSAOutputSigner(com.distrimind.bcfips.crypto.internal.DSA dsa, Digest digest, T parameter, Initializer initializer)
     {
         this(false, dsa, digest, parameter, initializer, false);
     }
 
-    DSAOutputSigner(DSA dsa, Digest digest, T parameter, Initializer initializer, boolean reverse)
+    DSAOutputSigner(com.distrimind.bcfips.crypto.internal.DSA dsa, Digest digest, T parameter, Initializer initializer, boolean reverse)
     {
         this(false, dsa, digest, parameter, initializer, reverse);
     }
 
-    DSAOutputSigner(boolean ready, DSA dsa, Digest digest, T parameter, Initializer initializer, boolean reverse)
+    DSAOutputSigner(boolean ready, com.distrimind.bcfips.crypto.internal.DSA dsa, Digest digest, T parameter, Initializer initializer, boolean reverse)
     {
         this.ready = ready;
         this.dsa = dsa;

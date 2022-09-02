@@ -23,7 +23,7 @@ final class BaseKeyGenerator
     private final int                      defaultKeySize;
     private final boolean                  fixedKeySize;
 
-    private SymmetricKeyGenerator engine;
+    private SymmetricKeyGenerator   engine;
 
     BaseKeyGenerator(
         BouncyCastleFipsProvider fipsProvider,

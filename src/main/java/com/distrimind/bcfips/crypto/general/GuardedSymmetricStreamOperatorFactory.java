@@ -4,6 +4,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.SecureRandom;
 
+import com.distrimind.bcfips.crypto.internal.StreamCipher;
+import com.distrimind.bcfips.crypto.internal.io.CipherInputStream;
+import com.distrimind.bcfips.crypto.internal.io.CipherOutputStreamImpl;
 import com.distrimind.bcfips.crypto.CipherOutputStream;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.InputDecryptor;
@@ -15,9 +18,6 @@ import com.distrimind.bcfips.crypto.SymmetricKey;
 import com.distrimind.bcfips.crypto.SymmetricOperatorFactory;
 import com.distrimind.bcfips.crypto.fips.FipsStatus;
 import com.distrimind.bcfips.crypto.fips.FipsUnapprovedOperationError;
-import com.distrimind.bcfips.crypto.internal.StreamCipher;
-import com.distrimind.bcfips.crypto.internal.io.CipherInputStream;
-import com.distrimind.bcfips.crypto.internal.io.CipherOutputStreamImpl;
 
 abstract class GuardedSymmetricStreamOperatorFactory<T extends Parameters>
     implements SymmetricOperatorFactory<T>

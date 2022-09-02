@@ -5,8 +5,6 @@ package com.distrimind.bcfips.math.ec.custom.sec;
 
 import java.math.BigInteger;
 
-import com.distrimind.bcfips.math.internal.Nat320;
-import com.distrimind.bcfips.util.encoders.Hex;
 import com.distrimind.bcfips.math.ec.ECCurve;
 import com.distrimind.bcfips.math.ec.ECCurve.AbstractF2m;
 import com.distrimind.bcfips.math.ec.ECFieldElement;
@@ -14,6 +12,8 @@ import com.distrimind.bcfips.math.ec.ECLookupTable;
 import com.distrimind.bcfips.math.ec.ECMultiplier;
 import com.distrimind.bcfips.math.ec.ECPoint;
 import com.distrimind.bcfips.math.ec.WTauNafMultiplier;
+import com.distrimind.bcfips.math.internal.Nat320;
+import com.distrimind.bcfips.util.encoders.Hex;
 
 public class SecT283K1Curve extends AbstractF2m
 {

@@ -6,6 +6,13 @@ import java.security.SecureRandom;
 
 import javax.security.auth.Destroyable;
 
+import com.distrimind.bcfips.asn1.ASN1Encodable;
+import com.distrimind.bcfips.asn1.ASN1Encoding;
+import com.distrimind.bcfips.asn1.ASN1Integer;
+import com.distrimind.bcfips.asn1.ASN1Object;
+import com.distrimind.bcfips.asn1.ASN1Sequence;
+import com.distrimind.bcfips.asn1.ASN1Set;
+import com.distrimind.bcfips.asn1.DERNull;
 import com.distrimind.bcfips.asn1.pkcs.PrivateKeyInfo;
 import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 import com.distrimind.bcfips.asn1.x509.SubjectPublicKeyInfo;
@@ -18,13 +25,6 @@ import com.distrimind.bcfips.math.ec.ECPoint;
 import com.distrimind.bcfips.math.internal.Primes;
 import com.distrimind.bcfips.util.Pack;
 import com.distrimind.bcfips.util.Strings;
-import com.distrimind.bcfips.asn1.ASN1Encodable;
-import com.distrimind.bcfips.asn1.ASN1Encoding;
-import com.distrimind.bcfips.asn1.ASN1Integer;
-import com.distrimind.bcfips.asn1.ASN1Object;
-import com.distrimind.bcfips.asn1.ASN1Sequence;
-import com.distrimind.bcfips.asn1.ASN1Set;
-import com.distrimind.bcfips.asn1.DERNull;
 
 class KeyUtils
 {

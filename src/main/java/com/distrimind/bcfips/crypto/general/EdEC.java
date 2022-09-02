@@ -4,10 +4,21 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.SecureRandom;
 
-import com.distrimind.bcfips.crypto.*;
+import com.distrimind.bcfips.crypto.internal.io.SignerOutputStream;
+import com.distrimind.bcfips.crypto.internal.params.AsymmetricKeyParameter;
+import com.distrimind.bcfips.crypto.internal.test.ConsistencyTest;
+import com.distrimind.bcfips.math.ec.rfc8032.Ed25519;
+import com.distrimind.bcfips.math.ec.rfc8032.Ed448;
+import com.distrimind.bcfips.crypto.Agreement;
 import com.distrimind.bcfips.crypto.AgreementFactory;
+import com.distrimind.bcfips.crypto.AsymmetricPrivateKey;
+import com.distrimind.bcfips.crypto.AsymmetricPublicKey;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
+import com.distrimind.bcfips.crypto.InvalidSignatureException;
+import com.distrimind.bcfips.crypto.OutputSigner;
+import com.distrimind.bcfips.crypto.OutputVerifier;
 import com.distrimind.bcfips.crypto.PlainInputProcessingException;
+import com.distrimind.bcfips.crypto.UpdateOutputStream;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricEdDSAPrivateKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricEdDSAPublicKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricKeyPair;
@@ -24,11 +35,6 @@ import com.distrimind.bcfips.crypto.internal.KeyGenerationParameters;
 import com.distrimind.bcfips.crypto.internal.RawAgreement;
 import com.distrimind.bcfips.crypto.internal.Signer;
 import com.distrimind.bcfips.crypto.internal.Xof;
-import com.distrimind.bcfips.crypto.internal.io.SignerOutputStream;
-import com.distrimind.bcfips.crypto.internal.params.AsymmetricKeyParameter;
-import com.distrimind.bcfips.crypto.internal.test.ConsistencyTest;
-import com.distrimind.bcfips.math.ec.rfc8032.Ed25519;
-import com.distrimind.bcfips.math.ec.rfc8032.Ed448;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.encoders.Hex;
 
@@ -390,7 +396,7 @@ public final class EdEC
 
         if (algorithm.equals(EdEC.Algorithm.Ed448))
         {
-            final Ed448 ed448 = new Ed448()
+            final com.distrimind.bcfips.math.ec.rfc8032.Ed448 ed448 = new Ed448()
             {
                 @Override
                 protected Xof createXof()
@@ -404,7 +410,7 @@ public final class EdEC
         }
         else if (algorithm.equals(Algorithm.Ed25519))
         {
-            final Ed25519 ed25519 = new Ed25519()
+            final com.distrimind.bcfips.math.ec.rfc8032.Ed25519 ed25519 = new Ed25519()
             {
                 @Override
                 protected Digest createDigest()

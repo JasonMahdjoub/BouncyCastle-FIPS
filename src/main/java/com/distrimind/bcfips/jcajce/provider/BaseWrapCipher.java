@@ -29,9 +29,6 @@ import javax.crypto.spec.SecretKeySpec;
 import com.distrimind.bcfips.asn1.DEROctetString;
 import com.distrimind.bcfips.asn1.pkcs.PrivateKeyInfo;
 import com.distrimind.bcfips.asn1.x509.SubjectPublicKeyInfo;
-import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
-import com.distrimind.bcfips.crypto.fips.FipsKeyWrapOperatorFactory;
-import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.IllegalKeyException;
@@ -44,6 +41,9 @@ import com.distrimind.bcfips.crypto.ParametersWithIV;
 import com.distrimind.bcfips.crypto.PlainInputProcessingException;
 import com.distrimind.bcfips.crypto.SymmetricKey;
 import com.distrimind.bcfips.crypto.SymmetricSecretKey;
+import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
+import com.distrimind.bcfips.crypto.fips.FipsKeyWrapOperatorFactory;
+import com.distrimind.bcfips.util.Arrays;
 
 class BaseWrapCipher
     extends CipherSpi
@@ -146,7 +146,7 @@ class BaseWrapCipher
 
     private int                       keySizeInBits;
     private Parameters                wrapParameters;
-    private KeyWrapper keyWrapper;
+    private KeyWrapper                keyWrapper;
     private KeyUnwrapper              keyUnwrapper;
     private ErasableOutputStream wrapStream = null;
 
