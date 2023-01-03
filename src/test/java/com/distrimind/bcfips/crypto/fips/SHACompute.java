@@ -93,6 +93,6 @@ public class SHACompute {
 	
 	public static void main(String args[]) throws IOException
 	{
-		System.out.println(new String(Hex.encode(calculateModuleHMAC(new JarFile(new File("build/libs/BouncyCastle-FIPS-1.0.2.3.jar").getCanonicalFile())))));
+		System.out.println(new String(Hex.encode(calculateModuleHMAC(new JarFile(new File("build/libs/BouncyCastle-FIPS-1.0.2.3b.jar").getCanonicalFile())))));
 	}
 }

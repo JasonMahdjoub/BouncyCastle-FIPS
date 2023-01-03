@@ -1,24 +1,5 @@
 package com.distrimind.bcfips.jcajce.provider;
 
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PrivilegedAction;
-import java.security.Provider;
-import java.security.PublicKey;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.pkcs.PrivateKeyInfo;
 import com.distrimind.bcfips.asn1.x509.SubjectPublicKeyInfo;
@@ -32,6 +13,13 @@ import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Pack;
 import com.distrimind.bcfips.util.Properties;
 import com.distrimind.bcfips.util.Strings;
+
+import java.io.IOException;
+import java.security.*;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * The BC FIPS provider.
@@ -255,24 +243,7 @@ public final class BouncyCastleFipsProvider
             new ProvPoly1305().configure(this);
         }
 
-        if (!Properties.isOverrideSet("com.distrimind.bcfips.jsse.disable_kdf"))
-        {
-            AccessController.doPrivileged(new PrivilegedAction<Object>()
-            {
-                public Object run()
-                {
-                    if (classExists("sun.security.internal.spec.TlsKeyMaterialParameterSpec")
-                        && classExists("sun.security.internal.spec.TlsKeyMaterialSpec")
-                        && classExists("sun.security.internal.spec.TlsMasterSecretParameterSpec")
-                        && classExists("sun.security.internal.spec.TlsPrfParameterSpec")
-                        && classExists("sun.security.internal.spec.TlsRsaPremasterSecretParameterSpec"))
-                    {
-                        new ProvSunTLSKDF().configure(BouncyCastleFipsProvider.this);
-                    }
-                    return null;
-                }
-            });
-        }
+
 
         if (!Properties.isOverrideSet("com.distrimind.bcfips.pkix.disable_certpath"))
         {
@@ -812,10 +783,10 @@ public final class BouncyCastleFipsProvider
     {
         CoreSecureRandom()
         {
-            super(new sun.security.provider.SecureRandom(), getSunProvider());
+            super();
         }
 
-        private static Provider getSunProvider()
+        /*private static Provider getSunProvider()
         {
             try
             {
@@ -829,7 +800,7 @@ public final class BouncyCastleFipsProvider
             {
                 return new sun.security.provider.Sun();
             }
-        }
+        }*/
     }
 
     private static class HybridRandomProvider

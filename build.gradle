@@ -76,7 +76,7 @@ repositories {
 dependencies {
 }
 
-def javaVersion = "8"
+def javaVersion = 11
 sourceCompatibility = javaVersion
 targetCompatibility=javaVersion
 
@@ -86,18 +86,14 @@ idea {
         languageLevel = javaVersion
     }
 }
-version='1.0.2.3'
+version='1.0.2.3b'
 allprojects {
 	group='com.distrimind.bcfips'
 
     //compileJava.options.compilerArgs << "-Xlint"
     //compileJava.options.compilerArgs.addAll(['--release', javaVersion])
 
-
-
-	
 }
-
 
 
 task sourcesJar(type: Jar, dependsOn: classes) {
