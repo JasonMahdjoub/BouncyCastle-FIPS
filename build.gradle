@@ -86,7 +86,7 @@ idea {
         languageLevel = javaVersion
     }
 }
-version='1.0.2.3b'
+version='1.0.2.3c'
 allprojects {
 	group='com.distrimind.bcfips'
 
@@ -95,32 +95,41 @@ allprojects {
 
 }
 
+jar {
+    manifest {
+        attributes('Implementation-Title': project.name,
+                'Implementation-Version': project.version)
+    }
+    from "LICENSE"
+
+}
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier.set('sources')
+    manifest {
+        attributes('Implementation-Title': project.name,
+                'Implementation-Version': project.version)
+    }
+    archiveClassifier.set("sources")
     from sourceSets.main.allSource
-    from "../LICENSE"
+    from "LICENSE"
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    archiveClassifier.set('javadoc')
+    manifest {
+        attributes('Implementation-Title': project.name,
+                'Implementation-Version': project.version)
+    }
+    archiveClassifier.set("javadoc")
     from javadoc.destinationDir
-    from "../LICENSE"
+    from "LICENSE"
 }
-
 artifacts {
+    archives jar
     archives sourcesJar
     archives javadocJar
 }
 
-jar {
-    manifest {
-        attributes('Implementation-Title': project.name,
-                   'Implementation-Version': project.version)
-    }
-    from "../LICENSE"
 
-}
 
 
 
