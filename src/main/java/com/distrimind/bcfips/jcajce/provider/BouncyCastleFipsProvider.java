@@ -38,8 +38,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * Possible values for the DRBG type are "SHA1", "SHA224", "SHA256", "SHA384", "SHA512", "SHA512(224)", "SHA512(256)",
  * "HMACrovRandSHA1", "HMACSHA224", "HMACSHA256", "HMACSHA384", "HMACSHA512", "HMACSHA512(224)", "HMACSHA512(256)", "CTRAES128",
  * "CTRAES192", CTRAES256", and "CTRDESEDE".
- * </p>
- * <p>
+
  * The default DRBG is configured to be prediction resistant. In situations where the amount of entropy is constrained
  * the default DRBG can be configured to use an entropy pool based on a SHA-512 SP 800-90A DRBG. To configure this use:
  * <pre>
@@ -48,10 +47,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * or include the string "HYBRID;" in the previous command string setting the DRBG. After initial seeding the entropy pool will
  * start a reseeding thread which it will begin polling once 20 samples have been taken since the last seeding and will do a reseed
  * as soon as new entropy bytes are returned.
- * </p>
- * <p>
  * <b>Note</b>: if the provider is created by an "approved mode" thread, only FIPS approved algorithms will be available from it.
- * </p>
  */
 public final class BouncyCastleFipsProvider
     extends Provider

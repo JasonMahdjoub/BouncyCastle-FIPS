@@ -1,5 +1,12 @@
 package com.distrimind.bcfips.crypto.fips;
 
+import com.distrimind.bcfips.LICENSE;
+import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
+import com.distrimind.bcfips.crypto.internal.macs.HMac;
+import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
+import com.distrimind.bcfips.util.Pack;
+import com.distrimind.bcfips.util.Strings;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -13,15 +20,6 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import com.distrimind.bcfips.crypto.internal.macs.HMac;
-import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
-import com.distrimind.bcfips.LICENSE;
-import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
-import com.distrimind.bcfips.util.Arrays;
-import com.distrimind.bcfips.util.Pack;
-import com.distrimind.bcfips.util.Strings;
-import com.distrimind.bcfips.util.encoders.Hex;
 
 /**
  * Status utility class - it has three methods on it, one for returning "isReady" status, one for a status message,

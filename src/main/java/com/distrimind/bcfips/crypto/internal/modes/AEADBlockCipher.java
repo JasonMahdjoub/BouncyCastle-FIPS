@@ -11,7 +11,7 @@ import com.distrimind.bcfips.crypto.internal.InvalidCipherTextException;
 
 /**
  * A block cipher mode that includes authenticated encryption with a streaming mode and optional associated data.
- * <p/>
+ *
  * Implementations of this interface may operate in a packet mode (where all input data is buffered and 
  * processed dugin the call to {@link #doFinal(byte[], int)}), or in a streaming mode (where output data is
  * incrementally produced with each call to {@link #processByte(byte, byte[], int)} or 
@@ -99,7 +99,7 @@ public interface AEADBlockCipher
      * @param outOff offset into out to start copying the data at.
      * @return number of bytes written into out.
      * @throws IllegalStateException if the cipher is in an inappropriate state.
-     * @throws com.distrimind.bcfips.crypto.InvalidCipherTextException if the MAC fails to match.
+     * @throws InvalidCipherTextException if the MAC fails to match.
      */
     public int doFinal(byte[] out, int outOff)
         throws IllegalStateException, InvalidCipherTextException;
@@ -114,7 +114,6 @@ public interface AEADBlockCipher
     /**
      * return the size of the output buffer required for a processBytes
      * an input of len bytes.
-     * <p/>
      * The returned size may be dependent on the initialisation of this cipher
      * and may not be accurate once subsequent input data is processed - this method
      * should be invoked immediately prior to input data being processed.
@@ -128,7 +127,6 @@ public interface AEADBlockCipher
     /**
      * return the size of the output buffer required for a processBytes plus a
      * doFinal with an input of len bytes.
-     * <p/>
      * The returned size may be dependent on the initialisation of this cipher
      * and may not be accurate once subsequent input data is processed - this method
      * should be invoked immediately prior to a call to final processing of input data
