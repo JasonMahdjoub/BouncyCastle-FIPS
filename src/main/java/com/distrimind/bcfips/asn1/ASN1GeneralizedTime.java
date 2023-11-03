@@ -22,9 +22,9 @@ import com.distrimind.bcfips.util.Strings;
  * <p>
  * One second resolution date+time on UTC timezone (Z)
  * with 4 digit year (valid from 0001 to 9999).
- * </p><p>
+ * <p>
  * Timestamp format is:  yyyymmddHHMMSS'Z'
- * </p><p>
+ * <p>
  * <h2>X.690</h2>
  * This is what is called "restricted string",
  * and it uses ASCII characters to encode digits and supplemental data.
@@ -35,7 +35,7 @@ import com.distrimind.bcfips.util.Strings;
  * <b>11.7.1</b> The encoding shall terminate with a "Z",
  * as described in the ITU-T Rec. X.680 | ISO/IEC 8824-1 clause on
  * GeneralizedTime.
- * </p><p>
+ * <p>
  * <b>11.7.2</b> The seconds element shall always be present.
  * </p>
  * <p>
@@ -278,19 +278,19 @@ public class ASN1GeneralizedTime
         {
             if (hasFractionalSeconds())
             {
-                dateF = new SimpleDateFormat("yyyyMMddHHmmss.SSS'Z'");
+                dateF = new SimpleDateFormat("yyyyMMddHHmmss.SSS'Z'", DateUtil.EN_Locale);
             }
             else if (hasSeconds())
             {
-                dateF = new SimpleDateFormat("yyyyMMddHHmmss'Z'");
+                dateF = new SimpleDateFormat("yyyyMMddHHmmss'Z'", DateUtil.EN_Locale);
             }
             else if (hasMinutes())
             {
-                dateF = new SimpleDateFormat("yyyyMMddHHmm'Z'");
+                dateF = new SimpleDateFormat("yyyyMMddHHmm'Z'", DateUtil.EN_Locale);
             }
             else
             {
-                dateF = new SimpleDateFormat("yyyyMMddHH'Z'");
+                dateF = new SimpleDateFormat("yyyyMMddHH'Z'", DateUtil.EN_Locale);
             }
 
             dateF.setTimeZone(new SimpleTimeZone(0, "Z"));

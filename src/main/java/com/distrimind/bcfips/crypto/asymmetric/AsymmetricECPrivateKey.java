@@ -16,6 +16,7 @@ import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AsymmetricPrivateKey;
 import com.distrimind.bcfips.crypto.internal.Permissions;
 import com.distrimind.bcfips.math.ec.ECPoint;
+import com.distrimind.bcfips.util.Arrays;
 
 /**
  * Class for Elliptic Curve (EC) private keys.
@@ -112,16 +113,16 @@ public final class AsymmetricECPrivateKey
 
         KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
 
-        KeyUtils.checkDestroyed(this);
-
-        X962Parameters params = KeyUtils.buildCurveParameters(this.getDomainParameters());
-        int            orderBitLength = KeyUtils.getOrderBitLength(this.getDomainParameters());
+        ECDomainParameters domainParameters = this.getDomainParameters();
+        X962Parameters params = KeyUtils.buildCurveParameters(domainParameters);
+        int            orderBitLength = KeyUtils.getOrderBitLength(domainParameters);
+        byte[]         pubKey = Arrays.clone(publicKey);
 
         ECPrivateKey keyStructure;
 
-        if (publicKey != null)
+        if (pubKey != null)
         {
-            keyStructure = new ECPrivateKey(orderBitLength, this.getS(), new DERBitString(publicKey), params);
+            keyStructure = new ECPrivateKey(orderBitLength, this.getS(), new DERBitString(pubKey), params);
         }
         else
         {
@@ -154,9 +155,11 @@ public final class AsymmetricECPrivateKey
     {
         checkApprovedOnlyModeStatus();
 
+        ECDomainParameters domainParameters = this.domainParameters;
+
         KeyUtils.checkDestroyed(this);
 
-        return super.getDomainParameters();
+        return domainParameters;
     }
 
     public BigInteger getS()
@@ -165,9 +168,11 @@ public final class AsymmetricECPrivateKey
 
         KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
 
+        BigInteger dVal = d;
+
         KeyUtils.checkDestroyed(this);
 
-        return d;
+        return dVal;
     }
 
     public void destroy()
@@ -206,19 +211,11 @@ public final class AsymmetricECPrivateKey
 
         AsymmetricECPrivateKey other = (AsymmetricECPrivateKey)o;
 
-        if (this.isDestroyed() || other.isDestroyed())
-        {
-            return false;
-        }
-
-        if (!d.equals(other.d))
-        {
-            return false;
-        }
+        other.checkApprovedOnlyModeStatus();
 
         // we ignore the public point encoding.
-
-        return this.getDomainParameters().equals(other.getDomainParameters());
+        return KeyUtils.isFieldEqual(this.d, other.d)
+            && KeyUtils.isFieldEqual(this.domainParameters, other.domainParameters);
     }
 
     @Override
@@ -234,14 +231,5 @@ public final class AsymmetricECPrivateKey
         int result = d.hashCode();
         result = 31 * result + this.getDomainParameters().hashCode();
         return result;
-    }
-
-    @Override
-    protected void finalize()
-        throws Throwable
-    {
-        super.finalize();
-
-        destroy();
     }
 }

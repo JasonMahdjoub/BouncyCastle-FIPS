@@ -83,9 +83,9 @@ public class NameOrPseudonym
 
     /**
      * Constructor from ASN1Sequence.
-     * <p/>
+     * 
      * The sequence is of type NameOrPseudonym:
-     * <p/>
+     * 
      * <pre>
      *       NameOrPseudonym ::= CHOICE {
      *            surAndGivenName SEQUENCE {

@@ -27,5 +27,7 @@ public class Dump
         {
             System.out.println(ASN1Dump.dumpAsString(obj));
         }
+
+        fIn.close();
     }
 }

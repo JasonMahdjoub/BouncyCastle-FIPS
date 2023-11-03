@@ -36,6 +36,7 @@ import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Properties;
 import com.distrimind.bcfips.util.encoders.Hex;
 import com.distrimind.bcfips.util.test.TestRandomBigInteger;
+import com.distrimind.bcfips.util.test.TestRandomData;
 
 /**
  * Source class for FIPS approved implementations of Elliptic Curve algorithms.
@@ -102,7 +103,7 @@ public final class FipsEC
 
         // FSM_STATE:3.EC.0,"ECDSA SIGN VERIFY KAT", "The module is performing ECDSA sign and verify KAT self-test"
         // FSM_TRANS:3.EC.0,"POWER ON SELF-TEST", "ECDSA SIGN VERIFY KAT", "Invoke ECDSA Sign/Verify  KAT self-test"
-        DSA_PROVIDER.createEngine();
+        EcDsaSigner signer = DSA_PROVIDER.createEngine(); f2mDsaTest(signer);
         // FSM_TRANS:3.EC.1,"ECDSA SIGN VERIFY KAT", "POWER ON SELF-TEST", "ECDSA Sign/Verify  KAT self-test successful completion"
 
         // FSM_STATE:3.EC.1,"EC CVL Primitive 'Z' computation KAT", "The module is performing EC CVL Primitive 'Z' computation KAT verify KAT self-test"
@@ -1347,6 +1348,55 @@ public final class FipsEC
             public EcPrivateKeyParameters run()
             {
                 return new EcPrivateKeyParameters(privKey.getS(), getDomainParamsWithInv(privKey.getDomainParameters()));
+            }
+        });
+    }
+
+    private static AsymmetricCipherKeyPair getF2mKATKeyPair()
+    {
+        X9ECParameters p = NISTNamedCurves.getByName("B-233");
+        EcDomainParameters params = new EcDomainParameters(new ECDomainParameters(p.getCurve(), p.getG(), p.getN(), p.getH(), p.getSeed()));
+        EcPrivateKeyParameters priKey = new EcPrivateKeyParameters(
+            new BigInteger("20186677036482506115567393538695075300175221296989956723148347484984008"), // d
+            params);
+
+        // Verify the signature
+        EcPublicKeyParameters pubKey = new EcPublicKeyParameters(
+            params.getCurve().decodePoint(Hex.decode("03000518bce3b1b492c23094dcd7674c8ea6a3bcb7861bd2fb11be1999b796")), // Q
+            params);
+
+        return new AsymmetricCipherKeyPair(pubKey, priKey);
+    }
+
+    private static void f2mDsaTest(EcDsaSigner signer)
+    {
+        SelfTestExecutor.validate(ALGORITHM, signer, new VariantKatTest<EcDsaSigner>()
+        {
+            void evaluate(EcDsaSigner dsa)
+                throws Exception
+            {
+                BigInteger f2mR = new BigInteger(1, Hex.decode("d001312179360f7a557d4686e2faf9740fd3289edbafb5e551402cf1b0"));
+                BigInteger f2mS = new BigInteger(1, Hex.decode("9d4c2f24b50ce6b9ac725c7833c495fe703296c038dab05ea7af06cafe"));
+
+                AsymmetricCipherKeyPair kp = getF2mKATKeyPair();
+
+                SecureRandom k = new TestRandomData("a0640d4957f27d091ab1aebc69949d96e5ac2bb283ed5284a5674758b12f08df");
+                byte[] M = Hex.decode("1BD4ED430B0F384B4E8D458EFF1A8A553286D7AC21CB2F6806172EF5F94A06AD");
+
+                dsa.init(true, new ParametersWithRandom(kp.getPrivate(), k));
+
+                BigInteger[] sig = dsa.generateSignature(M);
+
+                if (!sig[0].equals(f2mR) || !sig[1].equals(f2mS))
+                {
+                    fail("F2m signature incorrect");
+                }
+
+                dsa.init(false, kp.getPublic());
+                if (!dsa.verifySignature(M, sig[0], sig[1]))
+                {
+                    fail("F2m signature fails");
+                }
             }
         });
     }

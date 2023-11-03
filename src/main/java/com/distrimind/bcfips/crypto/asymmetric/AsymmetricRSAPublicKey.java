@@ -102,6 +102,6 @@ public final class AsymmetricRSAPublicKey
     {
         super.finalize();
 
-        zeroize();
+        //zeroize();
     }
 }

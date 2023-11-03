@@ -902,13 +902,17 @@ class BaseCipher
             throw new ShortBufferException("Output buffer too short for input.");
         }
 
-        byte[] result = engineUpdate(input, inputOffset, inputLen);
+        processingStream.update(input, inputOffset, inputLen);
 
-        if (result != null)
+        if (resultStream.size() > 0)
         {
-            System.arraycopy(result, 0, output, outputOffset, result.length);
+            int size = resultStream.size();
 
-            return result.length;
+            System.arraycopy(resultStream.getBuffer(), 0, output, outputOffset, size);
+
+            resultStream.reset();
+
+            return size;
         }
 
         return 0;
@@ -942,6 +946,7 @@ class BaseCipher
 
         resultStream.clearAndReset();
 
+        // reset AAD data if provided
         if (associatedData != null)
         {
             aadStream.update(associatedData);
@@ -963,13 +968,37 @@ class BaseCipher
             throw new ShortBufferException("Output buffer too short for input.");
         }
 
-        byte[] result = engineDoFinal(input, inputOffset, inputLen);
+        try
+        {
+            if (input != null && inputLen != 0)
+            {
+                processingStream.update(input, inputOffset, inputLen);
+            }
 
-        System.arraycopy(result, 0, output, outputOffset, result.length);
+            processingStream.close();
+        }
+        catch (IOException e)
+        {
+            if (cipher.getParameters() instanceof AuthenticationParametersWithIV)
+            {
+                ClassUtil.throwBadTagException(e.getMessage());
+            }
+            throw new BadPaddingException(e.getMessage());
+        }
 
-        Arrays.fill(result, (byte)0);
+        int size = resultStream.size();
 
-        return result.length;
+        System.arraycopy(resultStream.getBuffer(), 0, output, outputOffset, size);
+
+        resultStream.clearAndReset();
+
+        // reset AAD data if provided
+        if (associatedData != null)
+        {
+            aadStream.update(associatedData);
+        }
+        
+        return size;
     }
 
     protected byte[] engineWrap(

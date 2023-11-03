@@ -83,9 +83,11 @@ public final class AsymmetricDHPrivateKey
      */
     public final DHDomainParameters getDomainParameters()
     {
+        DHDomainParameters domainParameters = super.getDomainParameters();
+
         KeyUtils.checkDestroyed(this);
 
-        return super.getDomainParameters();
+        return domainParameters;
     }
 
     public final byte[] getEncoded()
@@ -122,9 +124,11 @@ public final class AsymmetricDHPrivateKey
 
         KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
 
+        BigInteger xVal = x;
+
         KeyUtils.checkDestroyed(this);
         
-        return x;
+        return xVal;
     }
 
     public void destroy()
@@ -151,6 +155,8 @@ public final class AsymmetricDHPrivateKey
     @Override
     public int hashCode()
     {
+        checkApprovedOnlyModeStatus();
+
         return hashCode;
     }
 
@@ -162,17 +168,10 @@ public final class AsymmetricDHPrivateKey
     }
 
     @Override
-    protected void finalize()
-        throws Throwable
-    {
-        destroy();
-
-        super.finalize();
-    }
-
-    @Override
     public boolean equals(Object o)
     {
+        checkApprovedOnlyModeStatus();
+
         if (this == o)
         {
             return true;
@@ -185,11 +184,10 @@ public final class AsymmetricDHPrivateKey
 
         AsymmetricDHPrivateKey other = (AsymmetricDHPrivateKey)o;
 
-        if (this.isDestroyed() || other.isDestroyed())
-        {
-            return false;
-        }
+        other.checkApprovedOnlyModeStatus();
 
-        return x.equals(other.x) && this.getDomainParameters().equals(other.getDomainParameters());
+        return this.hashCode == other.hashCode
+            && KeyUtils.isFieldEqual(this.x, other.x)
+            && KeyUtils.isFieldEqual(this.domainParameters, other.domainParameters);
     }
 }

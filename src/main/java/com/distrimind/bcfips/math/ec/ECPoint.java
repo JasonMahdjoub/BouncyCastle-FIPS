@@ -25,7 +25,8 @@ public abstract class ECPoint
      * Temporary code to provide randomness in the 1.0.2.X branch only
      */
     private static SecureRandom testRandom;
-    private static synchronized SecureRandom getTestRandom()
+
+    static synchronized SecureRandom getTestRandom()
     {
         if (testRandom == null)
         {

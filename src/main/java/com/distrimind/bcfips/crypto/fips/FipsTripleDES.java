@@ -14,6 +14,10 @@ import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
 import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
 import com.distrimind.bcfips.crypto.internal.test.BasicKatTest;
 import com.distrimind.bcfips.crypto.internal.wrappers.SP80038FWrapEngine;
+import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
+import com.distrimind.bcfips.crypto.OperatorUsingSecureRandom;
+import com.distrimind.bcfips.crypto.OutputEncryptor;
+import com.distrimind.bcfips.crypto.SymmetricKey;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.BufferedBlockCipher;
 import com.distrimind.bcfips.crypto.internal.InvalidCipherTextException;
@@ -463,6 +467,11 @@ public final class FipsTripleDES
 
             public OutEncryptor(ValidatedSymmetricKey key, Parameters parameters, SecureRandom random)
             {
+                if (CryptoServicesRegistrar.isInApprovedOnlyMode() && !Properties.isOverrideSet("com.distrimind.bcfips.tripledes.allow_enc"))
+                {
+                    throw new FipsUnapprovedOperationError("Triple-DES encryption disallowed");
+                }
+
                 this.key = key;
                 this.parameters = parameters;
 
@@ -595,7 +604,13 @@ public final class FipsTripleDES
         @Override
         public FipsKeyWrapper<WrapParameters> createKeyWrapper(SymmetricKey key, final WrapParameters parameters)
         {
+            if (CryptoServicesRegistrar.isInApprovedOnlyMode() && !Properties.isOverrideSet("com.distrimind.bcfips.tripledes.allow_wrap"))
+            {
+                throw new FipsUnapprovedOperationError("Triple-DES encryption key-wrapping disallowed");
+            }
+
             ValidatedSymmetricKey sKey = validateKey(key, parameters, false);
+
             final Wrapper wrapper = createWrapper(parameters.getAlgorithm(), parameters.useInverse);
 
             wrapper.init(true, new KeyParameterImpl(sKey.getKeyBytes()));

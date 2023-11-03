@@ -32,6 +32,8 @@ import com.distrimind.bcfips.asn1.pkcs.PrivateKeyInfo;
 import com.distrimind.bcfips.asn1.x509.DSAParameter;
 import com.distrimind.bcfips.asn1.x509.SubjectPublicKeyInfo;
 import com.distrimind.bcfips.asn1.x9.X9ObjectIdentifiers;
+import com.distrimind.bcfips.crypto.AsymmetricKeyPairGenerator;
+import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricDSAPrivateKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricDSAPublicKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricKeyPair;
@@ -788,7 +790,7 @@ class ProvDSA
 
         /**
          * Return the X.509 ASN.1 structure DSAParameter.
-         * <p/>
+         * 
          * <pre>
          *  DSAParameter ::= SEQUENCE {
          *                   prime INTEGER, -- p

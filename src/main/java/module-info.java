@@ -66,5 +66,6 @@ module com.distrimind.bcfips {
 	exports com.distrimind.bcfips.math.ec.rfc7748;
 	exports com.distrimind.bcfips.math.ec.rfc8032;
 	exports com.distrimind.bcfips.math.field;
+	exports com.distrimind.bcfips.pqc.addon;
 
 }

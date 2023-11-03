@@ -37,8 +37,8 @@ class X509CRLEntryObject
     private TBSCertList.CRLEntry c;
 
     private X500Name certificateIssuer;
-    private int           hashValue;
-    private boolean       isHashValueSet;
+    private volatile int           hashValue;
+    private volatile boolean       isHashValueSet;
 
     protected X509CRLEntryObject(TBSCertList.CRLEntry c)
     {
@@ -222,6 +222,14 @@ class X509CRLEntryObject
         if (o instanceof X509CRLEntryObject)
         {
             X509CRLEntryObject other = (X509CRLEntryObject)o;
+
+            if (this.isHashValueSet && other.isHashValueSet)
+            {
+                if (this.hashValue != other.hashValue)
+                {
+                    return false;
+                }
+            }
 
             return this.c.equals(other.c);
         }

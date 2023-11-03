@@ -20,7 +20,7 @@ import com.distrimind.bcfips.util.Arrays;
  * Wrap keys according to
  * <A HREF="https://www.ietf.org/rfc/rfc3217.txt">
  * RFC 3217</A>.
- * <p/>
+ * 
  * Note:
  * <ul>
  * <li>if you are using this to wrap triple-des keys you need to set the
@@ -322,10 +322,10 @@ class DesEdeWrapEngine
      * Some key wrap algorithms make use of the Key Checksum defined
      * in CMS [CMS-Algorithms]. This is used to provide an integrity
      * check value for the key being wrapped. The algorithm is
-     * <p/>
+     * 
      * - Compute the 20 octet SHA-1 hash on the key being wrapped.
      * - Use the first 8 octets of this hash as the checksum value.
-     * <p/>
+     * 
      * For details see http://www.w3.org/TR/xmlenc-core/#sec-CMSKeyChecksum.
      *
      * @param key the key to check,

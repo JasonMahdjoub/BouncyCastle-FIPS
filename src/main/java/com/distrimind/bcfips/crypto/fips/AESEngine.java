@@ -644,6 +644,12 @@ private static final int[] Tinv0 =
     {
         super.finalize();
 
-        this.init(true, ZERO_KEY);    // ZEROIZE: clear key schedule on de-allocation
+        if (WorkingKey != null)
+        {
+            for (int i = 0; i != WorkingKey.length; i++)
+            {
+                Arrays.fill(WorkingKey[i], 0);
+            }
+        }
     }
 }

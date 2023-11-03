@@ -55,9 +55,9 @@ public class CertHash
 
     /**
      * Constructor from ASN1Sequence.
-     * <p/>
+     * 
      * The sequence is of type CertHash:
-     * <p/>
+     * 
      * <pre>
      *     CertHash ::= SEQUENCE {
      *       hashAlgorithm AlgorithmIdentifier,

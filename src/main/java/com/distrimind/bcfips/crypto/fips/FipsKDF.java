@@ -23,6 +23,7 @@ import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
 import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Pack;
+import com.distrimind.bcfips.util.Properties;
 import com.distrimind.bcfips.util.Strings;
 import com.distrimind.bcfips.util.encoders.Hex;
 
@@ -152,6 +153,10 @@ public final class FipsKDF
         new DoublePipelineModeProvider(PRF.SHA512_HMAC).createEngine();
         new DoublePipelineModeProvider(PRF.SHA512_224_HMAC).createEngine();
         new DoublePipelineModeProvider(PRF.SHA512_256_HMAC).createEngine();
+
+        tlsLegacyKAT();   // full KAT test - not just MD5
+        tls1_1and2KAT();
+        sshKAT();
         // FSM_TRANS:3.KBKDF.1, "KBKDF GENERATE KAT", "POWER ON SELF-TEST", "KBKDF Generate KAT self-test successful completion"
     }
 
@@ -617,6 +622,15 @@ public final class FipsKDF
         FipsEngineProvider<Mac> macProvider;
         if (prfAlgorithm == PRF.TRIPLEDES_CMAC)
         {
+            // check only meaningful when out of startup phase.
+            if (!FipsStatus.isBooting())
+            {
+                if (CryptoServicesRegistrar.isInApprovedOnlyMode() && !Properties.isOverrideSet("com.distrimind.bcfips.tripledes.allow_prf"))
+                {
+                    throw new FipsUnapprovedOperationError("Triple-DES prf disallowed");
+                }
+            }
+
             macProvider = FipsTripleDES.getMacProvider(FipsTripleDES.CMAC.getAlgorithm());
         }
         else if (prfAlgorithm == PRF.AES_CMAC)
@@ -1906,6 +1920,41 @@ public final class FipsKDF
             default:
                 throw new SelfTestExecutor.TestFailedException("unknown PRF");
             }
+        }
+    }
+
+    private static void tlsLegacyKAT()
+    {
+        final Mac md5Hmac = new HMac(new MD5Digest());
+        final Mac sha1HMac = FipsSHS.createHMac(FipsSHS.Algorithm.SHA1_HMAC);
+
+        TLSParameters testParams = new TLSParameters(TLS1_0.getAlgorithm(), Hex.decode("0102030405060708090a0b0c0d0e0f"), TLSStage.MASTER_SECRET, Hex.decode("deadbeefbeefdead"));
+        byte[] kat = PRF_legacy(testParams, testParams.secret, testParams.label, 32, md5Hmac, sha1HMac);
+        if (!Arrays.areEqual(kat, Hex.decode("ef9dca01113c0f6fcaef528e604b3092c8e65022de73a1b117408297a0d969a9")))
+        {
+            FipsStatus.moveToErrorStatus(new FipsSelfTestFailedError("Exception on self test: TLS Legacy KAT", TLS1_0.getAlgorithm()));
+        }
+    }
+
+    private static void tls1_1and2KAT()
+    {
+        TLSParameters testParams = new TLSParameters(TLS1_2.getAlgorithm(), Hex.decode("0102030405060708090a0b0c0d0e0f"), TLSStage.MASTER_SECRET, Hex.decode("deadbeefbeefdead"));
+        byte[] kat = PRF(testParams, TLSPRF.SHA256_HMAC, testParams.secret, testParams.label, 32);
+        if (!Arrays.areEqual(kat, Hex.decode("fd9224c363882243d0d949139981093693407e438a508b3c324fd163247e210f")))
+        {
+            FipsStatus.moveToErrorStatus(new FipsSelfTestFailedError("Exception on self test: TLS KAT", TLS1_1.getAlgorithm()));
+        }
+    }
+
+    private static void sshKAT()
+    {
+        final Digest sha256 = FipsSHS.createDigest(FipsSHS.Algorithm.SHA256);
+        SSHParameters testParams = new SSHParameters(SSH.getAlgorithm(), 'A', Hex.decode("0102030405060708090a0b0c0d0e0f"), Hex.decode("deadbeefbeefdead"), Hex.decode("a1a2a3a4a5a6a7a8a9a0aaabacadaeaf"));
+        byte[] kat = new byte[32];
+        SSHOperatorFactory.hash(sha256, testParams, kat, 0, 32);
+        if (!Arrays.areEqual(kat, Hex.decode("5ec5d5b69202eecc55e4d932cd9907352c349b0c2ecd2432356dba984495cf2d")))
+        {
+            FipsStatus.moveToErrorStatus(new FipsSelfTestFailedError("Exception on self test: SSH KAT", SSH.getAlgorithm()));
         }
     }
 }

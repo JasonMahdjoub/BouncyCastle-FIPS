@@ -20,10 +20,10 @@ import com.distrimind.bcfips.crypto.fips.FipsUnapprovedOperationError;
 public abstract class AsymmetricDHKey
     implements AsymmetricKey
 {
-    private final boolean    approvedModeOnly;
+    protected final boolean    approvedModeOnly;
 
-    private Algorithm algorithm;
-    private DHDomainParameters domainParameters;
+    protected Algorithm algorithm;
+    protected DHDomainParameters domainParameters;
 
     AsymmetricDHKey(Algorithm algorithm, DHDomainParameters domainParameters)
     {

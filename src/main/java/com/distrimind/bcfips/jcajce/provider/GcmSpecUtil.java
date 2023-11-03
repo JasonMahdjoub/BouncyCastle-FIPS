@@ -16,7 +16,7 @@ import com.distrimind.bcfips.util.Integers;
 
 class GcmSpecUtil
 {
-    static final Class gcmSpecClass = lookup("javax.crypto.spec.GCMParameterSpec");
+    static final Class gcmSpecClass = ClassUtil.lookup("javax.crypto.spec.GCMParameterSpec");
 
     static boolean gcmSpecExists()
     {
@@ -106,18 +106,6 @@ class GcmSpecUtil
         else
         {
             throw (InvalidParameterSpecException)rv;
-        }
-    }
-
-    private static Class lookup(String className)
-    {
-        try
-        {
-            return GcmSpecUtil.class.getClassLoader().loadClass(className);
-        }
-        catch (Exception e)
-        {
-            return null;
         }
     }
 }

@@ -63,9 +63,9 @@ public class PersonalData
 
     /**
      * Constructor from ASN1Sequence.
-     * <p/>
+     * 
      * The sequence is of type NameOrPseudonym:
-     * <p/>
+     * 
      * <pre>
      *     PersonalData ::= SEQUENCE {
      *       nameOrPseudonym NameOrPseudonym,

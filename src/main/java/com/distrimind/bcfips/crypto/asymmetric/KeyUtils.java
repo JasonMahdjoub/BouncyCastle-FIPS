@@ -348,4 +348,10 @@ class KeyUtils
 
         return nonEqual == 0;
     }
+
+    // always return false if either object is null
+    static boolean isFieldEqual(Object a, Object b)
+    {
+        return a != null && a.equals(b);
+    }
 }

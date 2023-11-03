@@ -134,9 +134,11 @@ public final class AsymmetricDSTU4145PrivateKey
      */
     public final DSTU4145Parameters getParameters()
     {
+        DSTU4145Parameters parameters = super.getParameters();
+
         KeyUtils.checkDestroyed(this);
 
-        return super.getParameters();
+        return parameters;
     }
 
     public final BigInteger getS()
@@ -145,9 +147,11 @@ public final class AsymmetricDSTU4145PrivateKey
 
         KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
 
+        BigInteger dVal = d;
+
         KeyUtils.checkDestroyed(this);
 
-        return d;
+        return dVal;
     }
 
     public void destroy()
@@ -188,29 +192,11 @@ public final class AsymmetricDSTU4145PrivateKey
 
         AsymmetricDSTU4145PrivateKey other = (AsymmetricDSTU4145PrivateKey)o;
 
-        if (this.isDestroyed() || other.isDestroyed())
-        {
-            return false;
-        }
-
-        if (d == null)
-        {
-            if (other.d != null)
-            {
-                return false;
-            }
-        }
-        else
-        {
-            if (!d.equals(other.d))
-            {
-                return false;
-            }
-        }
+        other.checkApprovedOnlyModeStatus();
 
         // we ignore the public point encoding.
 
-        return this.getParameters().equals(other.getParameters());
+        return KeyUtils.isFieldEqual(this.d, other.d) && KeyUtils.isFieldEqual(this.parameters, other.parameters);
     }
 
     @Override
@@ -232,7 +218,7 @@ public final class AsymmetricDSTU4145PrivateKey
     protected void finalize()
         throws Throwable
     {
-        destroy();
+        //destroy();
 
         super.finalize();
     }

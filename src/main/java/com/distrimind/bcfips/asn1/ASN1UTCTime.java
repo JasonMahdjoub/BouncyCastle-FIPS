@@ -167,9 +167,9 @@ public class ASN1UTCTime
     public Date getDate()
         throws ParseException
     {
-        SimpleDateFormat dateF = new SimpleDateFormat("yyMMddHHmmssz");
+        SimpleDateFormat dateF = new SimpleDateFormat("yyMMddHHmmssz", DateUtil.EN_Locale);
 
-        return DateUtil.epochAdjust(dateF.parse(getTime()));
+        return dateF.parse(getTime());
     }
 
     /**
@@ -182,11 +182,11 @@ public class ASN1UTCTime
     public Date getAdjustedDate()
         throws ParseException
     {
-        SimpleDateFormat dateF = new SimpleDateFormat("yyyyMMddHHmmssz");
+        SimpleDateFormat dateF = new SimpleDateFormat("yyyyMMddHHmmssz", DateUtil.EN_Locale);
 
         dateF.setTimeZone(new SimpleTimeZone(0,"Z"));
         
-        return DateUtil.epochAdjust(dateF.parse(getAdjustedTime()));
+        return dateF.parse(getAdjustedTime());
     }
 
     /**

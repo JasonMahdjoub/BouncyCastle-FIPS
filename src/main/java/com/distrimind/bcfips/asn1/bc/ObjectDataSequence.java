@@ -10,8 +10,8 @@ import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.DERSequence;
-import com.distrimind.bcfips.util.Iterable;
 import com.distrimind.bcfips.util.Arrays;
+import com.distrimind.bcfips.util.Iterable;
 
 /**
  * <pre>

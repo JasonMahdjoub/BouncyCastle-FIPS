@@ -18,14 +18,10 @@ public class Properties
             {
                 public String run()
                 {
-                    String value = Security.getProperty(propertyName);
+                    String value = getPropertyValue(propertyName);
                     if (value == null)
                     {
-                        value = System.getProperty(propertyName);
-                        if (value == null)
-                        {
-                            return null;
-                        }
+                        return null;
                     }
 
                     return Strings.toLowerCase(value);
@@ -36,5 +32,21 @@ public class Properties
         {
             return false;
         }
+    }
+
+    public static String getPropertyValue(final String propertyName)
+    {
+        return AccessController.doPrivileged(new PrivilegedAction<String>()
+        {
+            public String run()
+            {
+                String v = Security.getProperty(propertyName);
+                if (v != null)
+                {
+                    return v;
+                }
+                return System.getProperty(propertyName);
+            }
+        });
     }
 }

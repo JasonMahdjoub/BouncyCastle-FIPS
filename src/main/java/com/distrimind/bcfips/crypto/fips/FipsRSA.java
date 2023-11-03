@@ -44,6 +44,7 @@ import com.distrimind.bcfips.crypto.internal.PrimeCertaintyCalculator;
 import com.distrimind.bcfips.crypto.internal.Signer;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.BigIntegers;
+import com.distrimind.bcfips.util.Properties;
 import com.distrimind.bcfips.util.encoders.Hex;
 import com.distrimind.bcfips.util.test.FixedSecureRandom;
 import com.distrimind.bcfips.util.test.TestRandomData;
@@ -888,6 +889,13 @@ public final class FipsRSA
 
                 if (random != null)
                 {
+                    if (CryptoServicesRegistrar.isInApprovedOnlyMode()
+                        && parameters.getAlgorithm().equals(ALGORITHM_PKCS1v1_5)
+                        && !Properties.isOverrideSet("com.distrimind.bcfips.rsa.allow_pkcs15_enc"))
+                    {
+                        throw new FipsUnapprovedOperationError("RSA PKCS1.5 encryption disallowed");
+                    }
+
                     keyWrapper = createCipher(true, key, parameters, random);
                 }
                 else

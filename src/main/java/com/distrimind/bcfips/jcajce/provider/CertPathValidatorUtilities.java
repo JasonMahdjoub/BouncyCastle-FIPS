@@ -614,7 +614,7 @@ class CertPathValidatorUtilities
      * Add the CRL issuers from the cRLIssuer field of the distribution point or
      * from the certificate if not given to the issuer criterion of the
      * <code>selector</code>.
-     * <p/>
+     * 
      * The <code>issuerPrincipals</code> are a collection with a single
      * <code>X500Principal</code> for <code>X509Certificate</code>s.
      *

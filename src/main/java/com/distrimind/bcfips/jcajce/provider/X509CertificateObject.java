@@ -50,7 +50,7 @@ import com.distrimind.bcfips.asn1.misc.NetscapeRevocationURL;
 import com.distrimind.bcfips.asn1.misc.VerisignCzagExtension;
 import com.distrimind.bcfips.asn1.util.ASN1Dump;
 import com.distrimind.bcfips.asn1.x500.X500Name;
-import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
+import com.distrimind.bcfips.asn1.x509.Extensions;
 import com.distrimind.bcfips.util.Integers;
 import com.distrimind.bcfips.util.Strings;
 import com.distrimind.bcfips.util.encoders.Hex;

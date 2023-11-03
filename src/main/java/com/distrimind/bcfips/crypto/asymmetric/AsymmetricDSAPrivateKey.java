@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.security.auth.Destroyable;
+
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.pkcs.PrivateKeyInfo;
 import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
@@ -18,7 +20,7 @@ import com.distrimind.bcfips.crypto.internal.Permissions;
  */
 public final class AsymmetricDSAPrivateKey
     extends AsymmetricDSAKey
-    implements AsymmetricPrivateKey
+    implements AsymmetricPrivateKey, Destroyable
 {
     private final AtomicBoolean hasBeenDestroyed = new AtomicBoolean(false);
 
@@ -77,9 +79,11 @@ public final class AsymmetricDSAPrivateKey
      */
     public final DSADomainParameters getDomainParameters()
     {
+        DSADomainParameters domainParameters = super.getDomainParameters();
+
         KeyUtils.checkDestroyed(this);
 
-        return super.getDomainParameters();
+        return domainParameters;
     }
 
     public final byte[] getEncoded()
@@ -95,9 +99,11 @@ public final class AsymmetricDSAPrivateKey
 
         KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
 
+        BigInteger xVal = x;
+
         KeyUtils.checkDestroyed(this);
 
-        return x;
+        return xVal;
     }
 
     public void destroy()
@@ -124,6 +130,8 @@ public final class AsymmetricDSAPrivateKey
     @Override
     public int hashCode()
     {
+        checkApprovedOnlyModeStatus();
+
         return hashCode;
     }
 
@@ -135,17 +143,10 @@ public final class AsymmetricDSAPrivateKey
     }
 
     @Override
-    protected void finalize()
-        throws Throwable
-    {
-        destroy();
-
-        super.finalize();
-    }
-
-    @Override
     public boolean equals(Object o)
     {
+        checkApprovedOnlyModeStatus();
+
         if (this == o)
         {
             return true;
@@ -158,11 +159,10 @@ public final class AsymmetricDSAPrivateKey
 
         AsymmetricDSAPrivateKey other = (AsymmetricDSAPrivateKey)o;
 
-        if (this.isDestroyed() || other.isDestroyed())
-        {
-            return false;
-        }
+        other.checkApprovedOnlyModeStatus();
 
-        return x.equals(other.x) && this.getDomainParameters().equals(other.getDomainParameters());
+        return this.hashCode == other.hashCode
+            && KeyUtils.isFieldEqual(this.x, other.x)
+            && KeyUtils.isFieldEqual(this.domainParameters, other.domainParameters);
     }
 }

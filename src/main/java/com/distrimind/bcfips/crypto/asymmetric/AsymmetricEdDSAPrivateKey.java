@@ -108,16 +108,20 @@ public final class AsymmetricEdDSAPrivateKey
 
         KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
 
+        byte[] clone = Arrays.clone(keyData);
+
         KeyUtils.checkDestroyed(this);
 
-        return Arrays.clone(keyData);
+        return clone;
     }
 
     public byte[] getPublicData()
     {
+        byte[] clone = Arrays.clone(publicData);
+
         KeyUtils.checkDestroyed(this);
 
-        return Arrays.clone(publicData);
+        return clone;
     }
 
     public byte[] getEncoded()
@@ -126,19 +130,18 @@ public final class AsymmetricEdDSAPrivateKey
 
         KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
 
-        KeyUtils.checkDestroyed(this);
-
         byte[] pubData = (hasPublicKey) ? publicData : null;
+        ASN1Set attributes = this.attributes;
 
         if (getAlgorithm().equals(EdEC.Algorithm.Ed448))
         {
             return KeyUtils.getEncodedPrivateKeyInfo(
-                new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed448), new DEROctetString(keyData), attributes, pubData);
+                new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed448), new DEROctetString(getSecret()), attributes, pubData);
         }
         else
         {
             return KeyUtils.getEncodedPrivateKeyInfo(
-                new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519), new DEROctetString(keyData), attributes, pubData);
+                new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519), new DEROctetString(getSecret()), attributes, pubData);
         }
     }
 
@@ -185,17 +188,11 @@ public final class AsymmetricEdDSAPrivateKey
 
         AsymmetricEdDSAPrivateKey other = (AsymmetricEdDSAPrivateKey)o;
 
-        if (this.isDestroyed() || other.isDestroyed())
-        {
-            return false;
-        }
+        other.checkApprovedOnlyModeStatus();
 
-        if (!Arrays.areEqual(keyData, other.keyData))
-        {
-            return false;
-        }
-
-        return this.getAlgorithm().equals(other.getAlgorithm());
+        return this.hashCode == other.hashCode
+            && KeyUtils.isFieldEqual(this.getAlgorithm(), other.getAlgorithm())
+            && Arrays.constantTimeAreEqual(this.keyData, other.keyData);
     }
 
     @Override
@@ -211,14 +208,5 @@ public final class AsymmetricEdDSAPrivateKey
         int result = getAlgorithm().hashCode();
         result = 31 * result + Arrays.hashCode(keyData);
         return result;
-    }
-
-    @Override
-    protected void finalize()
-        throws Throwable
-    {
-        super.finalize();
-
-        destroy();
     }
 }

@@ -89,7 +89,7 @@ idea {
         languageLevel = javaVersion
     }
 }
-version='1.0.2.3d'
+version='1.0.2.4'
 allprojects {
 	group='com.distrimind.bcfips'
 

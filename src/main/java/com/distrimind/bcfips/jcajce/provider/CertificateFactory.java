@@ -19,17 +19,20 @@ import java.util.List;
 
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
+import com.distrimind.bcfips.asn1.ASN1InputStream;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.ASN1SequenceParser;
 import com.distrimind.bcfips.asn1.ASN1Set;
 import com.distrimind.bcfips.asn1.ASN1SetParser;
 import com.distrimind.bcfips.asn1.ASN1StreamParser;
+import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.BERTaggedObjectParser;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.DERSet;
 import com.distrimind.bcfips.asn1.cms.SignedDataParser;
 import com.distrimind.bcfips.asn1.pkcs.PKCSObjectIdentifiers;
+import com.distrimind.bcfips.asn1.pkcs.SignedData;
 import com.distrimind.bcfips.asn1.x509.Certificate;
 import com.distrimind.bcfips.asn1.x509.CertificateList;
 import com.distrimind.bcfips.util.io.Streams;
@@ -195,50 +198,29 @@ class CertificateFactory
         return null;
     }
 
-    private CRL readDERCRL()
+    private CRL readDERCRL(ASN1InputStream aIn)
         throws IOException, CRLException
     {
-        ASN1SequenceParser seq = (ASN1SequenceParser)currentAsn1Parser.readObject();
-        ASN1Encodable first = seq.readObject();
-
-        if (first instanceof ASN1ObjectIdentifier)
+        ASN1Sequence seq = ASN1Sequence.getInstance(aIn.readObject());
+        if (seq == null)
         {
-            if (first.equals(PKCSObjectIdentifiers.signedData))
+            return null;
+        }
+
+        if (seq.size() > 1
+            && seq.getObjectAt(0) instanceof ASN1ObjectIdentifier)
+        {
+            if (seq.getObjectAt(0).equals(PKCSObjectIdentifiers.signedData))
             {
-                signedDataParser = SignedDataParser.getInstance(((BERTaggedObjectParser)seq.readObject()).getObjectParser(1, true));
+                sCrlData = SignedData.getInstance(ASN1Sequence.getInstance(
+                    (ASN1TaggedObject)seq.getObjectAt(1), true)).getCRLs();
 
-                signedDataParser.getDigestAlgorithms().toASN1Primitive();
-
-                ASN1Encodable content = signedDataParser.getEncapContentInfo().getContent(0);
-                if (content != null)
-                {
-                    content.toASN1Primitive();
-                }
-                signedDataParser.getCertificates().toASN1Primitive();
-
-                ASN1SetParser setParser = signedDataParser.getCrls();
-                if (setParser != null)
-                {
-                    sCrlData = pruneSet(setParser);
-
-                    return getCRL();
-                }
-                return null;
+                return getCRL();
             }
         }
 
-        ASN1EncodableVector v = new ASN1EncodableVector();
-
-        v.add(first.toASN1Primitive());
-        ASN1Encodable o;
-
-        while ((o = seq.readObject()) != null)
-        {
-            v.add(o.toASN1Primitive());
-        }
-
         return createCRL(
-                     CertificateList.getInstance(new DERSequence(v)));
+                     CertificateList.getInstance(seq));
     }
 
     private CRL getCRL()
@@ -447,9 +429,7 @@ class CertificateFactory
                 }
                 else
                 {       // lazy evaluate to help processing of large CRLs
-                    currentAsn1Parser = new ASN1StreamParser(pis);
-
-                    crl = readDERCRL();
+                    crl = readDERCRL(new ASN1InputStream(pis, true));
                 }
             }
         }

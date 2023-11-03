@@ -16,12 +16,12 @@ import com.distrimind.bcfips.util.Iterable;
  * <p>
  * Note: This does not know which syntax the set is!
  * (The difference: ordering of SET elements or not ordering.)
- * </p><p>
+ * <p>
  * DER form is always definite form length fields, while
  * BER support uses indefinite form.
- * </p><p>
+ * <p>
  * The CER form support does not exist.
- * </p><p>
+ * <p>
  * <h2>X.690</h2>
  * <h3>8: Basic encoding rules</h3>
  * <h4>8.11 Encoding of a set value </h4>
@@ -32,7 +32,7 @@ import com.distrimind.bcfips.util.Iterable;
  * ASN.1 definition of the set type, in an order chosen by the sender,
  * unless the type was referenced with the keyword
  * <b>OPTIONAL</b> or the keyword <b>DEFAULT</b>.
- * </p><p>
+ * <p>
  * <b>8.11.3</b> The encoding of a data value may, but need not,
  * be present for a type which was referenced with the keyword
  * <b>OPTIONAL</b> or the keyword <b>DEFAULT</b>.
@@ -43,12 +43,12 @@ import com.distrimind.bcfips.util.Iterable;
  * <h4>8.12 Encoding of a set-of value</h4>
  * <p>
  * <b>8.12.1</b> The encoding of a set-of value shall be constructed.
- * </p><p>
+ * <p>
  * <b>8.12.2</b> The text of 8.10.2 applies:
  * <i>The contents octets shall consist of zero,
  * one or more complete encodings of data values from the type listed in
  * the ASN.1 definition.</i>
- * </p><p>
+ * <p>
  * <b>8.12.3</b> The order of data values need not be preserved by
  * the encoding and subsequent decoding.
  *
@@ -104,6 +104,8 @@ public abstract class ASN1Set
 {
     private Vector set = new Vector();
     private boolean isSorted = false;
+
+    protected Vector sortedElements;
 
     /**
      * return an ASN1Set from the given object.
@@ -394,18 +396,28 @@ public abstract class ASN1Set
         }
         else
         {
-            Vector v = new Vector();
-
-            for (int i = 0; i != set.size(); i++)
-            {
-                v.addElement(set.elementAt(i));
-            }
-
             ASN1Set derSet = new DERSet();
 
-            derSet.set = v;
+            if (sortedElements == null)
+            {
+                Vector v = new Vector();
 
-            derSet.sort();
+                for (int i = 0; i != set.size(); i++)
+                {
+                    v.addElement(set.elementAt(i));
+                }
+
+                derSet.set = v;
+
+                derSet.sort();
+
+                sortedElements = v;
+            }
+            else
+            {
+                derSet.isSorted = true;
+                derSet.set = sortedElements;
+            }
 
             return derSet;
         }
@@ -481,15 +493,25 @@ public abstract class ASN1Set
          byte[] a,
          byte[] b)
     {
-        int len = Math.min(a.length, b.length);
-        for (int i = 0; i != len; ++i)
+        // constructed bit not part of tag value.
+        int a0 = a[0] & ~BERTags.CONSTRUCTED & 0xFF;
+        int b0 = b[0] & ~BERTags.CONSTRUCTED & 0xFF;
+
+        if (a0 != b0)
+        {
+            return a0 < b0;
+        }
+
+        int len = Math.min(a.length, b.length) - 1;
+        for (int i = 1; i < len; ++i)
         {
             if (a[i] != b[i])
             {
-                return (a[i] & 0xff) < (b[i] & 0xff);
+                return (a[i] & 0xFF) < (b[i] & 0xFF);
             }
         }
-        return len == a.length;
+
+        return (a[len] & 0xFF) <= (b[len] & 0xFF);
     }
 
     private byte[] getDEREncoded(

@@ -6,8 +6,10 @@ import java.util.Map;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
 import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
+import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.EntropySource;
 import com.distrimind.bcfips.util.Arrays;
+import com.distrimind.bcfips.util.Properties;
 import com.distrimind.bcfips.util.encoders.Hex;
 
 /**
@@ -109,6 +111,15 @@ class CTRSP800DRBG
         _seedLength = keySizeInBits + engine.getBlockSize() * 8;
         _isTDEA = isTDEA(engine);
 
+        // check only meaningful when out of startup phase.
+        if (!FipsStatus.isBooting())
+        {
+            if (_isTDEA && CryptoServicesRegistrar.isInApprovedOnlyMode() && !Properties.isOverrideSet("com.distrimind.bcfips.tripledes.allow_drbg"))
+            {
+                throw new FipsUnapprovedOperationError("Triple-DES CTRDRBG disallowed");
+            }
+        }
+        
         init(securityStrength, entropySource, personalizationString, nonce);
     }
 

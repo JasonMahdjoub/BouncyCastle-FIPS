@@ -1,9 +1,13 @@
 package com.distrimind.bcfips.crypto;
 
-import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.security.auth.DestroyFailedException;
+import javax.security.auth.Destroyable;
 
 import com.distrimind.bcfips.crypto.fips.FipsOperationError;
 import com.distrimind.bcfips.crypto.internal.Permissions;
+import com.distrimind.bcfips.util.Arrays;
 
 /**
  * Basic class describing a secret key implementation. The key will be zeroized explicitly on
@@ -14,7 +18,7 @@ import com.distrimind.bcfips.crypto.internal.Permissions;
  * </p>
  */
 public final class SymmetricSecretKey
-    implements SymmetricKey
+    implements SymmetricKey, Destroyable
 {
     private final boolean    approvedModeOnly;
 
@@ -57,10 +61,11 @@ public final class SymmetricSecretKey
      */
     public Algorithm getAlgorithm()
     {
+        checkDestroyed();
         return algorithm;
     }
 
-    private void zeroize()
+    private  void zeroize()
     {
         for (int i = 0; i != bytes.length; i++)
         {
@@ -78,7 +83,7 @@ public final class SymmetricSecretKey
      *
      * @return the bytes making up this key.
      */
-    public byte[] getKeyBytes()
+    public  byte[] getKeyBytes()
     {
         checkApprovedOnlyModeStatus();
 
@@ -89,12 +94,18 @@ public final class SymmetricSecretKey
             securityManager.checkPermission(Permissions.CanOutputSecretKey);
         }
 
-        return bytes.clone();
+        byte[] clone = Arrays.clone(bytes);
+
+        checkDestroyed();
+
+        return clone;
     }
 
     @Override
     public boolean equals(Object o)
     {
+        checkApprovedOnlyModeStatus();
+
         if (this == o)
         {
             return true;
@@ -107,16 +118,10 @@ public final class SymmetricSecretKey
 
         SymmetricSecretKey other = (SymmetricSecretKey)o;
 
-        if (!getAlgorithm().equals(other.getAlgorithm()))
-        {
-            return false;
-        }
-        if (!Arrays.equals(bytes, other.bytes))
-        {
-            return false;
-        }
+        other.checkApprovedOnlyModeStatus();
 
-        return true;
+        return (this.algorithm != null && this.algorithm.equals(other.algorithm))
+               && Arrays.constantTimeAreEqual(bytes, other.bytes);
     }
 
     @Override
@@ -136,18 +141,34 @@ public final class SymmetricSecretKey
         return result;
     }
 
-    @Override
-    protected void finalize()
-        throws Throwable
-    {
-        zeroize();       // ZEROIZE: clear key bytes on de-allocation
-    }
-
     final void checkApprovedOnlyModeStatus()
     {
         if (approvedModeOnly != CryptoServicesRegistrar.isInApprovedOnlyMode())
         {
             throw new FipsOperationError("attempt to use key created in " + ((approvedModeOnly) ? "approved mode" : "unapproved mode") + " in alternate mode.");
+        }
+    }
+
+    private final AtomicBoolean hasBeenDestroyed = new AtomicBoolean(false);
+
+    public void destroy() throws DestroyFailedException
+    {
+        if (hasBeenDestroyed.compareAndSet(false, true))
+        {
+            zeroize();
+        }
+    }
+
+    public boolean isDestroyed()
+    {
+        return hasBeenDestroyed.get();
+    }
+
+    private void checkDestroyed()
+    {
+        if (this.isDestroyed())
+        {
+            throw new IllegalStateException("key has been destroyed");
         }
     }
 }

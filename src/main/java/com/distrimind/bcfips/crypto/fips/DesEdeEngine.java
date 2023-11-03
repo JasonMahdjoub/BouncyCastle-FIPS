@@ -9,6 +9,7 @@ import com.distrimind.bcfips.crypto.internal.DataLengthException;
 import com.distrimind.bcfips.crypto.internal.OutputLengthException;
 import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
 import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
+import com.distrimind.bcfips.util.Arrays;
 
 /**
  * a class that provides a basic DESede (or Triple DES) engine.
@@ -165,6 +166,17 @@ class DesEdeEngine
     {
         super.finalize();
 
-        this.init(true, ZERO_KEY);    // ZEROIZE: clear key schedule on de-allocation
+        if (workingKey1 != null)
+        {
+            Arrays.fill(workingKey1, 0);
+        }
+        if (workingKey2 != null)
+        {
+            Arrays.fill(workingKey2, 0);
+        }
+        if (workingKey1 != workingKey3 && workingKey3 != null)
+        {
+            Arrays.fill(workingKey3, 0);
+        }
     }
 }

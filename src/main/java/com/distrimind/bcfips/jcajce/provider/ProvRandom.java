@@ -4,6 +4,8 @@ package com.distrimind.bcfips.jcajce.provider;
 import java.security.SecureRandom;
 import java.security.SecureRandomSpi;
 
+import com.distrimind.bcfips.crypto.EntropySource;
+import com.distrimind.bcfips.crypto.EntropySourceProvider;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Pack;
 import com.distrimind.bcfips.util.Strings;
@@ -48,13 +50,13 @@ class ProvRandom
         {
             public Object createInstance(Object constructorParameter)
             {
-                final SecureRandom entropySource = provider.getDefaultEntropySource();
+                final EntropySourceProvider entropySourceProvider = provider.getEntropySourceProvider();
+                final EntropySource seedSource = entropySourceProvider.get((provider.getProviderDefaultSecurityStrength() / 2) + 1);
 
                 final SecureRandom random = provider.getProviderDefaultRandomBuilder()
-                    .fromEntropySource(entropySource, true)
+                    .fromEntropySource(entropySourceProvider)
                     .setPersonalizationString(generatePersonalizationString())
-                    .build(entropySource.generateSeed((provider.getProviderDefaultSecurityStrength() / (2 * 8)) + 1),
-                        false, Strings.toByteArray("Bouncy Castle FIPS Provider Nonce/IV"));
+                    .build(seedSource.getEntropy(), false, Strings.toByteArray("Bouncy Castle FIPS Provider Nonce/IV"));
 
                 return new SecureRandomSpi()
                 {

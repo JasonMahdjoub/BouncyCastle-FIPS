@@ -126,9 +126,11 @@ public final class AsymmetricGOST3410PrivateKey
     {
         KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
 
+        BigInteger xVal = x;
+
         KeyUtils.checkDestroyed(this);
 
-        return x;
+        return xVal;
     }
 
     public void destroy()
@@ -154,6 +156,8 @@ public final class AsymmetricGOST3410PrivateKey
     @Override
     public int hashCode()
     {
+        checkApprovedOnlyModeStatus();
+
         return hashCode;
     }
 
@@ -170,12 +174,14 @@ public final class AsymmetricGOST3410PrivateKey
     {
         super.finalize();
 
-        destroy();
+        //destroy();
     }
 
     @Override
     public boolean equals(Object o)
     {
+        checkApprovedOnlyModeStatus();
+
         if (this == o)
         {
             return true;
@@ -188,11 +194,8 @@ public final class AsymmetricGOST3410PrivateKey
 
         AsymmetricGOST3410PrivateKey other = (AsymmetricGOST3410PrivateKey)o;
 
-        if (this.isDestroyed() || other.isDestroyed())
-        {
-            return false;
-        }
+        other.checkApprovedOnlyModeStatus();
 
-        return x.equals(other.x) && this.getParameters().equals(other.getParameters());
+        return KeyUtils.isFieldEqual(this.x, other.x) && KeyUtils.isFieldEqual(this.domainParameters, other.domainParameters);
     }
 }

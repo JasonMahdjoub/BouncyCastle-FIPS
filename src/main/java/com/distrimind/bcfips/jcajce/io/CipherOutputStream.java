@@ -14,8 +14,10 @@ import com.distrimind.bcfips.crypto.InvalidCipherTextException;
  * the written data with the cipher, and the output of the cipher is in turn written to the
  * underlying OutputStream. The cipher must be fully initialized before being used by a
  * CipherInputStream.
+ *
  * For example, if the cipher is initialized for encryption, the CipherOutputStream will encrypt the
  * data before writing the encrypted data to the underlying stream.
+ *
  * This is a reimplementation of {@link javax.crypto.CipherOutputStream} that is safe for use with
  * AEAD block ciphers, and does not silently catch {@link javax.crypto.BadPaddingException} and
  * {@link javax.crypto.IllegalBlockSizeException} errors. Any errors that occur during {@link javax.crypto.Cipher#doFinal()

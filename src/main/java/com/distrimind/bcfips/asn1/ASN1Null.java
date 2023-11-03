@@ -18,7 +18,7 @@ public abstract class ASN1Null
 
     /**
      * Return an instance of ASN.1 NULL from the passed in object.
-     *
+     * <p>
      * Accepted inputs:
      * <ul>
      * <li> null &rarr; null
@@ -42,7 +42,7 @@ public abstract class ASN1Null
         {
             try
             {
-                return ASN1Null.getInstance(fromByteArray((byte[])o));
+                return ASN1Null.getInstance(ASN1Primitive.fromByteArray((byte[])o));
             }
             catch (IOException e)
             {

@@ -125,9 +125,11 @@ public final class AsymmetricRSAPrivateKey
      */
     public Algorithm getAlgorithm()
     {
+        Algorithm rv = super.getAlgorithm();
+
         KeyUtils.checkDestroyed(this);
 
-        return super.getAlgorithm();
+        return rv;
     }
 
     /**
@@ -137,58 +139,50 @@ public final class AsymmetricRSAPrivateKey
      */
     public BigInteger getModulus()
     {
+        BigInteger rv = super.getModulus();
+
         KeyUtils.checkDestroyed(this);
 
-        return super.getModulus();
+        return rv;
     }
 
     public BigInteger getPublicExponent()
     {
+        BigInteger rv = publicExponent;
+
         KeyUtils.checkDestroyed(this);
 
-        return publicExponent;
+        return rv;
     }
 
     public BigInteger getPrivateExponent()
     {
-        checkCanRead();
-
-        return privateExponent;
+        return fieldValue(privateExponent);
     }
 
     public BigInteger getP()
     {
-        checkCanRead();
-
-        return p;
+        return fieldValue(p);
     }
 
     public BigInteger getQ()
     {
-        checkCanRead();
-
-        return q;
+        return fieldValue(q);
     }
 
     public BigInteger getDP()
     {
-        checkCanRead();
-
-        return dp;
+        return fieldValue(dp);
     }
 
     public BigInteger getDQ()
     {
-        checkCanRead();
-
-        return dq;
+        return fieldValue(dq);
     }
 
     public BigInteger getQInv()
     {
-        checkCanRead();
-
-        return qInv;
+        return fieldValue(qInv);
     }
 
     public final byte[] getEncoded()
@@ -241,15 +235,16 @@ public final class AsymmetricRSAPrivateKey
 
         AsymmetricRSAPrivateKey other = (AsymmetricRSAPrivateKey)o;
 
-        if (this.isDestroyed() || other.isDestroyed())
-        {
-            return false;
-        }
+        other.checkApprovedOnlyModeStatus();
 
-        return getModulus().equals(other.getModulus())
-            && privateExponent.equals(other.privateExponent) && getPublicExponent().equals(other.getPublicExponent())
-            && p.equals(other.p) && q.equals(other.q)
-            && dp.equals(other.dp) && dq.equals(other.dq) && qInv.equals(other.qInv);
+        return KeyUtils.isFieldEqual(modulus, other.modulus)
+            && KeyUtils.isFieldEqual(privateExponent, other.privateExponent)
+            && KeyUtils.isFieldEqual(publicExponent, other.publicExponent)
+            && KeyUtils.isFieldEqual(p, other.p)
+            && KeyUtils.isFieldEqual(q, other.q)
+            && KeyUtils.isFieldEqual(dp, other.dp)
+            && KeyUtils.isFieldEqual(dq, other.dq)
+            && KeyUtils.isFieldEqual(qInv, other.qInv);
     }
 
     @Override
@@ -279,7 +274,7 @@ public final class AsymmetricRSAPrivateKey
     {
         super.finalize();
 
-        destroy();
+        //destroy();
     }
 
     private void checkCanRead()
@@ -289,5 +284,12 @@ public final class AsymmetricRSAPrivateKey
         KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
 
         KeyUtils.checkDestroyed(this);
+    }
+
+    private BigInteger fieldValue(BigInteger value)
+    {
+        checkCanRead();
+
+        return value;
     }
 }

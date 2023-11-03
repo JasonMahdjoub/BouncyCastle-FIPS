@@ -12,4 +12,9 @@ class DataArrayOutputStream
         Arrays.fill(buf, 0, count, (byte)0);
         count = 0;
     }
+
+    byte[] getBuffer()
+    {
+        return buf;
+    }
 }

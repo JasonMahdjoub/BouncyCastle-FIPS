@@ -9,7 +9,6 @@ import com.distrimind.bcfips.util.Strings;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.security.AccessController;
 import java.security.CodeSource;
@@ -86,43 +85,75 @@ public final class FipsStatus
         return readyStatus.get();
     }
 
+    static boolean isBooting()
+    {
+        return !readyStatus.get();
+    }
+
     private static void checksumValidate()
     {
-        /*JarFile jarFile = AccessController.doPrivileged(new PrivilegedAction<JarFile>()
-                        {
-                            public JarFile run()
-                            {
-                                return getJarFile();
-                            }
-                        });
-
-        if (jarFile != null)      // we only do the checksum calculation if we are running off a jar file.
+        /*final String rscName = AccessController.doPrivileged(new PrivilegedAction<String>()
         {
-            try
+            public String run()
             {
-                byte[] hmac = calculateModuleHMAC(jarFile);
-                InputStream macIn = jarFile.getInputStream(jarFile.getEntry("META-INF/HMAC.SHA256"));
-
-                StringBuilder sb = new StringBuilder(hmac.length * 2);
-
-                int ch;
-                while ((ch = macIn.read()) >= 0 && ch != '\r' && ch != '\n')
-                {
-                    sb.append((char)ch);
-                }
-
-                byte[] fileMac = Hex.decode(sb.toString().trim());
-
-                if (!Arrays.areEqual(hmac, fileMac))
-                {
-                    moveToErrorStatus(new FipsOperationError("Module checksum failed: expected [" + sb.toString().trim() + "] got [" + Strings.fromByteArray(Hex.encode(hmac))) + "]");
-                }
+                return getResourceName();
             }
-            catch (Exception e)
-            {
-                statusException = e;
+        });
 
-                moveToErrorStatus(new FipsOperationError("Module checksum failed: " + e.getMessage(), e));
+        if (rscName == null)
+        {
+            moveToErrorStatus(new FipsOperationError("Module checksum failed: unable to find"));
+        }
+
+        if (rscName.startsWith("jrt:/"))
+        {
+            moveToErrorStatus(new FipsOperationError("Module checksum failed: unable to calculate"));
+        }
+        else
+        {
+            JarFile jarFile = AccessController.doPrivileged(new PrivilegedAction<JarFile>()
+            {
+                public JarFile run()
+                {
+                    try
+                    {
+                        return new JarFile(rscName);
+                    }
+                    catch (IOException e)
+                    {
+                        return null;
+                    }
+                }
+            });
+
+            if (jarFile != null)      // we only do the checksum calculation if we are running off a jar file.
+            {
+                try
+                {
+                    byte[] hmac = calculateModuleHMAC(jarFile);
+                    InputStream macIn = jarFile.getInputStream(jarFile.getEntry("META-INF/HMAC.SHA256"));
+
+                    StringBuilder sb = new StringBuilder(hmac.length * 2);
+
+                    int ch;
+                    while ((ch = macIn.read()) >= 0 && ch != '\r' && ch != '\n')
+                    {
+                        sb.append((char)ch);
+                    }
+
+                    byte[] fileMac = Hex.decode(sb.toString().trim());
+
+                    if (!Arrays.areEqual(hmac, fileMac))
+                    {
+                        moveToErrorStatus(new FipsOperationError("Module checksum failed: expected [" + sb.toString().trim() + "] got [" + Strings.fromByteArray(Hex.encode(hmac))) + "]");
+                    }
+                }
+                catch (Exception e)
+                {
+                    statusException = e;
+
+                    moveToErrorStatus(new FipsOperationError("Module checksum failed: " + e.getMessage(), e));
+                }
             }
         }*/
     }
@@ -185,7 +216,9 @@ public final class FipsStatus
     {
         try
         {
-            return calculateModuleHMAC(getJarFile());
+            String rscName = getResourceName();
+            
+            return calculateModuleHMAC(new JarFile(rscName));
         }
         catch (Exception e)
         {
@@ -268,12 +301,12 @@ public final class FipsStatus
         }
     }
 
-    private static JarFile getJarFile()
+    private static String getResourceName()
     {
         // we use the MARKER file, at the same level in the class hierarchy as this
         // class, to find the enclosing Jar file (if one exists)
 
-        JarFile result = null;
+        String result = null;
 
         final String markerName = LICENSE.class.getCanonicalName().replace(".", "/").replace("LICENSE", "MARKER");
         final String marker = getMarker(LICENSE.class, markerName);
@@ -286,7 +319,7 @@ public final class FipsStatus
                 {
                     String jarFilename = URLDecoder.decode(marker.substring("jar:file:".length(), marker.lastIndexOf("!/")), "UTF-8");
 
-                    result = new JarFile(jarFilename);
+                    result = jarFilename;
                 }
                 catch (IOException e)
                 {
@@ -300,13 +333,21 @@ public final class FipsStatus
                 {
                     String jarFilename = URLDecoder.decode(marker.substring("file:".length()), "UTF-8");
 
-                    result = new JarFile(jarFilename);
+                    result = jarFilename;
                 }
                 catch (IOException e)
                 {
                     // we found our jar file, but couldn't open it
                     result = null;
                 }
+            }
+            else if (marker.startsWith("jrt:"))
+            {
+                 return marker;
+            }
+            else if (marker.startsWith("file:"))
+            {
+                 return marker;    // this means we're running from classes (development)
             }
         }
 
@@ -362,23 +403,27 @@ public final class FipsStatus
 
         if (loader != null)
         {
-            URL resource = loader.getResource(markerName);
-
+            Object resource = AccessController.doPrivileged(
+                                new PrivilegedAction() {
+                                    public Object run() {
+                                        try
+                                        {
+                                            CodeSource cs =
+                                                sourceClass.getProtectionDomain().getCodeSource();
+                                            return cs.getLocation();
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            return null;
+                                        }
+                                    }
+                                });
             if (resource != null)
             {
-                return loader.getResource(markerName).toString();
+                return resource.toString();
             }
-            else
-            {
-                return AccessController.doPrivileged(
-                    new PrivilegedAction() {
-                        public Object run() {
-                            CodeSource cs =
-                                sourceClass.getProtectionDomain().getCodeSource();
-                            return cs.getLocation();
-                        }
-                    }).toString();
-            }
+
+            return loader.getResource(markerName).toString();
         }
         else
         {

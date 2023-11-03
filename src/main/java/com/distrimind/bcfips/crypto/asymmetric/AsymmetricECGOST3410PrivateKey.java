@@ -81,13 +81,15 @@ public final class AsymmetricECGOST3410PrivateKey
 
     public final byte[] getEncoded()
     {
+        GOST3410Parameters<ECDomainParameters> parameters = getParameters();
+
         byte[] encKey = new byte[32];
 
         extractBytes(encKey, 0, this.getS());
 
-        if (getParameters().getPublicKeyParamSet() != null)
+        if (parameters.getPublicKeyParamSet() != null)
         {
-            GOST3410PublicKeyAlgParameters pubParams = new GOST3410PublicKeyAlgParameters(getParameters().getPublicKeyParamSet(), getParameters().getDigestParamSet(), getParameters().getEncryptionParamSet());
+            GOST3410PublicKeyAlgParameters pubParams = new GOST3410PublicKeyAlgParameters(parameters.getPublicKeyParamSet(), parameters.getDigestParamSet(), parameters.getEncryptionParamSet());
 
             return KeyUtils.getEncodedPrivateKeyInfo(new AlgorithmIdentifier(CryptoProObjectIdentifiers.gostR3410_2001, pubParams), new DEROctetString(encKey));
         }
@@ -133,18 +135,22 @@ public final class AsymmetricECGOST3410PrivateKey
      */
     public final GOST3410Parameters<ECDomainParameters> getParameters()
     {
+        GOST3410Parameters<ECDomainParameters> parameters = super.getParameters();
+
         KeyUtils.checkDestroyed(this);
 
-        return super.getParameters();
+        return parameters;
     }
 
     public BigInteger getS()
     {
         KeyUtils.checkPermission(Permissions.CanOutputPrivateKey);
 
+        BigInteger xVal = x;
+
         KeyUtils.checkDestroyed(this);
 
-        return x;
+        return xVal;
     }
 
     public void destroy()
@@ -186,12 +192,14 @@ public final class AsymmetricECGOST3410PrivateKey
     {
         super.finalize();
 
-        destroy();
+        //destroy();
     }
 
     @Override
     public boolean equals(Object o)
     {
+        checkApprovedOnlyModeStatus();
+
         if (this == o)
         {
             return true;
@@ -204,11 +212,8 @@ public final class AsymmetricECGOST3410PrivateKey
 
         AsymmetricECGOST3410PrivateKey other = (AsymmetricECGOST3410PrivateKey)o;
 
-        if (this.isDestroyed() || other.isDestroyed())
-        {
-            return false;
-        }
-        
-        return x.equals(other.x) && this.getParameters().equals(other.getParameters());
+        other.checkApprovedOnlyModeStatus();
+
+        return KeyUtils.isFieldEqual(this.x, other.x) && KeyUtils.isFieldEqual(this.domainParameters, other.domainParameters);
     }
 }

@@ -15,7 +15,7 @@ import com.distrimind.bcfips.util.encoders.Hex;
  * Abstract base for the ASN.1 OCTET STRING data type
  * <p>
  * This supports BER, and DER forms of the data.
- * </p><p>
+ * <p>
  * DER form is always primitive single OCTET STRING, while
  * BER support includes the constructed forms.
  * </p>
@@ -86,14 +86,14 @@ import com.distrimind.bcfips.util.encoders.Hex;
  * the constructed encoding shall be encoded with a primitive encoding.
  * The encoding of each fragment, except possibly
  * the last, shall have 1000 contents octets. (Contrast with 8.21.6.)
- * </p><p>
+ * <p>
  * <b>10: Distinguished encoding rules</b>
- * </p><p>
+ * <p>
  * <b>10.1 Length forms</b>
  * The definite form of length encoding shall be used,
  * encoded in the minimum number of octets.
  * [Contrast with 8.1.3.2 b).] 
- * </p><p>
+ * <p>
  * <b>10.2 String encoding forms</b>
  * For BIT STRING, OCTET STRING and restricted character string types,
  * the constructed form of encoding shall not be used.

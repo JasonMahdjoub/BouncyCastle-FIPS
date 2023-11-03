@@ -12,13 +12,14 @@ import com.distrimind.bcfips.util.Strings;
  * DER Generalized time object.
  * 11: Restrictions on BER employed by both CER and DER
  * 11.7 GeneralizedTime
- *
+ * <p>
  * <b>11.7.1</b> The encoding shall terminate with a "Z",
  * as described in the ITU-T Rec. X.680 | ISO/IEC 8824-1 clause on
  * GeneralizedTime.
- *
+ * <p>
  * <b>11.7.2</b> The seconds element shall always be present.
- *
+ * </p>
+ * <p>
  * <b>11.7.3</b> The fractional-seconds elements, if present,
  * shall omit all trailing zeros; if the elements correspond to 0,
  * they shall be wholly omitted, and the decimal point element also

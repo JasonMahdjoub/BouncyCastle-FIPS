@@ -181,8 +181,8 @@ public class ProfessionInfo
 
     /**
      * Constructor from ASN1Sequence.
-     * <p/>
-     * <p/>
+     * 
+     * 
      * <pre>
      *               ProfessionInfo ::= SEQUENCE
      *               {

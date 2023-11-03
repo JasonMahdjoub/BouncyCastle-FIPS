@@ -4,6 +4,7 @@
  */
 package com.distrimind.bcfips.crypto.internal.modes;
 
+import com.distrimind.bcfips.crypto.InvalidCipherTextException;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.BufferedBlockCipher;
 import com.distrimind.bcfips.crypto.internal.DataLengthException;

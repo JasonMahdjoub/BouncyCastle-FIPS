@@ -199,6 +199,18 @@ public final class CryptoServicesRegistrar
     }
 
     /**
+     * If the default source of randomness is not set, return a SecureRandom generated from the
+     * passed in SecureRandomProvider.
+     *
+     * @param secureRandomProvider the provider of SecureRandom to use if no default is provided.
+     * @return a default SecureRandom, or one sourced from the provider if no default is available.
+     */
+    public static SecureRandom getSecureRandomIfSet(SecureRandomProvider secureRandomProvider)
+    {
+        return null == defaultSecureRandom ? secureRandomProvider.get() : defaultSecureRandom;
+    }
+
+    /**
      * Set a default secure random to be used where none is otherwise provided.
      *
      * @param secureRandom the SecureRandom to use as the default.

@@ -1,6 +1,8 @@
 package com.distrimind.bcfips.jcajce.provider;
 
 import java.lang.reflect.Constructor;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import javax.crypto.BadPaddingException;
 
@@ -36,18 +38,29 @@ class ClassUtil
         }
     }
 
-    private static Class lookup(String className)
+    static Class lookup(final String className)
     {
-        try
+        return AccessController.doPrivileged(new PrivilegedAction<Class>()
         {
-            Class def = ClassUtil.class.getClassLoader().loadClass(className);
+            public Class run()
+            {
+                try
+                {
+                    ClassLoader loader = ClassUtil.class.getClassLoader();
 
-            return def;
-        }
-        catch (Exception e)
-        {
-            return null;
-        }
+                    if (loader == null)
+                    {
+                        loader = ClassLoader.getSystemClassLoader();
+                    }
+
+                    return loader.loadClass(className);
+                }
+                catch (Exception e)
+                {
+                    return null;
+                }
+            }
+        });
     }
 
     public static void throwBadTagException(String message)

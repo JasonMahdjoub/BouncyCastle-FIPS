@@ -60,7 +60,7 @@ class BaseSingleBlockCipher
     {
         public Class run()
         {
-            return lookup("sun.security.internal.spec.TlsRsaPremasterSecretParameterSpec");
+            return ClassUtil.lookup("sun.security.internal.spec.TlsRsaPremasterSecretParameterSpec");
         }
     });
 
@@ -849,20 +849,6 @@ class BaseSingleBlockCipher
         }
 
         return BaseWrapCipher.rebuildKey(wrappedKeyAlgorithm, wrappedKeyType, encoded, fipsProvider);
-    }
-
-    private static Class lookup(String className)
-    {
-        try
-        {
-            Class def = BaseSingleBlockCipher.class.getClassLoader().loadClass(className);
-
-            return def;
-        }
-        catch (Exception e)
-        {
-            return null;
-        }
     }
 
     private static class BadBlockException

@@ -28,10 +28,10 @@ public abstract class AsymmetricDSAKey
         dsaOids.add(OIWObjectIdentifiers.dsaWithSHA1);
     }
 
-    private final boolean    approvedModeOnly;
+    protected final boolean    approvedModeOnly;
 
-    private Algorithm algorithm;
-    private DSADomainParameters domainParameters;
+    protected Algorithm algorithm;
+    protected DSADomainParameters domainParameters;
 
     AsymmetricDSAKey(Algorithm algorithm, DSADomainParameters domainParameters)
     {

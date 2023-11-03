@@ -18,6 +18,7 @@ import com.distrimind.bcfips.crypto.DigestOperatorFactory;
 import com.distrimind.bcfips.crypto.SymmetricKeyGenerator;
 import com.distrimind.bcfips.crypto.general.GeneralParameters;
 import com.distrimind.bcfips.crypto.general.SecureHash;
+import com.distrimind.bcfips.util.Properties;
 
 class ProvSecureHash
 {
@@ -126,14 +127,17 @@ class ProvSecureHash
         public void configure(final BouncyCastleFipsProvider provider)
         {
             // special case due to TLS 1.1
-            provider.addAlgorithmImplementation("MessageDigest.MD5", PREFIX + "$Digest", new EngineCreator()
+            if (!CryptoServicesRegistrar.isInApprovedOnlyMode() || Properties.isOverrideSet("com.distrimind.bcfips.jsse.enable_md5"))
             {
-                public Object createInstance(Object constructorParameter)
+                provider.addAlgorithmImplementation("MessageDigest.MD5", PREFIX + "$Digest", new EngineCreator()
                 {
-                    return new MD5MessageDigest();
-                }
-            });
-            provider.addAlias("MessageDigest", "MD5", PKCSObjectIdentifiers.md5);
+                    public Object createInstance(Object constructorParameter)
+                    {
+                        return new MD5MessageDigest();
+                    }
+                });
+                provider.addAlias("MessageDigest", "MD5", PKCSObjectIdentifiers.md5);
+            }
 
             if (!CryptoServicesRegistrar.isInApprovedOnlyMode())
             {

@@ -23,7 +23,7 @@ import com.distrimind.bcfips.util.encoders.Hex;
 public final class IDEA
 {
     private IDEA()
-    {
+    {                          
 
     }
 
@@ -142,11 +142,6 @@ public final class IDEA
      * IDEA in counter (CTR) mode.
      */
     public static final Parameters CTR = new Parameters(new GeneralAlgorithm(ALGORITHM, Mode.CTR));
-
-    /**
-     * IDEA in offset code book (OCB) mode.
-     */
-    public static final AuthParameters OCB = new AuthParameters(new GeneralAlgorithm(ALGORITHM, Mode.OCB));
 
     /**
      * IDEA in EAX mode.

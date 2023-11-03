@@ -22,6 +22,7 @@ public class Time
     extends ASN1Object
     implements ASN1Choice
 {
+    private static final Locale EN_locale = forEN();
     ASN1Primitive time;
 
     public static Time getInstance(
@@ -54,7 +55,7 @@ public class Time
         Date    time)
     {
         SimpleTimeZone      tz = new SimpleTimeZone(0, "Z");
-        SimpleDateFormat    dateF = new SimpleDateFormat("yyyyMMddHHmmss");
+        SimpleDateFormat    dateF = new SimpleDateFormat("yyyyMMddHHmmss", EN_locale);
 
         dateF.setTimeZone(tz);
 
@@ -168,5 +169,24 @@ public class Time
     public String toString()
     {
         return getTime();
+    }
+
+    private static Locale forEN()
+    {
+        if ("en".equalsIgnoreCase(Locale.getDefault().getLanguage()))
+        {
+            return Locale.getDefault();
+        }
+
+        Locale[] locales = Locale.getAvailableLocales();
+        for (int i = 0; i != locales.length; i++)
+        {
+            if ("en".equalsIgnoreCase(locales[i].getLanguage()))
+            {
+                return locales[i];
+            }
+        }
+
+        return Locale.getDefault();
     }
 }

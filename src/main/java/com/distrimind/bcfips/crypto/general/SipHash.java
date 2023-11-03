@@ -7,6 +7,7 @@ import com.distrimind.bcfips.crypto.internal.KeyGenerationParameters;
 import com.distrimind.bcfips.crypto.internal.Mac;
 import com.distrimind.bcfips.crypto.internal.ValidatedSymmetricKey;
 import com.distrimind.bcfips.crypto.internal.macs.TruncatingMac;
+import com.distrimind.bcfips.crypto.SymmetricKey;
 
 /**
  * Source class for implementations of SipHash based algorithms
