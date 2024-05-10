@@ -1,11 +1,11 @@
 package com.distrimind.bcfips.crypto.general;
 
+import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.internal.PBEParametersGenerator;
 import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
 import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
-import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.util.Arrays;
 
 /**
@@ -18,7 +18,7 @@ import com.distrimind.bcfips.util.Arrays;
 class OpenSSLPBEParametersGenerator<T extends Parameters>
     extends PBEParametersGenerator<T>
 {
-    private Digest digest = new MD5Digest();
+    private Digest  digest = new MD5Digest();
 
     /**
      * Construct a OpenSSL Parameters generator. 

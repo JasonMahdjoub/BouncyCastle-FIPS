@@ -14,8 +14,6 @@ import java.security.spec.ECGenParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 
-import com.distrimind.bcfips.jcajce.interfaces.ECGOST3410PrivateKey;
-import com.distrimind.bcfips.jcajce.interfaces.ECGOST3410PublicKey;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.cryptopro.CryptoProObjectIdentifiers;
 import com.distrimind.bcfips.asn1.cryptopro.ECGOST3410NamedCurves;
@@ -29,6 +27,8 @@ import com.distrimind.bcfips.crypto.asymmetric.AsymmetricKeyPair;
 import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
 import com.distrimind.bcfips.crypto.asymmetric.GOST3410Parameters;
 import com.distrimind.bcfips.crypto.general.ECGOST3410;
+import com.distrimind.bcfips.jcajce.interfaces.ECGOST3410PrivateKey;
+import com.distrimind.bcfips.jcajce.interfaces.ECGOST3410PublicKey;
 import com.distrimind.bcfips.jcajce.spec.ECDomainParameterSpec;
 import com.distrimind.bcfips.jcajce.spec.ECGOST3410PrivateKeySpec;
 import com.distrimind.bcfips.jcajce.spec.ECGOST3410PublicKeySpec;

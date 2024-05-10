@@ -30,8 +30,8 @@ import com.distrimind.bcfips.asn1.DERSequence;
  *            }
  * </pre>
  * 
- * @see Target
- * @see TargetInformation
+ * @see com.distrimind.bcfips.asn1.x509.Target
+ * @see com.distrimind.bcfips.asn1.x509.TargetInformation
  */
 public class Targets
     extends ASN1Object

@@ -36,9 +36,9 @@ public class Restriction
 
     /**
      * Constructor from DirectoryString.
-     * 
+     * <p/>
      * The DirectoryString is of type RestrictionSyntax:
-     * 
+     * <p/>
      * <pre>
      *      RestrictionSyntax ::= DirectoryString (SIZE(1..1024))
      * </pre>

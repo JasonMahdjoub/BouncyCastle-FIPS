@@ -7,9 +7,9 @@ import java.math.BigInteger;
 
 import javax.security.auth.Destroyable;
 
-import com.distrimind.bcfips.jcajce.interfaces.DSTU4145PrivateKey;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricDSTU4145PrivateKey;
+import com.distrimind.bcfips.jcajce.interfaces.DSTU4145PrivateKey;
 import com.distrimind.bcfips.jcajce.spec.DSTU4145ParameterSpec;
 import com.distrimind.bcfips.jcajce.spec.DSTU4145PrivateKeySpec;
 

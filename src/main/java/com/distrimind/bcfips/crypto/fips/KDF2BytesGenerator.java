@@ -17,7 +17,7 @@ class KDF2BytesGenerator
      * @param digest the digest to be used as the source of derived keys.
      */
     public KDF2BytesGenerator(
-        Digest digest)
+        Digest  digest)
     {
         super(1, digest);
     }

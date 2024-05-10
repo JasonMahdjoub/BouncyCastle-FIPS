@@ -65,7 +65,7 @@ public class OtherRevocationInfoFormat
      * <ul>
      * <li> null &rarr; null
      * <li> {@link OtherRevocationInfoFormat} object
-     * <li> {@link ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with OtherRevocationInfoFormat structure inside
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with OtherRevocationInfoFormat structure inside
      * </ul>
      *
      * @param obj the object we want converted.

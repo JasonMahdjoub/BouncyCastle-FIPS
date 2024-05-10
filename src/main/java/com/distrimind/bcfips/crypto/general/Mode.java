@@ -2,8 +2,8 @@ package com.distrimind.bcfips.crypto.general;
 
 import java.security.SecureRandom;
 
-import com.distrimind.bcfips.crypto.internal.BlockCipherMode;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
+import com.distrimind.bcfips.crypto.internal.BlockCipherMode;
 
 enum Mode
 {

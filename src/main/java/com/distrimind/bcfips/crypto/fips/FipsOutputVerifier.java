@@ -1,6 +1,5 @@
 package com.distrimind.bcfips.crypto.fips;
 
-import com.distrimind.bcfips.crypto.UpdateOutputStream;
 import com.distrimind.bcfips.crypto.InvalidSignatureException;
 import com.distrimind.bcfips.crypto.OutputVerifier;
 import com.distrimind.bcfips.crypto.Parameters;
@@ -20,7 +19,7 @@ public abstract class FipsOutputVerifier<T extends Parameters>
 
     public abstract T getParameters();
 
-    public abstract UpdateOutputStream getVerifyingStream();
+    public abstract com.distrimind.bcfips.crypto.UpdateOutputStream getVerifyingStream();
 
     public abstract boolean isVerified(byte[] signature)
         throws InvalidSignatureException;

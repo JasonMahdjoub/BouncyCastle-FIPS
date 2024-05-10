@@ -5,10 +5,10 @@ package com.distrimind.bcfips.asn1.ua;
 
 import java.math.BigInteger;
 
+import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
 import com.distrimind.bcfips.math.ec.ECCurve;
 import com.distrimind.bcfips.math.ec.ECPoint;
-import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 
 public class DSTU4145NamedCurves
 {

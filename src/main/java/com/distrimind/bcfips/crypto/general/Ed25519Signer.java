@@ -2,11 +2,11 @@ package com.distrimind.bcfips.crypto.general;
 
 import java.io.ByteArrayOutputStream;
 
+import com.distrimind.bcfips.crypto.fips.FipsSHS;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.internal.Signer;
 import com.distrimind.bcfips.math.ec.rfc8032.Ed25519;
-import com.distrimind.bcfips.crypto.fips.FipsSHS;
 import com.distrimind.bcfips.util.Arrays;
 
 class Ed25519Signer

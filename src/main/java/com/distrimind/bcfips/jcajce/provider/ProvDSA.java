@@ -22,7 +22,6 @@ import java.security.spec.KeySpec;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.distrimind.bcfips.crypto.*;
 import com.distrimind.bcfips.asn1.ASN1Encoding;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
@@ -32,8 +31,14 @@ import com.distrimind.bcfips.asn1.pkcs.PrivateKeyInfo;
 import com.distrimind.bcfips.asn1.x509.DSAParameter;
 import com.distrimind.bcfips.asn1.x509.SubjectPublicKeyInfo;
 import com.distrimind.bcfips.asn1.x9.X9ObjectIdentifiers;
+import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AsymmetricKeyPairGenerator;
+import com.distrimind.bcfips.crypto.AsymmetricPrivateKey;
+import com.distrimind.bcfips.crypto.AsymmetricPublicKey;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
+import com.distrimind.bcfips.crypto.OutputSignerUsingSecureRandom;
+import com.distrimind.bcfips.crypto.OutputVerifier;
+import com.distrimind.bcfips.crypto.SignatureOperatorFactory;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricDSAPrivateKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricDSAPublicKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricKeyPair;
@@ -377,7 +382,7 @@ class ProvDSA
         }
     }
 
-    private static class AdaptiveSignatureOperatorFactory<T extends Parameters>
+    private static class AdaptiveSignatureOperatorFactory<T extends com.distrimind.bcfips.crypto.Parameters>
         implements SignatureOperatorFactory<FipsDSA.Parameters>
     {
         public final OutputSignerUsingSecureRandom createSigner(AsymmetricPrivateKey key, FipsDSA.Parameters parameters)
@@ -790,7 +795,7 @@ class ProvDSA
 
         /**
          * Return the X.509 ASN.1 structure DSAParameter.
-         * 
+         * <p/>
          * <pre>
          *  DSAParameter ::= SEQUENCE {
          *                   prime INTEGER, -- p

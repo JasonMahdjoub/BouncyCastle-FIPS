@@ -1,5 +1,25 @@
 package com.distrimind.bcfips.jcajce.provider;
 
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PrivilegedAction;
+import java.security.Provider;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.pkcs.PrivateKeyInfo;
 import com.distrimind.bcfips.asn1.x509.SubjectPublicKeyInfo;
@@ -16,13 +36,6 @@ import com.distrimind.bcfips.util.Pack;
 import com.distrimind.bcfips.util.Properties;
 import com.distrimind.bcfips.util.Strings;
 
-import java.io.IOException;
-import java.security.*;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-
 /**
  * The BC FIPS provider.
  * <p>
@@ -35,30 +48,30 @@ import java.util.concurrent.atomic.AtomicReference;
  * with "C:" and finish with "ENABLE{ALL};". The command for setting the actual DRBG type is DEFRND so a configuration
  * string requesting the use of a SHA1 DRBG would look like:
  * <pre>
- *         C:DEFRND[SHA1];ENABLE{All};
+ *         C:DEFRND[SHA1];ENABLE{ALL};
  *     </pre>
  * Possible values for the DRBG type are "SHA1", "SHA224", "SHA256", "SHA384", "SHA512", "SHA512(224)", "SHA512(256)",
  * "HMACrovRandSHA1", "HMACSHA224", "HMACSHA256", "HMACSHA384", "HMACSHA512", "HMACSHA512(224)", "HMACSHA512(256)", "CTRAES128",
  * "CTRAES192", CTRAES256", and "CTRDESEDE".
- *
+ * </p>
  * <p>
  * The default DRBG is configured to be prediction resistant. In situations where the amount of entropy is constrained
  * the default DRBG can be configured to use an entropy pool based on a SHA-512 SP 800-90A DRBG. To configure this use:
  * <pre>
- *         C:HYBRID;ENABLE{All};
+ *         C:HYBRID;ENABLE{ALL};
  *     </pre>
  * or include the string "HYBRID;" in the previous command string setting the DRBG. After initial seeding the entropy pool will
  * start a reseeding thread which it will begin polling once 20 samples have been taken since the last seeding and will do a reseed
  * as soon as new entropy bytes are returned.
- *
+ * </p>
  * <p>
  * <b>Note</b>: if the provider is created by an "approved mode" thread, only FIPS approved algorithms will be available from it.
- *
+ * </p>
  */
 public final class BouncyCastleFipsProvider
     extends Provider
 {
-    private static final String info = "BouncyCastle Security Provider (FIPS edition) v1.0.2.4";
+    private static final String info = "BouncyCastle Security Provider (FIPS edition) v1.0.2.5";
 
     public static final String PROVIDER_NAME = "BCFIPS";
 
@@ -157,7 +170,7 @@ public final class BouncyCastleFipsProvider
      */
     public BouncyCastleFipsProvider(String config, SecureRandom entropySource)
     {
-        super(PROVIDER_NAME, 1.000204, info);
+        super(PROVIDER_NAME, 1.000205, info);
 
         // TODO: add support for file parsing, selective disable.
 
@@ -832,21 +845,6 @@ public final class BouncyCastleFipsProvider
             super();
         }
 
-        /*private static Provider getSunProvider()
-        {
-            try
-            {
-                Class provClass = Class.forName("sun.security.jca.Providers");
-
-                Method method = provClass.getMethod("getSunProvider");
-
-                return (Provider)method.invoke(provClass);
-            }
-            catch (Exception e)
-            {
-                return new sun.security.provider.Sun();
-            }
-        }*/
     }
 
     private static class EntropyDaemon

@@ -9,19 +9,18 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import com.distrimind.bcfips.util.Arrays;
-import com.distrimind.bcfips.util.Iterable;
 
 /**
  * ASN.1 <code>SET</code> and <code>SET OF</code> constructs.
  * <p>
  * Note: This does not know which syntax the set is!
  * (The difference: ordering of SET elements or not ordering.)
- * <p>
+ * </p><p>
  * DER form is always definite form length fields, while
  * BER support uses indefinite form.
- * <p>
+ * </p><p>
  * The CER form support does not exist.
- * <p>
+ * </p><p>
  * <h2>X.690</h2>
  * <h3>8: Basic encoding rules</h3>
  * <h4>8.11 Encoding of a set value </h4>
@@ -32,7 +31,7 @@ import com.distrimind.bcfips.util.Iterable;
  * ASN.1 definition of the set type, in an order chosen by the sender,
  * unless the type was referenced with the keyword
  * <b>OPTIONAL</b> or the keyword <b>DEFAULT</b>.
- * <p>
+ * </p><p>
  * <b>8.11.3</b> The encoding of a data value may, but need not,
  * be present for a type which was referenced with the keyword
  * <b>OPTIONAL</b> or the keyword <b>DEFAULT</b>.
@@ -43,12 +42,12 @@ import com.distrimind.bcfips.util.Iterable;
  * <h4>8.12 Encoding of a set-of value</h4>
  * <p>
  * <b>8.12.1</b> The encoding of a set-of value shall be constructed.
- * <p>
+ * </p><p>
  * <b>8.12.2</b> The text of 8.10.2 applies:
  * <i>The contents octets shall consist of zero,
  * one or more complete encodings of data values from the type listed in
  * the ASN.1 definition.</i>
- * <p>
+ * </p><p>
  * <b>8.12.3</b> The order of data values need not be preserved by
  * the encoding and subsequent decoding.
  *
@@ -100,7 +99,7 @@ import com.distrimind.bcfips.util.Iterable;
  */
 public abstract class ASN1Set
     extends ASN1Primitive
-    implements Iterable<ASN1Encodable>
+    implements com.distrimind.bcfips.util.Iterable<ASN1Encodable>
 {
     private Vector set = new Vector();
     private boolean isSorted = false;

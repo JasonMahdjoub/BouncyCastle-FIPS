@@ -31,8 +31,6 @@ import java.util.Set;
 
 import javax.security.auth.x500.X500Principal;
 
-import com.distrimind.bcfips.asn1.x500.style.RFC4519Style;
-import com.distrimind.bcfips.asn1.x509.*;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1Encoding;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
@@ -50,7 +48,13 @@ import com.distrimind.bcfips.asn1.misc.NetscapeRevocationURL;
 import com.distrimind.bcfips.asn1.misc.VerisignCzagExtension;
 import com.distrimind.bcfips.asn1.util.ASN1Dump;
 import com.distrimind.bcfips.asn1.x500.X500Name;
+import com.distrimind.bcfips.asn1.x500.style.RFC4519Style;
+import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
+import com.distrimind.bcfips.asn1.x509.BasicConstraints;
+import com.distrimind.bcfips.asn1.x509.Extension;
 import com.distrimind.bcfips.asn1.x509.Extensions;
+import com.distrimind.bcfips.asn1.x509.GeneralName;
+import com.distrimind.bcfips.asn1.x509.KeyUsage;
 import com.distrimind.bcfips.util.Integers;
 import com.distrimind.bcfips.util.Strings;
 import com.distrimind.bcfips.util.encoders.Hex;
@@ -59,7 +63,7 @@ class X509CertificateObject
     extends X509Certificate
 {
     private final BouncyCastleFipsProvider fipsProvider;
-    private final Certificate c;
+    private final com.distrimind.bcfips.asn1.x509.Certificate    c;
     private final BasicConstraints            basicConstraints;
     private final boolean[]                   keyUsage;
 
@@ -69,7 +73,7 @@ class X509CertificateObject
 
     public X509CertificateObject(
         BouncyCastleFipsProvider fipsProvider,
-        Certificate c)
+        com.distrimind.bcfips.asn1.x509.Certificate c)
         throws CertificateParsingException
     {
         this.fipsProvider = fipsProvider;

@@ -834,7 +834,7 @@ class ProvRSA
         }
     }
 
-    private class AdaptiveSignatureOperatorFactory<T extends Parameters>
+    private class AdaptiveSignatureOperatorFactory<T extends com.distrimind.bcfips.crypto.Parameters>
         implements SignatureOperatorFactory<FipsRSA.PKCS1v15SignatureParameters>
     {
         public final OutputSigner createSigner(AsymmetricPrivateKey key, FipsRSA.PKCS1v15SignatureParameters parameters)

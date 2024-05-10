@@ -5,6 +5,8 @@ package com.distrimind.bcfips.math.raw;
 
 import java.util.Random;
 
+import com.distrimind.bcfips.util.Pack;
+
 public abstract class Mod
 {
     public static int inverse32(int d)

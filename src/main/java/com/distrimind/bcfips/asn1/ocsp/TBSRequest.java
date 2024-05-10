@@ -3,8 +3,6 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.ocsp;
 
-import com.distrimind.bcfips.asn1.x509.Extensions;
-import com.distrimind.bcfips.asn1.x509.GeneralName;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1Object;
@@ -13,6 +11,8 @@ import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.DERTaggedObject;
+import com.distrimind.bcfips.asn1.x509.Extensions;
+import com.distrimind.bcfips.asn1.x509.GeneralName;
 
 public class TBSRequest
     extends ASN1Object
@@ -20,9 +20,9 @@ public class TBSRequest
     private static final ASN1Integer V1 = new ASN1Integer(0);
     
     ASN1Integer      version;
-    GeneralName requestorName;
+    GeneralName     requestorName;
     ASN1Sequence    requestList;
-    Extensions requestExtensions;
+    Extensions  requestExtensions;
 
     boolean         versionSet;
 

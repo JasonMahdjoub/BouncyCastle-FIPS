@@ -109,7 +109,7 @@ public class OriginatorInfo
      * <ul>
      * <li> null &rarr; null
      * <li> {@link OriginatorInfo} object
-     * <li> {@link ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with OriginatorInfo structure inside
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with OriginatorInfo structure inside
      * </ul>
      *
      * @param obj the object we want converted.

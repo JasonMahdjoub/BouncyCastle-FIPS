@@ -10,9 +10,9 @@ import java.security.cert.X509CRLSelector;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 
-import com.distrimind.bcfips.asn1.x509.Extension;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1OctetString;
+import com.distrimind.bcfips.asn1.x509.Extension;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Selector;
 
@@ -20,7 +20,7 @@ import com.distrimind.bcfips.util.Selector;
  * This class is a Selector implementation for X.509 certificate revocation
  * lists.
  * 
- * @see Selector
+ * @see com.distrimind.bcfips.util.Selector
  */
 public class PKIXCRLStoreSelector<T extends CRL>
     implements Selector<T>

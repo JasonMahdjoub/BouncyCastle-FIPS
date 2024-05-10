@@ -1,11 +1,11 @@
 package com.distrimind.bcfips.crypto.internal.macs;
 
-import com.distrimind.bcfips.crypto.internal.paddings.BlockCipherPadding;
-import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.DataLengthException;
 import com.distrimind.bcfips.crypto.internal.Mac;
+import com.distrimind.bcfips.crypto.internal.paddings.BlockCipherPadding;
+import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
 
 /**
  * implements a Cipher-FeedBack (CFB) mode on top of a simple cipher.
@@ -173,7 +173,7 @@ public class CFBBlockCipherMac
     private byte[]              buf;
     private int                 bufOff;
     private MacCFBBlockCipher   cipher;
-    private BlockCipherPadding padding = null;
+    private BlockCipherPadding  padding = null;
 
 
     private int                 macSize;

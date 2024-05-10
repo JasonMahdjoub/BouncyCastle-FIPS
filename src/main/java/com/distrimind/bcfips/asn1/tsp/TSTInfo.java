@@ -5,8 +5,6 @@ package com.distrimind.bcfips.asn1.tsp;
 
 import java.util.Enumeration;
 
-import com.distrimind.bcfips.asn1.x509.Extensions;
-import com.distrimind.bcfips.asn1.x509.GeneralName;
 import com.distrimind.bcfips.asn1.ASN1Boolean;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1GeneralizedTime;
@@ -18,6 +16,8 @@ import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.DERTaggedObject;
+import com.distrimind.bcfips.asn1.x509.Extensions;
+import com.distrimind.bcfips.asn1.x509.GeneralName;
 
 public class TSTInfo
     extends ASN1Object

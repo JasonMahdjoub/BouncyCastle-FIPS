@@ -1,11 +1,10 @@
 package com.distrimind.bcfips.crypto.fips;
 
-import com.distrimind.bcfips.crypto.UpdateOutputStream;
-import com.distrimind.bcfips.crypto.internal.Mac;
-import com.distrimind.bcfips.crypto.internal.io.MacOutputStream;
 import com.distrimind.bcfips.crypto.AuthenticationParameters;
 import com.distrimind.bcfips.crypto.MACOperatorFactory;
 import com.distrimind.bcfips.crypto.SymmetricKey;
+import com.distrimind.bcfips.crypto.internal.Mac;
+import com.distrimind.bcfips.crypto.internal.io.MacOutputStream;
 
 /**
  * Base class for the approved mode MACOperatorFactory implementations.
@@ -37,7 +36,7 @@ public abstract class FipsMACOperatorFactory<T extends AuthenticationParameters>
                 return mac.getMacSize();
             }
 
-            public UpdateOutputStream getMACStream()
+            public com.distrimind.bcfips.crypto.UpdateOutputStream getMACStream()
             {
                 return new MacOutputStream(mac);
             }

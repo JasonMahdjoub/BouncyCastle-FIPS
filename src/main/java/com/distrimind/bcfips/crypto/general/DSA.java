@@ -5,10 +5,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.SecureRandom;
 
-import com.distrimind.bcfips.crypto.internal.AsymmetricCipherKeyPair;
-import com.distrimind.bcfips.crypto.internal.Digest;
-import com.distrimind.bcfips.crypto.internal.PrimeCertaintyCalculator;
-import com.distrimind.bcfips.crypto.internal.test.ConsistencyTest;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AsymmetricPrivateKey;
 import com.distrimind.bcfips.crypto.AsymmetricPublicKey;
@@ -24,6 +20,9 @@ import com.distrimind.bcfips.crypto.asymmetric.DSAValidationParameters;
 import com.distrimind.bcfips.crypto.fips.FipsDSA;
 import com.distrimind.bcfips.crypto.fips.FipsSHS;
 import com.distrimind.bcfips.crypto.fips.FipsUnapprovedOperationError;
+import com.distrimind.bcfips.crypto.internal.AsymmetricCipherKeyPair;
+import com.distrimind.bcfips.crypto.internal.Digest;
+import com.distrimind.bcfips.crypto.internal.PrimeCertaintyCalculator;
 import com.distrimind.bcfips.crypto.internal.params.DsaKeyGenerationParameters;
 import com.distrimind.bcfips.crypto.internal.params.DsaParameterGenerationParameters;
 import com.distrimind.bcfips.crypto.internal.params.DsaParameters;
@@ -31,6 +30,7 @@ import com.distrimind.bcfips.crypto.internal.params.DsaPrivateKeyParameters;
 import com.distrimind.bcfips.crypto.internal.params.DsaPublicKeyParameters;
 import com.distrimind.bcfips.crypto.internal.params.DsaValidationParameters;
 import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
+import com.distrimind.bcfips.crypto.internal.test.ConsistencyTest;
 import com.distrimind.bcfips.util.Properties;
 import com.distrimind.bcfips.util.encoders.Hex;
 

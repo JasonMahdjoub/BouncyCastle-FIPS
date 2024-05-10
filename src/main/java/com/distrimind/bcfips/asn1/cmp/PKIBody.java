@@ -3,14 +3,14 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.cmp;
 
-import com.distrimind.bcfips.asn1.crmf.CertReqMessages;
-import com.distrimind.bcfips.asn1.pkcs.CertificationRequest;
 import com.distrimind.bcfips.asn1.ASN1Choice;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.DERTaggedObject;
+import com.distrimind.bcfips.asn1.crmf.CertReqMessages;
+import com.distrimind.bcfips.asn1.pkcs.CertificationRequest;
 
 public class PKIBody
     extends ASN1Object

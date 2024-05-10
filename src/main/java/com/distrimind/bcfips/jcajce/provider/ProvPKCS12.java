@@ -45,7 +45,6 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.distrimind.bcfips.asn1.pkcs.*;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Encoding;
@@ -69,10 +68,14 @@ import com.distrimind.bcfips.asn1.cryptopro.GOST28147Parameters;
 import com.distrimind.bcfips.asn1.nist.NISTObjectIdentifiers;
 import com.distrimind.bcfips.asn1.pkcs.AuthenticatedSafe;
 import com.distrimind.bcfips.asn1.pkcs.CertBag;
+import com.distrimind.bcfips.asn1.pkcs.ContentInfo;
 import com.distrimind.bcfips.asn1.pkcs.EncryptedData;
 import com.distrimind.bcfips.asn1.pkcs.MacData;
+import com.distrimind.bcfips.asn1.pkcs.PBES2Parameters;
 import com.distrimind.bcfips.asn1.pkcs.PBKDF2Params;
 import com.distrimind.bcfips.asn1.pkcs.PKCS12PBEParams;
+import com.distrimind.bcfips.asn1.pkcs.PKCSObjectIdentifiers;
+import com.distrimind.bcfips.asn1.pkcs.Pfx;
 import com.distrimind.bcfips.asn1.pkcs.SafeBag;
 import com.distrimind.bcfips.asn1.util.ASN1Dump;
 import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
@@ -1159,7 +1162,7 @@ class ProvPKCS12
                             SafeBag b = SafeBag.getInstance(seq.getObjectAt(j));
                             if (b.getBagId().equals(pkcs8ShroudedKeyBag))
                             {
-                                EncryptedPrivateKeyInfo eIn = EncryptedPrivateKeyInfo.getInstance(b.getBagValue());
+                                com.distrimind.bcfips.asn1.pkcs.EncryptedPrivateKeyInfo eIn = com.distrimind.bcfips.asn1.pkcs.EncryptedPrivateKeyInfo.getInstance(b.getBagValue());
                                 PrivateKey privKey = unwrapKey(eIn.getEncryptionAlgorithm(), eIn.getEncryptedData(), password);
 
                                 //
@@ -1251,7 +1254,7 @@ class ProvPKCS12
                             }
                             else if (b.getBagId().equals(pkcs8ShroudedKeyBag))
                             {
-                                EncryptedPrivateKeyInfo eIn = EncryptedPrivateKeyInfo.getInstance(b.getBagValue());
+                                com.distrimind.bcfips.asn1.pkcs.EncryptedPrivateKeyInfo eIn = com.distrimind.bcfips.asn1.pkcs.EncryptedPrivateKeyInfo.getInstance(b.getBagValue());
                                 PrivateKey privKey = unwrapKey(eIn.getEncryptionAlgorithm(), eIn.getEncryptedData(), password);
                                 String alias = null;
                                 ASN1OctetString localId = null;
@@ -1303,7 +1306,7 @@ class ProvPKCS12
                             }
                             else if (b.getBagId().equals(keyBag))
                             {
-                                PrivateKeyInfo kInfo = PrivateKeyInfo.getInstance(b.getBagValue());
+                                com.distrimind.bcfips.asn1.pkcs.PrivateKeyInfo kInfo = com.distrimind.bcfips.asn1.pkcs.PrivateKeyInfo.getInstance(b.getBagValue());
                                 PrivateKey privKey = fipsProvider.getPrivateKey(kInfo);
 
                                 String alias = null;
@@ -1527,7 +1530,7 @@ class ProvPKCS12
                 AlgorithmIdentifier kAlgId = new AlgorithmIdentifier(keyAlgorithm, kParams);
                 byte[] kBytes = wrapKey(kAlgId, privKey, password);
 
-                EncryptedPrivateKeyInfo kInfo = new EncryptedPrivateKeyInfo(kAlgId, kBytes);
+                com.distrimind.bcfips.asn1.pkcs.EncryptedPrivateKeyInfo kInfo = new com.distrimind.bcfips.asn1.pkcs.EncryptedPrivateKeyInfo(kAlgId, kBytes);
                 ASN1EncodableVector kName = new ASN1EncodableVector();
 
                 //

@@ -112,7 +112,7 @@ public class EnvelopedData
      * <ul>
      * <li> null &rarr; null
      * <li> {@link EnvelopedData} object
-     * <li> {@link ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with EnvelopedData structure inside
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with EnvelopedData structure inside
      * </ul>
      *
      * @param obj the object we want converted.

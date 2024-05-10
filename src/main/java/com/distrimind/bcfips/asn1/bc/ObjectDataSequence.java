@@ -11,7 +11,6 @@ import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.util.Arrays;
-import com.distrimind.bcfips.util.Iterable;
 
 /**
  * <pre>
@@ -20,7 +19,7 @@ import com.distrimind.bcfips.util.Iterable;
  */
 public class ObjectDataSequence
     extends ASN1Object
-    implements Iterable<ASN1Encodable>
+    implements com.distrimind.bcfips.util.Iterable<ASN1Encodable>
 {
     private final ASN1Encodable[] dataSequence;
 

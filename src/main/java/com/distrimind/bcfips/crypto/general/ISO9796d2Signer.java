@@ -1,10 +1,10 @@
 package com.distrimind.bcfips.crypto.general;
 
+import com.distrimind.bcfips.crypto.fips.FipsRSA;
 import com.distrimind.bcfips.crypto.internal.AsymmetricBlockCipher;
 import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.internal.signers.BaseISO9796d2Signer;
 import com.distrimind.bcfips.crypto.internal.util.ISOTrailers;
-import com.distrimind.bcfips.crypto.fips.FipsRSA;
 
 class ISO9796d2Signer
     extends BaseISO9796d2Signer

@@ -113,9 +113,9 @@ import com.distrimind.bcfips.asn1.x509.GeneralName;
  * are logically connected (e.g. they have been issued under the same admission
  * number).
  *
- * @see Admissions
- * @see ProfessionInfo
- * @see NamingAuthority
+ * @see com.distrimind.bcfips.asn1.isismtt.x509.Admissions
+ * @see com.distrimind.bcfips.asn1.isismtt.x509.ProfessionInfo
+ * @see com.distrimind.bcfips.asn1.isismtt.x509.NamingAuthority
  */
 public class AdmissionSyntax
     extends ASN1Object
@@ -143,30 +143,30 @@ public class AdmissionSyntax
 
     /**
      * Constructor from ASN1Sequence.
-     * 
+     * <p/>
      * The sequence is of type ProcurationSyntax:
-     * 
+     * <p/>
      * <pre>
      *     AdmissionSyntax ::= SEQUENCE
      *     {
      *       admissionAuthority GeneralName OPTIONAL,
      *       contentsOfAdmissions SEQUENCE OF Admissions
      *     }
-     * 
+     * <p/>
      *     Admissions ::= SEQUENCE
      *     {
      *       admissionAuthority [0] EXPLICIT GeneralName OPTIONAL
      *       namingAuthority [1] EXPLICIT NamingAuthority OPTIONAL
      *       professionInfos SEQUENCE OF ProfessionInfo
      *     }
-     * 
+     * <p/>
      *     NamingAuthority ::= SEQUENCE
      *     {
      *       namingAuthorityId OBJECT IDENTIFIER OPTIONAL,
      *       namingAuthorityUrl IA5String OPTIONAL,
      *       namingAuthorityText DirectoryString(SIZE(1..128)) OPTIONAL
      *     }
-     * 
+     * <p/>
      *     ProfessionInfo ::= SEQUENCE
      *     {
      *       namingAuthority [0] EXPLICIT NamingAuthority OPTIONAL,

@@ -32,7 +32,6 @@ import java.util.TimeZone;
 
 import javax.security.auth.x500.X500Principal;
 
-import com.distrimind.bcfips.asn1.x500.style.BCStyle;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Integer;
@@ -44,6 +43,7 @@ import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.x500.RDN;
 import com.distrimind.bcfips.asn1.x500.X500Name;
+import com.distrimind.bcfips.asn1.x500.style.BCStyle;
 import com.distrimind.bcfips.asn1.x509.BasicConstraints;
 import com.distrimind.bcfips.asn1.x509.CRLDistPoint;
 import com.distrimind.bcfips.asn1.x509.CRLReason;
@@ -131,7 +131,7 @@ class RFC3280CertPathUtilities
     /**
      * If the complete CRL includes an issuing distribution point (IDP) CRL
      * extension check the following:
-     * 
+     * <p/>
      * (i) If the distribution point name is present in the IDP CRL extension
      * and the distribution field is present in the DP, then verify that one of
      * the names in the IDP matches one of the names in the DP. If the
@@ -140,17 +140,17 @@ class RFC3280CertPathUtilities
      * names in the IDP matches one of the names in the cRLIssuer field of the
      * DP.
      * </p>
-     * 
+     * <p/>
      * (ii) If the onlyContainsUserCerts boolean is asserted in the IDP CRL
      * extension, verify that the certificate does not include the basic
      * constraints extension with the cA boolean asserted.
      * </p>
-     * 
+     * <p/>
      * (iii) If the onlyContainsCACerts boolean is asserted in the IDP CRL
      * extension, verify that the certificate includes the basic constraints
      * extension with the cA boolean asserted.
      * </p>
-     * 
+     * <p/>
      * (iv) Verify that the onlyContainsAttributeCerts boolean is not asserted.
      * </p>
      *

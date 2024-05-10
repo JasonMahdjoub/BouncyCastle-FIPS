@@ -10,7 +10,7 @@ import com.distrimind.bcfips.crypto.internal.params.AsymmetricKeyParameter;
  */
 public class AsymmetricCipherKeyPair
 {
-    private AsymmetricKeyParameter publicParam;
+    private AsymmetricKeyParameter    publicParam;
     private AsymmetricKeyParameter    privateParam;
 
     /**

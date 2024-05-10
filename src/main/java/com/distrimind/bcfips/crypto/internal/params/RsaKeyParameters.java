@@ -3,6 +3,8 @@
 /***************************************************************/
 package com.distrimind.bcfips.crypto.internal.params;
 
+import com.distrimind.bcfips.crypto.internal.params.AsymmetricKeyParameter;
+
 
 import java.math.BigInteger;
 

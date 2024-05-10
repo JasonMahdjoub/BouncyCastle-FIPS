@@ -27,7 +27,7 @@ import com.distrimind.bcfips.asn1.x500.DirectoryString;
  *       }
  * </pre>
  * 
- * @see PersonalData
+ * @see com.distrimind.bcfips.asn1.x509.sigi.PersonalData
  * 
  */
 public class NameOrPseudonym
@@ -83,9 +83,9 @@ public class NameOrPseudonym
 
     /**
      * Constructor from ASN1Sequence.
-     * 
+     * <p/>
      * The sequence is of type NameOrPseudonym:
-     * 
+     * <p/>
      * <pre>
      *       NameOrPseudonym ::= CHOICE {
      *            surAndGivenName SEQUENCE {

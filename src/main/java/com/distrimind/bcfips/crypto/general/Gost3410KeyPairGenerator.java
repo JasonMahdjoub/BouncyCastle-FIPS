@@ -6,6 +6,10 @@ package com.distrimind.bcfips.crypto.general;
 import com.distrimind.bcfips.crypto.internal.AsymmetricCipherKeyPair;
 import com.distrimind.bcfips.crypto.internal.AsymmetricCipherKeyPairGenerator;
 import com.distrimind.bcfips.crypto.internal.KeyGenerationParameters;
+import com.distrimind.bcfips.crypto.general.Gost3410KeyGenerationParameters;
+import com.distrimind.bcfips.crypto.general.Gost3410Parameters;
+import com.distrimind.bcfips.crypto.general.Gost3410PrivateKeyParameters;
+import com.distrimind.bcfips.crypto.general.Gost3410PublicKeyParameters;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;

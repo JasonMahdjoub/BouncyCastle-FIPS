@@ -6,7 +6,6 @@ package com.distrimind.bcfips.asn1.x509;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import com.distrimind.bcfips.asn1.x500.style.BCStyle;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
@@ -30,7 +29,7 @@ import com.distrimind.bcfips.asn1.DERSequence;
  *     AttributeValue ::= ANY DEFINED BY AttributeType
  * </pre>
  * 
- * @see BCStyle for AttributeType ObjectIdentifiers.
+ * @see com.distrimind.bcfips.asn1.x500.style.BCStyle for AttributeType ObjectIdentifiers.
  */
 public class SubjectDirectoryAttributes 
     extends ASN1Object

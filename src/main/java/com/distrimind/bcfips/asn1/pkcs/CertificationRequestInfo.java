@@ -5,8 +5,6 @@ package com.distrimind.bcfips.asn1.pkcs;
 
 import java.util.Enumeration;
 
-import com.distrimind.bcfips.asn1.x500.X500Name;
-import com.distrimind.bcfips.asn1.x509.SubjectPublicKeyInfo;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1Object;
@@ -16,6 +14,8 @@ import com.distrimind.bcfips.asn1.ASN1Set;
 import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.DERTaggedObject;
+import com.distrimind.bcfips.asn1.x500.X500Name;
+import com.distrimind.bcfips.asn1.x509.SubjectPublicKeyInfo;
 
 /**
  * PKCS10 CertificationRequestInfo object.
@@ -39,8 +39,8 @@ public class CertificationRequestInfo
     extends ASN1Object
 {
     ASN1Integer              version = new ASN1Integer(0);
-    X500Name subject;
-    SubjectPublicKeyInfo subjectPKInfo;
+    X500Name                subject;
+    SubjectPublicKeyInfo    subjectPKInfo;
     ASN1Set                 attributes = null;
 
     public static CertificationRequestInfo getInstance(

@@ -34,7 +34,7 @@ public class SCVPReqRes
      * <ul>
      * <li> null &rarr; null
      * <li> {@link SCVPReqRes} object
-     * <li> {@link ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with SCVPReqRes structure inside
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with SCVPReqRes structure inside
      * </ul>
      *
      * @param obj the object we want converted.

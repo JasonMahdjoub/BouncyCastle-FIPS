@@ -13,7 +13,7 @@ import java.util.Vector;
  * <p>
  * The Basic Encoding Rules (BER) format allows encoding using so called "<i>constructed form</i>",
  * which DER and CER formats forbid allowing only "primitive form".
- * <p>
+ * </p><p>
  * This class <b>always</b> produces the constructed form with underlying segments
  * in an indefinite length array.  If the input wasn't the same, then this output
  * is not faithful reproduction.

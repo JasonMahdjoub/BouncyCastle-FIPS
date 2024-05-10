@@ -11,7 +11,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.DESKeySpec;
 import javax.crypto.spec.IvParameterSpec;
 
-import com.distrimind.bcfips.crypto.internal.params.DesParameters;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.oiw.OIWObjectIdentifiers;
 import com.distrimind.bcfips.asn1.pkcs.PKCSObjectIdentifiers;
@@ -25,6 +24,7 @@ import com.distrimind.bcfips.crypto.fips.FipsSHS;
 import com.distrimind.bcfips.crypto.general.DES;
 import com.distrimind.bcfips.crypto.general.SecureHash;
 import com.distrimind.bcfips.crypto.internal.ValidatedSymmetricKey;
+import com.distrimind.bcfips.crypto.internal.params.DesParameters;
 
 final class ProvDES
     extends AlgorithmProvider

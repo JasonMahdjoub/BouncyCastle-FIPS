@@ -7,20 +7,6 @@ import java.security.PrivilegedAction;
 import java.security.Provider;
 import java.security.SecureRandom;
 
-import com.distrimind.bcfips.crypto.asymmetric.AsymmetricKeyPair;
-import com.distrimind.bcfips.crypto.asymmetric.AsymmetricRSAKey;
-import com.distrimind.bcfips.crypto.asymmetric.AsymmetricRSAPrivateKey;
-import com.distrimind.bcfips.crypto.asymmetric.AsymmetricRSAPublicKey;
-import com.distrimind.bcfips.crypto.general.FipsRegister;
-import com.distrimind.bcfips.crypto.internal.encodings.OAEPEncoding;
-import com.distrimind.bcfips.crypto.internal.encodings.PKCS1Encoding;
-import com.distrimind.bcfips.crypto.internal.io.SignerOutputStream;
-import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
-import com.distrimind.bcfips.crypto.internal.params.RsaKeyGenerationParameters;
-import com.distrimind.bcfips.crypto.internal.params.RsaKeyParameters;
-import com.distrimind.bcfips.crypto.internal.params.RsaPrivateCrtKeyParameters;
-import com.distrimind.bcfips.crypto.internal.signers.BaseRsaDigestSigner;
-import com.distrimind.bcfips.crypto.internal.test.ConsistencyTest;
 import com.distrimind.bcfips.crypto.AsymmetricPrivateKey;
 import com.distrimind.bcfips.crypto.AsymmetricPublicKey;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
@@ -34,6 +20,11 @@ import com.distrimind.bcfips.crypto.KeyWrapperUsingSecureRandom;
 import com.distrimind.bcfips.crypto.PlainInputProcessingException;
 import com.distrimind.bcfips.crypto.SecretWithEncapsulation;
 import com.distrimind.bcfips.crypto.UpdateOutputStream;
+import com.distrimind.bcfips.crypto.asymmetric.AsymmetricKeyPair;
+import com.distrimind.bcfips.crypto.asymmetric.AsymmetricRSAKey;
+import com.distrimind.bcfips.crypto.asymmetric.AsymmetricRSAPrivateKey;
+import com.distrimind.bcfips.crypto.asymmetric.AsymmetricRSAPublicKey;
+import com.distrimind.bcfips.crypto.general.FipsRegister;
 import com.distrimind.bcfips.crypto.internal.AsymmetricBlockCipher;
 import com.distrimind.bcfips.crypto.internal.AsymmetricCipherKeyPair;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
@@ -42,6 +33,15 @@ import com.distrimind.bcfips.crypto.internal.DataLengthException;
 import com.distrimind.bcfips.crypto.internal.Permissions;
 import com.distrimind.bcfips.crypto.internal.PrimeCertaintyCalculator;
 import com.distrimind.bcfips.crypto.internal.Signer;
+import com.distrimind.bcfips.crypto.internal.encodings.OAEPEncoding;
+import com.distrimind.bcfips.crypto.internal.encodings.PKCS1Encoding;
+import com.distrimind.bcfips.crypto.internal.io.SignerOutputStream;
+import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
+import com.distrimind.bcfips.crypto.internal.params.RsaKeyGenerationParameters;
+import com.distrimind.bcfips.crypto.internal.params.RsaKeyParameters;
+import com.distrimind.bcfips.crypto.internal.params.RsaPrivateCrtKeyParameters;
+import com.distrimind.bcfips.crypto.internal.signers.BaseRsaDigestSigner;
+import com.distrimind.bcfips.crypto.internal.test.ConsistencyTest;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.BigIntegers;
 import com.distrimind.bcfips.util.Properties;
@@ -724,7 +724,7 @@ public final class FipsRSA
                 }
 
                 @Override
-                public UpdateOutputStream getVerifyingStream()
+                public com.distrimind.bcfips.crypto.UpdateOutputStream getVerifyingStream()
                 {
                     return new SignerOutputStream(parameters.getAlgorithm().getName(), signer);
                 }
@@ -883,19 +883,19 @@ public final class FipsRSA
                     throw new IllegalKeyException("Attempt to encrypt/decrypt with RSA modulus already used for sign/verify.");
                 }
                 // FSM_TRANS:5.RSAK.1,"RSA KEY USAGE CHECK", "CONDITIONAL TEST", "RSA key usage check successful"
-
                 this.key = key;
                 this.parameters = parameters;
-
                 if (random != null)
                 {
-                    if (CryptoServicesRegistrar.isInApprovedOnlyMode()
-                        && parameters.getAlgorithm().equals(ALGORITHM_PKCS1v1_5)
-                        && !Properties.isOverrideSet("com.distrimind.bcfips.rsa.allow_pkcs15_enc"))
+                    if (CryptoServicesRegistrar.isInApprovedOnlyMode())
                     {
-                        throw new FipsUnapprovedOperationError("RSA PKCS1.5 encryption disallowed");
+                        validateKeySize(key, parameters.getAlgorithm());
+                        if (parameters.getAlgorithm().equals(ALGORITHM_PKCS1v1_5)
+                            && !Properties.isOverrideSet("com.distrimind.bcfips.rsa.allow_pkcs15_enc"))
+                        {
+                            throw new FipsUnapprovedOperationError("RSA PKCS1.5 encryption disallowed");
+                        }
                     }
-
                     keyWrapper = createCipher(true, key, parameters, random);
                 }
                 else
@@ -1112,9 +1112,9 @@ public final class FipsRSA
         {
             if (CryptoServicesRegistrar.isInApprovedOnlyMode())
             {
+                validateKeySize((AsymmetricRSAPublicKey)key, parameters.getAlgorithm());
                 Utils.validateRandom(random, parameters.getAlgorithm(), "Attempt to create generator with unapproved RNG");
             }
-
             return new GeneratorImpl((AsymmetricRSAPublicKey)key, parameters, random);
         }
 
@@ -1762,6 +1762,15 @@ public final class FipsRSA
         public void reset()
         {
             bOut = new ByteArrayOutputStream();
+        }
+    }
+
+    private static void validateKeySize(AsymmetricRSAKey key, FipsAlgorithm algorithm)
+    {
+        int bitLength = key.getModulus().bitLength();
+        if (bitLength < 2048)
+        {
+            throw new FipsUnapprovedOperationError("Attempt to use RSA key size outside of accepted range - requested keySize " + bitLength + " bits", algorithm);
         }
     }
 }

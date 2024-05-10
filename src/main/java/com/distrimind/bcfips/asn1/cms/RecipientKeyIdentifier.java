@@ -110,7 +110,7 @@ public class RecipientKeyIdentifier
      * <ul>
      * <li> null &rarr; null
      * <li> {@link RecipientKeyIdentifier} object
-     * <li> {@link ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with RecipientKeyIdentifier structure inside
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with RecipientKeyIdentifier structure inside
      * </ul>
      *
      * @param obj the object we want converted.

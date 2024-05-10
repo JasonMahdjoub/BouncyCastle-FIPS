@@ -4,21 +4,21 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.distrimind.bcfips.crypto.internal.CipherKeyGenerator;
-import com.distrimind.bcfips.crypto.internal.io.DigestOutputStream;
-import com.distrimind.bcfips.crypto.internal.macs.HMac;
-import com.distrimind.bcfips.crypto.internal.macs.TruncatingMac;
-import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
-import com.distrimind.bcfips.crypto.internal.test.BasicKatTest;
 import com.distrimind.bcfips.crypto.AuthenticationParameters;
 import com.distrimind.bcfips.crypto.OutputDigestCalculator;
 import com.distrimind.bcfips.crypto.SymmetricKey;
 import com.distrimind.bcfips.crypto.SymmetricSecretKey;
 import com.distrimind.bcfips.crypto.UpdateOutputStream;
+import com.distrimind.bcfips.crypto.internal.CipherKeyGenerator;
 import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.internal.KeyGenerationParameters;
 import com.distrimind.bcfips.crypto.internal.Mac;
 import com.distrimind.bcfips.crypto.internal.ValidatedSymmetricKey;
+import com.distrimind.bcfips.crypto.internal.io.DigestOutputStream;
+import com.distrimind.bcfips.crypto.internal.macs.HMac;
+import com.distrimind.bcfips.crypto.internal.macs.TruncatingMac;
+import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
+import com.distrimind.bcfips.crypto.internal.test.BasicKatTest;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Strings;
 import com.distrimind.bcfips.util.encoders.Hex;
@@ -195,7 +195,7 @@ public final class SecureHash
 
         public SymmetricKey doGenerateKey()
         {
-            com.distrimind.bcfips.crypto.internal.CipherKeyGenerator cipherKeyGenerator = new CipherKeyGenerator();
+            CipherKeyGenerator cipherKeyGenerator = new CipherKeyGenerator();
 
             cipherKeyGenerator.init(new KeyGenerationParameters(random, keySizeInBits));
 

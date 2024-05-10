@@ -3,11 +3,6 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.isismtt;
 
-import com.distrimind.bcfips.asn1.isismtt.ocsp.CertHash;
-import com.distrimind.bcfips.asn1.isismtt.ocsp.RequestedCertificate;
-import com.distrimind.bcfips.asn1.isismtt.x509.AdditionalInformationSyntax;
-import com.distrimind.bcfips.asn1.isismtt.x509.Restriction;
-import com.distrimind.bcfips.asn1.x509.SubjectDirectoryAttributes;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 
 /**
@@ -112,7 +107,7 @@ public interface ISISMTTObjectIdentifiers
      * <p>
      * OID: 1.3.36.8.3.8
      * 
-     * @see Restriction
+     * @see com.distrimind.bcfips.asn1.isismtt.x509.Restriction
      */
     static final ASN1ObjectIdentifier id_isismtt_at_restriction = id_isismtt_at.branch("8");
 
@@ -138,7 +133,7 @@ public interface ISISMTTObjectIdentifiers
      * <p>
      * OID: 1.3.36.8.3.10
      * 
-     * @see RequestedCertificate
+     * @see com.distrimind.bcfips.asn1.isismtt.ocsp.RequestedCertificate
      */
     static final ASN1ObjectIdentifier id_isismtt_at_requestedCertificate = id_isismtt_at.branch("10");
 
@@ -168,7 +163,7 @@ public interface ISISMTTObjectIdentifiers
      * <p>
      * OID: 1.3.36.8.3.13
      * 
-     * @see CertHash
+     * @see com.distrimind.bcfips.asn1.isismtt.ocsp.CertHash
      */
     static final ASN1ObjectIdentifier id_isismtt_at_certHash = id_isismtt_at.branch("13");
 
@@ -178,7 +173,7 @@ public interface ISISMTTObjectIdentifiers
      * </pre>
      * 
      * Used in
-     * {@link SubjectDirectoryAttributes SubjectDirectoryAttributes}
+     * {@link com.distrimind.bcfips.asn1.x509.SubjectDirectoryAttributes SubjectDirectoryAttributes}
      * <p>
      * OID: 1.3.36.8.3.14
      */
@@ -195,7 +190,7 @@ public interface ISISMTTObjectIdentifiers
      * <p>
      * OID: 1.3.36.8.3.15
      * 
-     * @see AdditionalInformationSyntax
+     * @see com.distrimind.bcfips.asn1.isismtt.x509.AdditionalInformationSyntax
      */
     static final ASN1ObjectIdentifier id_isismtt_at_additionalInformation = id_isismtt_at.branch("15");
 

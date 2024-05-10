@@ -2,7 +2,6 @@ package com.distrimind.bcfips.crypto.fips;
 
 import java.io.OutputStream;
 
-import com.distrimind.bcfips.crypto.CipherOutputStream;
 import com.distrimind.bcfips.crypto.OutputDecryptor;
 import com.distrimind.bcfips.crypto.Parameters;
 
@@ -21,5 +20,5 @@ public abstract class FipsOutputDecryptor<T extends Parameters>
 
     public abstract T getParameters();
 
-    public abstract CipherOutputStream getDecryptingStream(OutputStream out);
+    public abstract com.distrimind.bcfips.crypto.CipherOutputStream getDecryptingStream(OutputStream out);
 }

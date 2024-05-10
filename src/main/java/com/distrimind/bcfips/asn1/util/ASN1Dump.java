@@ -6,7 +6,6 @@ package com.distrimind.bcfips.asn1.util;
 import java.io.IOException;
 import java.util.Enumeration;
 
-import com.distrimind.bcfips.util.encoders.Hex;
 import com.distrimind.bcfips.asn1.ASN1ApplicationSpecific;
 import com.distrimind.bcfips.asn1.ASN1Boolean;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
@@ -42,6 +41,7 @@ import com.distrimind.bcfips.asn1.DERVideotexString;
 import com.distrimind.bcfips.asn1.DERVisibleString;
 import com.distrimind.bcfips.asn1.DLApplicationSpecific;
 import com.distrimind.bcfips.util.Strings;
+import com.distrimind.bcfips.util.encoders.Hex;
 
 /**
  * Utility class for dumping ASN.1 objects as (hopefully) human friendly strings.

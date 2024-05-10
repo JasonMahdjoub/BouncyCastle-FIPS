@@ -33,8 +33,8 @@ import com.distrimind.bcfips.asn1.x500.DirectoryString;
  *       }
  * </pre>
  *
- * @see NameOrPseudonym
- * @see SigIObjectIdentifiers
+ * @see com.distrimind.bcfips.asn1.x509.sigi.NameOrPseudonym
+ * @see com.distrimind.bcfips.asn1.x509.sigi.SigIObjectIdentifiers
  */
 public class PersonalData
     extends ASN1Object
@@ -63,9 +63,9 @@ public class PersonalData
 
     /**
      * Constructor from ASN1Sequence.
-     * 
+     * <p/>
      * The sequence is of type NameOrPseudonym:
-     * 
+     * <p/>
      * <pre>
      *     PersonalData ::= SEQUENCE {
      *       nameOrPseudonym NameOrPseudonym,

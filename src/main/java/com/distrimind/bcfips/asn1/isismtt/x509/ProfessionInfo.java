@@ -33,7 +33,7 @@ import com.distrimind.bcfips.asn1.x500.DirectoryString;
  *               }
  * </pre>
  * 
- * @see AdmissionSyntax
+ * @see com.distrimind.bcfips.asn1.isismtt.x509.AdmissionSyntax
  */
 public class ProfessionInfo 
     extends ASN1Object
@@ -181,8 +181,8 @@ public class ProfessionInfo
 
     /**
      * Constructor from ASN1Sequence.
-     * 
-     * 
+     * <p/>
+     * <p/>
      * <pre>
      *               ProfessionInfo ::= SEQUENCE
      *               {

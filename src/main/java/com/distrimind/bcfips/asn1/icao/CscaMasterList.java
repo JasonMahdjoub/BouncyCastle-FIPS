@@ -3,7 +3,6 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.icao;
 
-import com.distrimind.bcfips.asn1.x509.Certificate;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1Object;
@@ -12,6 +11,7 @@ import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.ASN1Set;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.DERSet;
+import com.distrimind.bcfips.asn1.x509.Certificate;
 
 /**
  * The CscaMasterList object. This object can be wrapped in a

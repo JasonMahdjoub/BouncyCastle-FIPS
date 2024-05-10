@@ -35,7 +35,7 @@ class ElGamalEngine
      */
     public void init(
         boolean             forEncryption,
-        CipherParameters param)
+        CipherParameters    param)
     {
         if (param instanceof ParametersWithRandom)
         {

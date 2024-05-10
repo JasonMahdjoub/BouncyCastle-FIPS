@@ -3,8 +3,8 @@ package com.distrimind.bcfips.crypto.general;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.EntropySource;
+import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.util.encoders.Hex;
 
 class X931RNG

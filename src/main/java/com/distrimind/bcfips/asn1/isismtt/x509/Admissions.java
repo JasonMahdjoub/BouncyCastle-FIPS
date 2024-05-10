@@ -26,9 +26,9 @@ import com.distrimind.bcfips.asn1.x509.GeneralName;
  *            }
  * </pre>
  *
- * @see AdmissionSyntax
- * @see ProfessionInfo
- * @see NamingAuthority
+ * @see com.distrimind.bcfips.asn1.isismtt.x509.AdmissionSyntax
+ * @see com.distrimind.bcfips.asn1.isismtt.x509.ProfessionInfo
+ * @see com.distrimind.bcfips.asn1.isismtt.x509.NamingAuthority
  */
 public class Admissions 
     extends ASN1Object
@@ -57,9 +57,9 @@ public class Admissions
 
     /**
      * Constructor from ASN1Sequence.
-     * 
+     * <p/>
      * The sequence is of type ProcurationSyntax:
-     * 
+     * <p/>
      * <pre>
      *            Admissions ::= SEQUENCE
      *            {

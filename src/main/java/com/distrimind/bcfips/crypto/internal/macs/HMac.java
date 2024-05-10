@@ -5,11 +5,11 @@ package com.distrimind.bcfips.crypto.internal.macs;
 
 import java.util.Hashtable;
 
-import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.internal.ExtendedDigest;
 import com.distrimind.bcfips.crypto.internal.Mac;
+import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
 import com.distrimind.bcfips.util.Integers;
 import com.distrimind.bcfips.util.Memoable;
 

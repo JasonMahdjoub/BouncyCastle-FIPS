@@ -4,8 +4,8 @@ import java.security.Provider;
 import java.security.SecureRandom;
 import java.security.SecureRandomSpi;
 
-import com.distrimind.bcfips.crypto.util.EntropyUtil;
 import com.distrimind.bcfips.crypto.EntropySource;
+import com.distrimind.bcfips.crypto.util.EntropyUtil;
 
 /**
  * Base class for DRBG/RNG SecureRandom implementations that use FIPS approved algorithms.

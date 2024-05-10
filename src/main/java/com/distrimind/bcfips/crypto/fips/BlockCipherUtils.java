@@ -2,9 +2,8 @@ package com.distrimind.bcfips.crypto.fips;
 
 import java.security.SecureRandom;
 
-import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
-import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
+import com.distrimind.bcfips.crypto.ParametersWithIV;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.BufferedBlockCipher;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
@@ -24,6 +23,7 @@ import com.distrimind.bcfips.crypto.internal.paddings.PKCS7Padding;
 import com.distrimind.bcfips.crypto.internal.paddings.PaddedBufferedBlockCipher;
 import com.distrimind.bcfips.crypto.internal.paddings.TBCPadding;
 import com.distrimind.bcfips.crypto.internal.paddings.X923Padding;
+import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
 import com.distrimind.bcfips.util.Pack;
 import com.distrimind.bcfips.util.Strings;
 
@@ -96,14 +96,14 @@ class BlockCipherUtils
         return new BufferedBlockCipher(cipher);
     }
 
-    static BufferedBlockCipher createStandardCipher(boolean forEncryption, final ValidatedSymmetricKey key, EngineProvider<BlockCipher> engineProvider, com.distrimind.bcfips.crypto.ParametersWithIV parameters, SecureRandom random)
+    static BufferedBlockCipher createStandardCipher(boolean forEncryption, final ValidatedSymmetricKey key, EngineProvider<BlockCipher> engineProvider, ParametersWithIV parameters, SecureRandom random)
     {
         BufferedBlockCipher cipher = BlockCipherUtils.createBlockCipher(engineProvider, (FipsParameters)parameters);
         CipherParameters cipherParameters = Utils.getKeyParameter(key);
 
         if (parameters.getIV() != null)
         {
-            cipherParameters = new ParametersWithIV(cipherParameters, parameters.getIV());
+            cipherParameters = new com.distrimind.bcfips.crypto.internal.params.ParametersWithIV(cipherParameters, parameters.getIV());
         }
 
         if (((FipsAlgorithm)parameters.getAlgorithm()).additionalVariation() instanceof Padding)

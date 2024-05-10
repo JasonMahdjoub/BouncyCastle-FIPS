@@ -1,11 +1,11 @@
 package com.distrimind.bcfips.crypto.general;
 
+import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.Mac;
 import com.distrimind.bcfips.crypto.internal.PBEParametersGenerator;
 import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
 import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
-import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.util.Arrays;
 
 /**

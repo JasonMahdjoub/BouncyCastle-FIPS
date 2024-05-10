@@ -5,7 +5,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.SecureRandom;
 
-import com.distrimind.bcfips.crypto.internal.test.ConsistencyTest;
 import com.distrimind.bcfips.crypto.AsymmetricPrivateKey;
 import com.distrimind.bcfips.crypto.AsymmetricPublicKey;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
@@ -26,10 +25,10 @@ import com.distrimind.bcfips.crypto.internal.params.DsaPrivateKeyParameters;
 import com.distrimind.bcfips.crypto.internal.params.DsaPublicKeyParameters;
 import com.distrimind.bcfips.crypto.internal.params.DsaValidationParameters;
 import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
+import com.distrimind.bcfips.crypto.internal.test.ConsistencyTest;
 import com.distrimind.bcfips.math.internal.Primes;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.encoders.Hex;
-import com.distrimind.bcfips.util.test.FixedSecureRandom;
 import com.distrimind.bcfips.util.test.TestRandomBigInteger;
 
 /**
@@ -883,14 +882,14 @@ public final class FipsDSA
                     DsaKeyPairGenerator kpGen = new DsaKeyPairGenerator();
 
                     kpGen.init(new DsaKeyGenerationParameters(
-                        new TestRandomBigInteger(Hex.decode("947813B589EDBA642411AD79205E43CE9B859327A4F84CF4B02628DB058A7B22771EA1852903711B")),
+                        new TestRandomBigInteger("947813B589EDBA642411AD79205E43CE9B859327A4F84CF4B02628DB058A7B22771EA185", 16),
                         new DsaParameters(p, q, g)));
 
                     AsymmetricCipherKeyPair kp = kpGen.generateKeyPair();
 
-                    signer.init(true, new ParametersWithRandom(kp.getPrivate(), new FixedSecureRandom(
-                        new FixedSecureRandom.BigInteger("735959CC4463B8B440E407EECA8A473BF6A6D1FE657546F67D401F05"),
-                        new FixedSecureRandom.Data(Hex.decode("01020304")))));
+                    signer.init(true,
+                            new ParametersWithRandom(kp.getPrivate(),
+                            new TestRandomBigInteger(224,Hex.decode("735959CC4463B8B440E407EECA8A473BF6A6D1FE657546F67D401F0500000000"))));
 
                     byte[] msg = Hex.decode("23097D223405D8228642A477BDA255B32AADBCE4BDA0B3F7E36C9DA7");
 

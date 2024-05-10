@@ -5,21 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.SecureRandom;
 
-import com.distrimind.bcfips.crypto.general.FipsRegister;
-import com.distrimind.bcfips.crypto.internal.io.CipherInputStream;
-import com.distrimind.bcfips.crypto.internal.io.CipherOutputStreamImpl;
-import com.distrimind.bcfips.crypto.internal.macs.AEADCipherMac;
-import com.distrimind.bcfips.crypto.internal.macs.CMac;
-import com.distrimind.bcfips.crypto.internal.macs.GMac;
-import com.distrimind.bcfips.crypto.internal.modes.AEADBlockCipher;
-import com.distrimind.bcfips.crypto.internal.modes.CCMBlockCipher;
-import com.distrimind.bcfips.crypto.internal.modes.GCMBlockCipher;
-import com.distrimind.bcfips.crypto.internal.params.AEADParameters;
-import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
-import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
-import com.distrimind.bcfips.crypto.internal.test.BasicKatTest;
-import com.distrimind.bcfips.crypto.internal.wrappers.SP80038FWrapEngine;
-import com.distrimind.bcfips.crypto.internal.wrappers.SP80038FWrapWithPaddingEngine;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AuthenticationParametersWithIV;
 import com.distrimind.bcfips.crypto.CipherOutputStream;
@@ -33,6 +18,7 @@ import com.distrimind.bcfips.crypto.PlainInputProcessingException;
 import com.distrimind.bcfips.crypto.SymmetricKey;
 import com.distrimind.bcfips.crypto.SymmetricSecretKey;
 import com.distrimind.bcfips.crypto.UpdateOutputStream;
+import com.distrimind.bcfips.crypto.general.FipsRegister;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.BufferedBlockCipher;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
@@ -42,6 +28,19 @@ import com.distrimind.bcfips.crypto.internal.Mac;
 import com.distrimind.bcfips.crypto.internal.StreamCipher;
 import com.distrimind.bcfips.crypto.internal.ValidatedSymmetricKey;
 import com.distrimind.bcfips.crypto.internal.Wrapper;
+import com.distrimind.bcfips.crypto.internal.io.CipherInputStream;
+import com.distrimind.bcfips.crypto.internal.io.CipherOutputStreamImpl;
+import com.distrimind.bcfips.crypto.internal.macs.AEADCipherMac;
+import com.distrimind.bcfips.crypto.internal.macs.CMac;
+import com.distrimind.bcfips.crypto.internal.macs.GMac;
+import com.distrimind.bcfips.crypto.internal.modes.AEADBlockCipher;
+import com.distrimind.bcfips.crypto.internal.modes.CCMBlockCipher;
+import com.distrimind.bcfips.crypto.internal.modes.GCMBlockCipher;
+import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
+import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
+import com.distrimind.bcfips.crypto.internal.test.BasicKatTest;
+import com.distrimind.bcfips.crypto.internal.wrappers.SP80038FWrapEngine;
+import com.distrimind.bcfips.crypto.internal.wrappers.SP80038FWrapWithPaddingEngine;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.encoders.Hex;
 
@@ -1036,7 +1035,7 @@ public final class FipsAES
 
                 KeyParameter keyParam = new KeyParameterImpl(K);
 
-                encCipher.init(true, new AEADParameters(keyParam, macSize, N, A));
+                encCipher.init(true, new com.distrimind.bcfips.crypto.internal.params.AEADParameters(keyParam, macSize, N, A));
 
                 byte[] enc = new byte[C.length];
 
@@ -1056,7 +1055,7 @@ public final class FipsAES
 
                 CCMBlockCipher decCipher = new CCMBlockCipher(aesCipher);
 
-                decCipher.init(false, new AEADParameters(keyParam, macSize, N, A));
+                decCipher.init(false, new com.distrimind.bcfips.crypto.internal.params.AEADParameters(keyParam, macSize, N, A));
 
                 byte[] tmp = new byte[enc.length];
 
@@ -1136,7 +1135,7 @@ public final class FipsAES
                     + "1ba30b396a0aac973d58e091");
                 byte[] T = Hex.decode("5bc94fbc3221a5db94fae95ae7121a47");
 
-                CipherParameters params = new AEADParameters(new KeyParameterImpl(K), T.length * 8, IV, A);
+                CipherParameters params = new com.distrimind.bcfips.crypto.internal.params.AEADParameters(new KeyParameterImpl(K), T.length * 8, IV, A);
 
                 encCipher.init(true, params);
 

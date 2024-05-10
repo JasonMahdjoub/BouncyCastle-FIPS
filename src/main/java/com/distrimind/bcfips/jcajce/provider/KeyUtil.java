@@ -10,7 +10,6 @@ import com.distrimind.bcfips.crypto.asymmetric.DHDomainParameters;
 import com.distrimind.bcfips.crypto.asymmetric.DSADomainParameters;
 import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
 import com.distrimind.bcfips.crypto.asymmetric.GOST3410DomainParameters;
-import com.distrimind.bcfips.math.ec.ECPoint;
 import com.distrimind.bcfips.math.ec.ECCurve;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Fingerprint;
@@ -149,7 +148,7 @@ class KeyUtil
                     dhParams.getP().toByteArray(), dhParams.getA().toByteArray())).toString();
     }
 
-    static String publicKeyToString(String algorithm, ECPoint q, ECDomainParameters params)
+    static String publicKeyToString(String algorithm, com.distrimind.bcfips.math.ec.ECPoint q, ECDomainParameters params)
     {
         StringBuffer buf = new StringBuffer();
         String nl = Strings.lineSeparator();
@@ -167,7 +166,7 @@ class KeyUtil
         StringBuilder buf = new StringBuilder();
         String        nl = Strings.lineSeparator();
 
-        ECPoint q = calculateQ(d, params);
+        com.distrimind.bcfips.math.ec.ECPoint q = calculateQ(d, params);
 
         buf.append(algorithm);
         buf.append(" Private Key [").append(generateKeyFingerprint(q, params)).append("]").append(nl);
@@ -177,15 +176,15 @@ class KeyUtil
         return buf.toString();
     }
 
-    private static ECPoint calculateQ(BigInteger d, ECDomainParameters params)
+    private static com.distrimind.bcfips.math.ec.ECPoint calculateQ(BigInteger d, ECDomainParameters params)
     {
         return params.getG().multiply(d).normalize();
     }
 
-    private static String generateKeyFingerprint(ECPoint publicPoint, ECDomainParameters params)
+    private static String generateKeyFingerprint(com.distrimind.bcfips.math.ec.ECPoint publicPoint, ECDomainParameters params)
     {
         ECCurve curve = params.getCurve();
-        ECPoint g = params.getG();
+        com.distrimind.bcfips.math.ec.ECPoint g = params.getG();
 
         if (curve != null)
         {

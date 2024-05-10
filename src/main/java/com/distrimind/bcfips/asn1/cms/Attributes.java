@@ -46,7 +46,7 @@ public class Attributes
      * <ul>
      * <li> null &rarr; null
      * <li> {@link Attributes} object
-     * <li> {@link ASN1Set#getInstance(java.lang.Object) ASN1Set} input formats with Attributes structure inside
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1Set#getInstance(java.lang.Object) ASN1Set} input formats with Attributes structure inside
      * </ul>
      *
      * @param obj the object we want converted.

@@ -3,12 +3,12 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.pkcs;
 
-import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
+import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 
 public class KeyDerivationFunc
     extends ASN1Object

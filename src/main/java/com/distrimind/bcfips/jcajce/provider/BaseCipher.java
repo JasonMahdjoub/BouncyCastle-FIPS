@@ -241,9 +241,9 @@ class BaseCipher
     {
         Parameters params = cipher.getParameters();
 
-        if (params instanceof ParametersWithIV)
+        if (params instanceof com.distrimind.bcfips.crypto.ParametersWithIV)
         {
-            return ((ParametersWithIV)params).getIV();
+            return ((com.distrimind.bcfips.crypto.ParametersWithIV)params).getIV();
         }
 
         return null;
@@ -282,7 +282,7 @@ class BaseCipher
                     throw new IllegalStateException(e.toString(), e);
                 }
             }
-            else if (params instanceof ParametersWithIV)
+            else if (params instanceof com.distrimind.bcfips.crypto.ParametersWithIV)
             {
                 ParametersWithIV ivParams = (ParametersWithIV)params;
 
@@ -926,33 +926,38 @@ class BaseCipher
     {
         try
         {
-            if (input != null && inputLen != 0)
+            try
             {
-                processingStream.update(input, inputOffset, inputLen);
+                if (input != null && inputLen != 0)
+                {
+                    processingStream.update(input, inputOffset, inputLen);
+                }
+
+                processingStream.close();
+            }
+            catch (IOException e)
+            {
+                if (cipher.getParameters() instanceof AuthenticationParametersWithIV)
+                {
+                    ClassUtil.throwBadTagException(e.getMessage());
+                }
+                throw new BadPaddingException(e.getMessage());
             }
 
-            processingStream.close();
-        }
-        catch (IOException e)
-        {
-            if (cipher.getParameters() instanceof AuthenticationParametersWithIV)
+            byte[] result = resultStream.toByteArray();
+
+            // reset AAD data if provided
+            if (associatedData != null)
             {
-                ClassUtil.throwBadTagException(e.getMessage());
+                aadStream.update(associatedData);
             }
-            throw new BadPaddingException(e.getMessage());
+
+            return result;
         }
-
-        byte[] result = resultStream.toByteArray();
-
-        resultStream.clearAndReset();
-
-        // reset AAD data if provided
-        if (associatedData != null)
+        finally
         {
-            aadStream.update(associatedData);
+            resultStream.clearAndReset();             
         }
-
-        return result;
     }
 
     protected int engineDoFinal(
@@ -970,35 +975,40 @@ class BaseCipher
 
         try
         {
-            if (input != null && inputLen != 0)
+            try
             {
-                processingStream.update(input, inputOffset, inputLen);
+                if (input != null && inputLen != 0)
+                {
+                    processingStream.update(input, inputOffset, inputLen);
+                }
+
+                processingStream.close();
+            }
+            catch (IOException e)
+            {
+                if (cipher.getParameters() instanceof AuthenticationParametersWithIV)
+                {
+                    ClassUtil.throwBadTagException(e.getMessage());
+                }
+                throw new BadPaddingException(e.getMessage());
             }
 
-            processingStream.close();
-        }
-        catch (IOException e)
-        {
-            if (cipher.getParameters() instanceof AuthenticationParametersWithIV)
+            int size = resultStream.size();
+
+            System.arraycopy(resultStream.getBuffer(), 0, output, outputOffset, size);
+
+            // reset AAD data if provided
+            if (associatedData != null)
             {
-                ClassUtil.throwBadTagException(e.getMessage());
+                aadStream.update(associatedData);
             }
-            throw new BadPaddingException(e.getMessage());
+
+            return size;
         }
-
-        int size = resultStream.size();
-
-        System.arraycopy(resultStream.getBuffer(), 0, output, outputOffset, size);
-
-        resultStream.clearAndReset();
-
-        // reset AAD data if provided
-        if (associatedData != null)
+        finally
         {
-            aadStream.update(associatedData);
+            resultStream.clearAndReset();
         }
-        
-        return size;
     }
 
     protected byte[] engineWrap(

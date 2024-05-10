@@ -7,10 +7,10 @@ import java.math.BigInteger;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
 import com.distrimind.bcfips.math.ec.ECConstants;
 import com.distrimind.bcfips.math.ec.ECCurve;
-import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 
 /**
  * table of the available named parameters for GOST 3410-2001.

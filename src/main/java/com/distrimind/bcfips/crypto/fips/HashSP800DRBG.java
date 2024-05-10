@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
-import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.EntropySource;
+import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Integers;
 import com.distrimind.bcfips.util.encoders.Hex;
@@ -108,7 +108,7 @@ class HashSP800DRBG
             Hex.decode("e862780ba48bab8df070be0ca429299a9c744cfa84acb578be5f86155719a23aab6c92b432e9f85b") });
     }
 
-    private Digest _digest;
+    private Digest        _digest;
     private byte[]        _V;
     private byte[]        _C;
     private long          _reseedCounter;

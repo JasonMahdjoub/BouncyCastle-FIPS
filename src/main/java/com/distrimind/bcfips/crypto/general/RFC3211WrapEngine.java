@@ -18,7 +18,7 @@ import com.distrimind.bcfips.util.Arrays;
 class RFC3211WrapEngine
     implements Wrapper
 {
-    private CBCBlockCipher engine;
+    private CBCBlockCipher   engine;
     private ParametersWithIV param;
     private boolean          forWrapping;
     private SecureRandom     rand;

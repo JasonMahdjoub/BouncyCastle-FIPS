@@ -1,12 +1,12 @@
 package com.distrimind.bcfips.crypto.general;
 
-import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
-import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.DataLengthException;
 import com.distrimind.bcfips.crypto.internal.MaxBytesExceededException;
 import com.distrimind.bcfips.crypto.internal.OutputLengthException;
 import com.distrimind.bcfips.crypto.internal.SkippingStreamCipher;
+import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
+import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
 import com.distrimind.bcfips.util.Pack;
 import com.distrimind.bcfips.util.Strings;
 
@@ -86,7 +86,7 @@ class Salsa20Engine
      */
     public void init(
         boolean             forEncryption, 
-        CipherParameters params)
+        CipherParameters     params)
     {
         /* 
         * Salsa20 encryption and decryption is completely

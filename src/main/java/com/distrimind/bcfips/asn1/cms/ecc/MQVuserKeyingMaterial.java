@@ -81,7 +81,7 @@ public class MQVuserKeyingMaterial
      * <ul>
      * <li> null &rarr; null
      * <li> {@link MQVuserKeyingMaterial} object
-     * <li> {@link ASN1Sequence ASN1Sequence} with MQVuserKeyingMaterial inside it.
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1Sequence ASN1Sequence} with MQVuserKeyingMaterial inside it.
      * </ul>
      *
      * @param obj the object we want converted.

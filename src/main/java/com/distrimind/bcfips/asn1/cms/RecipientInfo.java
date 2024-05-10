@@ -74,8 +74,8 @@ public class RecipientInfo
      * <ul>
      * <li> null &rarr; null
      * <li> {@link RecipientInfo} object
-     * <li> {@link ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with RecipientInfo structure inside
-     * <li> {@link ASN1TaggedObject#getInstance(java.lang.Object) ASN1TaggedObject} input formats with RecipientInfo structure inside
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with RecipientInfo structure inside
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1TaggedObject#getInstance(java.lang.Object) ASN1TaggedObject} input formats with RecipientInfo structure inside
      * </ul>
      *
      * @param o the object we want converted.

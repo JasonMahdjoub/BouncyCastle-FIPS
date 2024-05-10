@@ -1,12 +1,5 @@
 package com.distrimind.bcfips.crypto.fips;
 
-import com.distrimind.bcfips.LICENSE;
-import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
-import com.distrimind.bcfips.crypto.internal.macs.HMac;
-import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
-import com.distrimind.bcfips.util.Pack;
-import com.distrimind.bcfips.util.Strings;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
@@ -19,6 +12,13 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import com.distrimind.bcfips.LICENSE;
+import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
+import com.distrimind.bcfips.crypto.internal.macs.HMac;
+import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
+import com.distrimind.bcfips.util.Pack;
+import com.distrimind.bcfips.util.Strings;
 
 /**
  * Status utility class - it has three methods on it, one for returning "isReady" status, one for a status message,
@@ -108,6 +108,25 @@ public final class FipsStatus
         if (rscName.startsWith("jrt:/"))
         {
             moveToErrorStatus(new FipsOperationError("Module checksum failed: unable to calculate"));
+        }
+        else if (checkValidJarUrl(rscName))
+        {
+            try
+            {
+                JarInputStream jIn = new JarInputStream(new URL(rscName).openStream());
+
+                byte[][] hmacs = calculateModuleHMAC(jIn);
+
+                if (!Arrays.areEqual(hmacs[0], hmacs[1]))
+                {
+                    moveToErrorStatus(new FipsOperationError("Module checksum failed: expected [" + Hex.toHexString(hmacs[1]) + "] got [" + Hex.toHexString(hmacs[0]) + "]"));
+                }
+            }
+            catch (Exception e)
+            {
+                statusException = e;
+                moveToErrorStatus(new FipsOperationError("Module checksum failed: " + e.getMessage(), e));
+            }
         }
         else
         {
@@ -217,7 +236,7 @@ public final class FipsStatus
         try
         {
             String rscName = getResourceName();
-            
+
             return calculateModuleHMAC(new JarFile(rscName));
         }
         catch (Exception e)
@@ -274,7 +293,6 @@ public final class FipsStatus
                 hMac.update(encName, 0, encName.length);
                 hMac.update(Pack.longToBigEndian(jarEntry.getSize()), 0, 8);
                 hMac.update((byte)0x5D);    // ']'
-
                 // contents
                 int n;
                 while ((n = is.read(buf, 0, buf.length)) != -1)
@@ -313,12 +331,16 @@ public final class FipsStatus
 
         if (marker != null)
         {
-            if (marker.startsWith("jar:file:") && marker.contains("!/"))
+            if (marker.startsWith("jar:") && marker.contains("!/"))
             {
                 try
                 {
-                    String jarFilename = URLDecoder.decode(marker.substring("jar:file:".length(), marker.lastIndexOf("!/")), "UTF-8");
-
+                    int secondColon = marker.indexOf(':', 4);
+                    if (secondColon == -1)
+                    {
+                        return null;
+                    }
+                    String jarFilename = URLDecoder.decode(marker.substring(secondColon + 1, marker.lastIndexOf("!/")), "UTF-8");
                     result = jarFilename;
                 }
                 catch (IOException e)
@@ -348,6 +370,10 @@ public final class FipsStatus
             else if (marker.startsWith("file:"))
             {
                  return marker;    // this means we're running from classes (development)
+            }
+            else if (checkValidJarUrl(marker))
+            {
+                return marker;
             }
         }
 
@@ -384,7 +410,7 @@ public final class FipsStatus
         }
 
         void run()
-            throws Exception
+                throws Exception
         {
             // FSM_STATE:3.0, "POWER ON SELF-TEST", ""
             for (String cls : classes)
@@ -404,20 +430,18 @@ public final class FipsStatus
         if (loader != null)
         {
             Object resource = AccessController.doPrivileged(
-                                new PrivilegedAction() {
-                                    public Object run() {
-                                        try
-                                        {
-                                            CodeSource cs =
-                                                sourceClass.getProtectionDomain().getCodeSource();
-                                            return cs.getLocation();
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            return null;
-                                        }
-                                    }
-                                });
+					(PrivilegedAction) () -> {
+						try
+						{
+							CodeSource cs =
+									sourceClass.getProtectionDomain().getCodeSource();
+							return cs.getLocation();
+						}
+						catch (Exception e)
+						{
+							return null;
+						}
+					});
             if (resource != null)
             {
                 return resource.toString();
@@ -435,5 +459,10 @@ public final class FipsStatus
                 }
             });
         }
+    }
+
+    private static boolean checkValidJarUrl(String url)
+    {
+        return (url.startsWith("http://") || url.startsWith("https://")) && url.endsWith(".jar");
     }
 }

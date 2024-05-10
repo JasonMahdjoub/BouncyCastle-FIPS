@@ -34,8 +34,8 @@ public class GCMParameters
      * Accepted inputs:
      * <ul>
      * <li> null &rarr; null
-     * <li> {@link GCMParameters} object
-     * <li> {@link ASN1Sequence#getInstance(Object) ASN1Sequence} input formats with GCMParameters structure inside
+     * <li> {@link com.distrimind.bcfips.asn1.cms.GCMParameters} object
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1Sequence#getInstance(Object) ASN1Sequence} input formats with GCMParameters structure inside
      * </ul>
      *
      * @param obj the object we want converted.

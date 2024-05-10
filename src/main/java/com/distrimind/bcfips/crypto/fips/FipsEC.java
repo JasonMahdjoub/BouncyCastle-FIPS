@@ -5,11 +5,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.SecureRandom;
 
-import com.distrimind.bcfips.crypto.internal.AsymmetricCipherKeyPair;
-import com.distrimind.bcfips.crypto.internal.Digest;
-import com.distrimind.bcfips.crypto.internal.Permissions;
-import com.distrimind.bcfips.crypto.internal.test.ConsistencyTest;
 import com.distrimind.bcfips.asn1.nist.NISTNamedCurves;
+import com.distrimind.bcfips.asn1.sec.SECObjectIdentifiers;
 import com.distrimind.bcfips.asn1.x9.X9ECParameters;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AsymmetricPrivateKey;
@@ -20,7 +17,11 @@ import com.distrimind.bcfips.crypto.asymmetric.AsymmetricECPublicKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricKeyPair;
 import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
 import com.distrimind.bcfips.crypto.asymmetric.ECDomainParametersID;
+import com.distrimind.bcfips.crypto.asymmetric.ECDomainParametersIndex;
 import com.distrimind.bcfips.crypto.asymmetric.NamedECDomainParameters;
+import com.distrimind.bcfips.crypto.internal.AsymmetricCipherKeyPair;
+import com.distrimind.bcfips.crypto.internal.Digest;
+import com.distrimind.bcfips.crypto.internal.Permissions;
 import com.distrimind.bcfips.crypto.internal.params.EcDhuPrivateParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcDhuPublicParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcDomainParameters;
@@ -30,13 +31,13 @@ import com.distrimind.bcfips.crypto.internal.params.EcNamedDomainParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcPrivateKeyParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcPublicKeyParameters;
 import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
+import com.distrimind.bcfips.crypto.internal.test.ConsistencyTest;
 import com.distrimind.bcfips.math.ec.ECConstants;
 import com.distrimind.bcfips.math.ec.ECPoint;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Properties;
 import com.distrimind.bcfips.util.encoders.Hex;
 import com.distrimind.bcfips.util.test.TestRandomBigInteger;
-import com.distrimind.bcfips.util.test.TestRandomData;
 
 /**
  * Source class for FIPS approved implementations of Elliptic Curve algorithms.
@@ -1103,7 +1104,7 @@ public final class FipsEC
 
     private static AsymmetricCipherKeyPair getKATKeyPair()
     {
-        X9ECParameters p = NISTNamedCurves.getByName("P-256");
+        ECDomainParameters p = ECDomainParametersIndex.lookupDomainParameters(SECObjectIdentifiers.secp256r1);
         EcDomainParameters params = new EcDomainParameters(new ECDomainParameters(p.getCurve(), p.getG(), p.getN(), p.getH(), p.getSeed()));
         EcPrivateKeyParameters priKey = new EcPrivateKeyParameters(
             new BigInteger("20186677036482506117540275567393538695075300175221296989956723148347484984008"), // d
@@ -1377,10 +1378,9 @@ public final class FipsEC
             {
                 BigInteger f2mR = new BigInteger(1, Hex.decode("d001312179360f7a557d4686e2faf9740fd3289edbafb5e551402cf1b0"));
                 BigInteger f2mS = new BigInteger(1, Hex.decode("9d4c2f24b50ce6b9ac725c7833c495fe703296c038dab05ea7af06cafe"));
-
                 AsymmetricCipherKeyPair kp = getF2mKATKeyPair();
 
-                SecureRandom k = new TestRandomData("a0640d4957f27d091ab1aebc69949d96e5ac2bb283ed5284a5674758b12f08df");
+                SecureRandom k = new TestRandomBigInteger(233, Hex.decode("640d4957f27d091ab1aebc69949d96e5ac2bb283ed5284a5674758b12f"));
                 byte[] M = Hex.decode("1BD4ED430B0F384B4E8D458EFF1A8A553286D7AC21CB2F6806172EF5F94A06AD");
 
                 dsa.init(true, new ParametersWithRandom(kp.getPrivate(), k));

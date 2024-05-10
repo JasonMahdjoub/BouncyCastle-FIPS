@@ -34,7 +34,7 @@ public class OtherKeyAttribute
      * <ul>
      * <li> null &rarr; null
      * <li> {@link OtherKeyAttribute} object
-     * <li> {@link ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with OtherKeyAttribute structure inside
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with OtherKeyAttribute structure inside
      * </ul>
      *
      * @param o the object we want converted.

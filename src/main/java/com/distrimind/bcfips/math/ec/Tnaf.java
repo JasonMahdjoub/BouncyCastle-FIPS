@@ -643,7 +643,7 @@ class Tnaf
     }
 
     /**
-     * Multiplies a {@link ECPoint.AbstractF2m ECPoint.AbstractF2m}
+     * Multiplies a {@link com.distrimind.bcfips.math.ec.ECPoint.AbstractF2m ECPoint.AbstractF2m}
      * by a <code>BigInteger</code> using the reduced <code>&tau;</code>-adic
      * NAF (RTNAF) method.
      * @param p The ECPoint.AbstractF2m to multiply.
@@ -663,7 +663,7 @@ class Tnaf
     }
 
     /**
-     * Multiplies a {@link ECPoint.AbstractF2m ECPoint.AbstractF2m}
+     * Multiplies a {@link com.distrimind.bcfips.math.ec.ECPoint.AbstractF2m ECPoint.AbstractF2m}
      * by an element <code>&lambda;</code> of <code><b>Z</b>[&tau;]</code>
      * using the <code>&tau;</code>-adic NAF (TNAF) method.
      * @param p The ECPoint.AbstractF2m to multiply.
@@ -683,7 +683,7 @@ class Tnaf
     }
 
     /**
-    * Multiplies a {@link ECPoint.AbstractF2m ECPoint.AbstractF2m}
+    * Multiplies a {@link com.distrimind.bcfips.math.ec.ECPoint.AbstractF2m ECPoint.AbstractF2m}
     * by an element <code>&lambda;</code> of <code><b>Z</b>[&tau;]</code>
     * using the <code>&tau;</code>-adic NAF (TNAF) method, given the TNAF
     * of <code>&lambda;</code>.

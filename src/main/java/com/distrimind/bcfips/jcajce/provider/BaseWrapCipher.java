@@ -179,9 +179,9 @@ class BaseWrapCipher
 
     protected byte[] engineGetIV()
     {
-        if (wrapParameters instanceof ParametersWithIV)
+        if (wrapParameters instanceof com.distrimind.bcfips.crypto.ParametersWithIV)
         {
-            return ((ParametersWithIV)wrapParameters).getIV();
+            return ((com.distrimind.bcfips.crypto.ParametersWithIV)wrapParameters).getIV();
         }
 
         return null;
@@ -201,7 +201,7 @@ class BaseWrapCipher
 
     protected AlgorithmParameters engineGetParameters()
     {
-        if (wrapParameters instanceof ParametersWithIV)
+        if (wrapParameters instanceof com.distrimind.bcfips.crypto.ParametersWithIV)
         {
             ParametersWithIV ivParams = (ParametersWithIV)wrapParameters;
 

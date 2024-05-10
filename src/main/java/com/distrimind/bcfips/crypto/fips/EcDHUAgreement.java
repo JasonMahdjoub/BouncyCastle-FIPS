@@ -1,5 +1,6 @@
 package com.distrimind.bcfips.crypto.fips;
 
+import com.distrimind.bcfips.crypto.AsymmetricPublicKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricECPublicKey;
 import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
 import com.distrimind.bcfips.crypto.asymmetric.NamedECDomainParameters;
@@ -7,7 +8,6 @@ import com.distrimind.bcfips.crypto.internal.params.EcDhuPublicParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcDomainParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcNamedDomainParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcPublicKeyParameters;
-import com.distrimind.bcfips.crypto.AsymmetricPublicKey;
 
 class EcDHUAgreement<T extends FipsAgreementParameters>
     extends FipsAgreement<T>

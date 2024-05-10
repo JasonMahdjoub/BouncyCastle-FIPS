@@ -1,6 +1,7 @@
 package com.distrimind.bcfips.jcajce.provider;
 
 import java.security.InvalidAlgorithmParameterException;
+import java.security.Provider;
 import java.security.cert.CertPath;
 import java.security.cert.CertPathBuilderException;
 import java.security.cert.CertPathBuilderResult;

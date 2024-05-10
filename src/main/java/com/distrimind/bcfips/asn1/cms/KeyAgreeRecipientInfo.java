@@ -3,7 +3,6 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.cms;
 
-import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1Object;
@@ -13,6 +12,7 @@ import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.DERTaggedObject;
+import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 
 /**
  * <a href="http://tools.ietf.org/html/rfc5652#section-6.2.2">RFC 5652</a>:
@@ -36,7 +36,7 @@ public class KeyAgreeRecipientInfo
     private ASN1Integer                  version;
     private OriginatorIdentifierOrKey   originator;
     private ASN1OctetString             ukm;
-    private AlgorithmIdentifier keyEncryptionAlgorithm;
+    private AlgorithmIdentifier         keyEncryptionAlgorithm;
     private ASN1Sequence                recipientEncryptedKeys;
     
     public KeyAgreeRecipientInfo(
@@ -96,7 +96,7 @@ public class KeyAgreeRecipientInfo
      * <ul>
      * <li> null &rarr; null
      * <li> {@link KeyAgreeRecipientInfo} object
-     * <li> {@link ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with KeyAgreeRecipientInfo structure inside
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with KeyAgreeRecipientInfo structure inside
      * </ul>
      *
      * @param obj the object we want converted.

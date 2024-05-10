@@ -7,10 +7,10 @@ import java.security.PrivateKey;
 
 import javax.security.auth.Destroyable;
 
-import com.distrimind.bcfips.jcajce.interfaces.XDHKey;
 import com.distrimind.bcfips.asn1.pkcs.PrivateKeyInfo;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricXDHPrivateKey;
 import com.distrimind.bcfips.crypto.asymmetric.AsymmetricXDHPublicKey;
+import com.distrimind.bcfips.jcajce.interfaces.XDHKey;
 import com.distrimind.bcfips.util.Arrays;
 
 class ProvXDHPrivateKey

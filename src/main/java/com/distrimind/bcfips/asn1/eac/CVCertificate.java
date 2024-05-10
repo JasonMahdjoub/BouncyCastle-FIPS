@@ -196,7 +196,7 @@ public class CVCertificate
     }
 
     /**
-     * @see ASN1Object#toASN1Primitive()
+     * @see com.distrimind.bcfips.asn1.ASN1Object#toASN1Primitive()
      */
     public ASN1Primitive toASN1Primitive()
     {

@@ -5,7 +5,6 @@ package com.distrimind.bcfips.asn1.cms;
 
 import java.util.Enumeration;
 
-import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1Object;
@@ -17,6 +16,7 @@ import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.DEROctetString;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.DERTaggedObject;
+import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 
 /**
  * <a href="http://tools.ietf.org/html/rfc5652#section-5.3">RFC 5652</a>:
@@ -80,7 +80,7 @@ public class SignerInfo
 {
     private ASN1Integer              version;
     private SignerIdentifier        sid;
-    private AlgorithmIdentifier digAlgorithm;
+    private AlgorithmIdentifier     digAlgorithm;
     private ASN1Set                 authenticatedAttributes;
     private AlgorithmIdentifier     digEncryptionAlgorithm;
     private ASN1OctetString         encryptedDigest;
@@ -93,7 +93,7 @@ public class SignerInfo
      * <ul>
      * <li> null &rarr; null
      * <li> {@link SignerInfo} object
-     * <li> {@link ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with SignerInfo structure inside
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with SignerInfo structure inside
      * </ul>
      *
      * @param o the object we want converted.

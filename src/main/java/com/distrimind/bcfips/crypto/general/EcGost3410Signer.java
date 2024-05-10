@@ -4,7 +4,6 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
-import com.distrimind.bcfips.crypto.internal.DSA;
 import com.distrimind.bcfips.crypto.internal.params.EcDomainParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcKeyParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcPrivateKeyParameters;
@@ -20,7 +19,7 @@ import com.distrimind.bcfips.math.ec.FixedPointCombMultiplier;
  * GOST R 34.10-2001 Signature Algorithm
  */
 class EcGost3410Signer
-    implements DSA
+    implements com.distrimind.bcfips.crypto.internal.DSA
 {
     EcKeyParameters key;
 

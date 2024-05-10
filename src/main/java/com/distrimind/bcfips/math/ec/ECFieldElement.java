@@ -153,10 +153,10 @@ public abstract class ECFieldElement
 
         public ECFieldElement addOne()
         {
-            BigInteger x2 = x.add(ONE);
+            BigInteger x2 = x.add(ECConstants.ONE);
             if (x2.compareTo(q) == 0)
             {
-                x2 = ZERO;
+                x2 = ECConstants.ZERO;
             }
             return new Fp(q, r, x2);
         }
@@ -246,7 +246,7 @@ public abstract class ECFieldElement
 
             if (q.testBit(1)) // q == 4m + 3
             {
-                BigInteger e = q.shiftRight(2).add(ONE);
+                BigInteger e = q.shiftRight(2).add(ECConstants.ONE);
                 return checkSqrt(new Fp(q, r, x.modPow(e, q)));
             }
 
@@ -256,13 +256,13 @@ public abstract class ECFieldElement
                 BigInteger t2 = modMult(t1, x);
                 BigInteger t3 = modMult(t2, t1);
 
-                if (t3.equals(ONE))
+                if (t3.equals(ECConstants.ONE))
                 {
                     return checkSqrt(new Fp(q, r, t2));
                 }
 
                 // TODO This is constant and could be precomputed
-                BigInteger t4 = TWO.modPow(q.shiftRight(2), q);
+                BigInteger t4 = ECConstants.TWO.modPow(q.shiftRight(2), q);
 
                 BigInteger y = modMult(t2, t4);
 
@@ -272,7 +272,7 @@ public abstract class ECFieldElement
             // q == 8m + 1
 
             BigInteger legendreExponent = q.shiftRight(1);
-            if (!(x.modPow(legendreExponent, q).equals(ONE)))
+            if (!(x.modPow(legendreExponent, q).equals(ECConstants.ONE)))
             {
                 return null;
             }
@@ -280,7 +280,7 @@ public abstract class ECFieldElement
             BigInteger X = this.x;
             BigInteger fourX = modDouble(modDouble(X));
 
-            BigInteger k = legendreExponent.add(ONE), qMinusOne = q.subtract(ONE);
+            BigInteger k = legendreExponent.add(ECConstants.ONE), qMinusOne = q.subtract(ECConstants.ONE);
 
             BigInteger U, V;
             Random rand = new Random();
@@ -303,7 +303,7 @@ public abstract class ECFieldElement
                     return new ECFieldElement.Fp(q, r, modHalfAbs(V));
                 }
             }
-            while (U.equals(ONE) || U.equals(qMinusOne));
+            while (U.equals(ECConstants.ONE) || U.equals(qMinusOne));
 
             return null;
         }
@@ -325,11 +325,11 @@ public abstract class ECFieldElement
 
             // assert k.testBit(s);
 
-            BigInteger Uh = ONE;
-            BigInteger Vl = TWO;
+            BigInteger Uh = ECConstants.ONE;
+            BigInteger Vl = ECConstants.TWO;
             BigInteger Vh = P;
-            BigInteger Ql = ONE;
-            BigInteger Qh = ONE;
+            BigInteger Ql = ECConstants.ONE;
+            BigInteger Qh = ECConstants.ONE;
 
             for (int j = n - 1; j >= s + 1; --j)
             {
@@ -431,7 +431,7 @@ public abstract class ECFieldElement
                     x = x.abs();
                 }
                 int qLen = q.bitLength();
-                boolean rIsOne = r.equals(ONE);
+                boolean rIsOne = r.equals(ECConstants.ONE);
                 while (x.bitLength() > (qLen + 1))
                 {
                     BigInteger u = x.shiftRight(qLen);

@@ -593,7 +593,7 @@ public class BaseISO9796d2PSSSigner
      * Return true if the full message was recoveredMessage.
      *
      * @return true on full message recovery, false otherwise, or if not sure.
-     * @see SignerWithRecovery#hasFullMessage()
+     * @see com.distrimind.bcfips.crypto.internal.SignerWithRecovery#hasFullMessage()
      */
     public boolean hasFullMessage()
     {
@@ -606,7 +606,7 @@ public class BaseISO9796d2PSSSigner
      * to a just generated signature, or extracted from a verified one.
      *
      * @return the full/partial recoveredMessage message.
-     * @see SignerWithRecovery#getRecoveredMessage()
+     * @see com.distrimind.bcfips.crypto.internal.SignerWithRecovery#getRecoveredMessage()
      */
     public byte[] getRecoveredMessage()
     {

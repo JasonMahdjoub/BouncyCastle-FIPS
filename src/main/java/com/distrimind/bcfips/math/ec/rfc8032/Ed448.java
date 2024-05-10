@@ -2,8 +2,8 @@ package com.distrimind.bcfips.math.ec.rfc8032;
 
 import java.security.SecureRandom;
 
-import com.distrimind.bcfips.math.ec.rfc7748.X448Field;
 import com.distrimind.bcfips.crypto.internal.Xof;
+import com.distrimind.bcfips.math.ec.rfc7748.X448Field;
 import com.distrimind.bcfips.math.raw.Nat;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Strings;

@@ -5,10 +5,6 @@ package com.distrimind.bcfips.asn1.x9;
 
 import java.math.BigInteger;
 
-import com.distrimind.bcfips.math.ec.ECAlgorithms;
-import com.distrimind.bcfips.math.ec.ECCurve;
-import com.distrimind.bcfips.math.ec.ECPoint;
-import com.distrimind.bcfips.math.field.PolynomialExtensionField;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1Object;
@@ -16,6 +12,10 @@ import com.distrimind.bcfips.asn1.ASN1OctetString;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.DERSequence;
+import com.distrimind.bcfips.math.ec.ECAlgorithms;
+import com.distrimind.bcfips.math.ec.ECCurve;
+import com.distrimind.bcfips.math.ec.ECPoint;
+import com.distrimind.bcfips.math.field.PolynomialExtensionField;
 import com.distrimind.bcfips.util.Arrays;
 
 /**
@@ -29,7 +29,7 @@ public class X9ECParameters
     private static final BigInteger   ONE = BigInteger.valueOf(1);
 
     private X9FieldID           fieldID;
-    private ECCurve curve;
+    private ECCurve             curve;
     private X9ECPoint           g;
     private BigInteger          n;
     private BigInteger          h;
@@ -87,7 +87,7 @@ public class X9ECParameters
 
     public X9ECParameters(
         ECCurve     curve,
-        ECPoint g,
+        ECPoint     g,
         BigInteger  n)
     {
         this(curve, g, n, null, null);

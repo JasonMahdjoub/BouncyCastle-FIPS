@@ -118,7 +118,7 @@ public final class AsymmetricECPrivateKey
         int            orderBitLength = KeyUtils.getOrderBitLength(domainParameters);
         byte[]         pubKey = Arrays.clone(publicKey);
 
-        ECPrivateKey keyStructure;
+        com.distrimind.bcfips.asn1.sec.ECPrivateKey keyStructure;
 
         if (pubKey != null)
         {

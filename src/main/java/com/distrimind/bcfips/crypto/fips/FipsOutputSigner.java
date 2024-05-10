@@ -1,6 +1,5 @@
 package com.distrimind.bcfips.crypto.fips;
 
-import com.distrimind.bcfips.crypto.UpdateOutputStream;
 import com.distrimind.bcfips.crypto.OutputSigner;
 import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.crypto.PlainInputProcessingException;
@@ -20,7 +19,7 @@ public abstract class FipsOutputSigner<T extends Parameters>
 
     public abstract T getParameters();
 
-    public abstract UpdateOutputStream getSigningStream();
+    public abstract com.distrimind.bcfips.crypto.UpdateOutputStream getSigningStream();
 
     public abstract byte[] getSignature()
         throws PlainInputProcessingException;

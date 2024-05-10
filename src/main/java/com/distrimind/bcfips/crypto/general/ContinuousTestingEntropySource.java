@@ -1,6 +1,7 @@
 package com.distrimind.bcfips.crypto.general;
 
 import com.distrimind.bcfips.crypto.EntropySource;
+import com.distrimind.bcfips.crypto.fips.FipsStatus;
 import com.distrimind.bcfips.util.Arrays;
 
 class ContinuousTestingEntropySource

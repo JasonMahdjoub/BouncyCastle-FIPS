@@ -3,9 +3,6 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.ess;
 
-import com.distrimind.bcfips.asn1.nist.NISTObjectIdentifiers;
-import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
-import com.distrimind.bcfips.asn1.x509.IssuerSerial;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1OctetString;
@@ -13,6 +10,9 @@ import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.DEROctetString;
 import com.distrimind.bcfips.asn1.DERSequence;
+import com.distrimind.bcfips.asn1.nist.NISTObjectIdentifiers;
+import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
+import com.distrimind.bcfips.asn1.x509.IssuerSerial;
 import com.distrimind.bcfips.util.Arrays;
 
 public class ESSCertIDv2
@@ -20,7 +20,7 @@ public class ESSCertIDv2
 {
     private AlgorithmIdentifier hashAlgorithm;
     private byte[]              certHash;
-    private IssuerSerial issuerSerial;
+    private IssuerSerial        issuerSerial;
     private static final AlgorithmIdentifier DEFAULT_ALG_ID = new AlgorithmIdentifier(NISTObjectIdentifiers.id_sha256);
 
     public static ESSCertIDv2 getInstance(

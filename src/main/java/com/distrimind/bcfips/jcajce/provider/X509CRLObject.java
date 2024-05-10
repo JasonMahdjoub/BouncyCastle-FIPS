@@ -25,7 +25,6 @@ import java.util.Set;
 
 import javax.security.auth.x500.X500Principal;
 
-import com.distrimind.bcfips.asn1.x509.*;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1Encoding;
 import com.distrimind.bcfips.asn1.ASN1Integer;
@@ -34,7 +33,13 @@ import com.distrimind.bcfips.asn1.ASN1OctetString;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.util.ASN1Dump;
 import com.distrimind.bcfips.asn1.x500.X500Name;
+import com.distrimind.bcfips.asn1.x509.CRLDistPoint;
+import com.distrimind.bcfips.asn1.x509.CRLNumber;
 import com.distrimind.bcfips.asn1.x509.CertificateList;
+import com.distrimind.bcfips.asn1.x509.Extension;
+import com.distrimind.bcfips.asn1.x509.Extensions;
+import com.distrimind.bcfips.asn1.x509.GeneralNames;
+import com.distrimind.bcfips.asn1.x509.IssuingDistributionPoint;
 import com.distrimind.bcfips.asn1.x509.TBSCertList;
 import com.distrimind.bcfips.util.Strings;
 import com.distrimind.bcfips.util.encoders.Hex;
@@ -604,7 +609,7 @@ class X509CRLObject
                     {
                         try
                         {
-                            issuer = TBSCertificate.getInstance(cert.getEncoded()).getIssuer();
+                            issuer = com.distrimind.bcfips.asn1.x509.TBSCertificate.getInstance(cert.getEncoded()).getIssuer();
                         }
                         catch (CertificateEncodingException e)
                         {

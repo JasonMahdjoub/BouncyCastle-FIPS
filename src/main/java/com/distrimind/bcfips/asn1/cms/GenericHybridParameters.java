@@ -3,12 +3,12 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.cms;
 
-import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.DERSequence;
+import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 
 /**
  * RFC 5990 GenericHybridParameters class.

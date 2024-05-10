@@ -66,7 +66,7 @@ class PKIXCRLUtil
      * Return a Collection of all CRLs found in the X509Store's that are
      * matching the crlSelect criteriums.
      *
-     * @param crlSelect a {@link PKIXCRLStoreSelector} object that will be used
+     * @param crlSelect a {@link com.distrimind.bcfips.jcajce.PKIXCRLStoreSelector} object that will be used
      *            to select the CRLs
      * @param crlStores a List containing only
      *            {@link Store} objects.

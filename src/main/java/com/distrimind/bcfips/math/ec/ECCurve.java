@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
+import com.distrimind.bcfips.crypto.fips.FipsStatus;
 import com.distrimind.bcfips.math.ec.endo.ECEndomorphism;
 import com.distrimind.bcfips.math.ec.endo.GLVEndomorphism;
 import com.distrimind.bcfips.math.field.FiniteField;
@@ -766,6 +768,20 @@ public abstract class ECCurve
 
         private static FiniteField buildField(int m, int k1, int k2, int k3)
         {
+            if (FipsStatus.isReady())
+            {
+                String maxMProperty = Properties.getPropertyValue("com.distrimind.bcfips.ec.max_f2m_field_size");
+                int maxM = 1142;    // twice 571
+                if (maxMProperty != null)
+                {
+                    maxM = Integer.parseInt(maxMProperty);
+                }
+                if (m > maxM)
+                {
+                    throw new IllegalArgumentException("field size out of range: " + m);
+                }
+            }
+
             if (k1 == 0)
             {
                 throw new IllegalArgumentException("k1 must be > 0");

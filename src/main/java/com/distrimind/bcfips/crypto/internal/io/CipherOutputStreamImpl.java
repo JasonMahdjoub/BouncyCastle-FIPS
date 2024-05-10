@@ -3,13 +3,12 @@ package com.distrimind.bcfips.crypto.internal.io;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.distrimind.bcfips.crypto.CipherOutputStream;
-import com.distrimind.bcfips.crypto.internal.InvalidCipherTextException;
-import com.distrimind.bcfips.crypto.internal.modes.AEADBlockCipher;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
+import com.distrimind.bcfips.crypto.InvalidCipherTextException;
 import com.distrimind.bcfips.crypto.StreamException;
 import com.distrimind.bcfips.crypto.internal.BufferedBlockCipher;
 import com.distrimind.bcfips.crypto.internal.StreamCipher;
+import com.distrimind.bcfips.crypto.internal.modes.AEADBlockCipher;
 
 /**
  * A CipherOutputStream is composed of an OutputStream and a cipher so that write() methods process
@@ -25,7 +24,7 @@ import com.distrimind.bcfips.crypto.internal.StreamCipher;
  * </p>
  */
 public class CipherOutputStreamImpl
-    extends CipherOutputStream
+    extends com.distrimind.bcfips.crypto.CipherOutputStream
 {
     private final String algorithmName;
     private final boolean isApprovedMode;
@@ -237,7 +236,7 @@ public class CipherOutputStreamImpl
      * stream.
      *
      * @throws java.io.IOException if an I/O error occurs.
-     * @throws com.distrimind.bcfips.crypto.InvalidCipherTextException if the data written to this stream was invalid cipher text
+     * @throws InvalidCipherTextException if the data written to this stream was invalid cipher text
      * (e.g. the cipher is an AEAD cipher and the ciphertext tag check fails).
      */
     public void close()
@@ -272,9 +271,9 @@ public class CipherOutputStreamImpl
                 streamCipher.reset();
             }
         }
-        catch (InvalidCipherTextException e)
+        catch (com.distrimind.bcfips.crypto.internal.InvalidCipherTextException e)
         {
-            error = new com.distrimind.bcfips.crypto.InvalidCipherTextException("Error finalising cipher data: " + e.getMessage(), e);
+            error = new InvalidCipherTextException("Error finalising cipher data: " + e.getMessage(), e);
         }
         catch (IllegalStateException e)
         {

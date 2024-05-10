@@ -2,12 +2,15 @@ package com.distrimind.bcfips.crypto.general;
 
 import java.security.SecureRandom;
 
-import com.distrimind.bcfips.crypto.*;
+import com.distrimind.bcfips.crypto.Algorithm;
+import com.distrimind.bcfips.crypto.AuthenticationParameters;
+import com.distrimind.bcfips.crypto.IllegalKeyException;
+import com.distrimind.bcfips.crypto.SymmetricKey;
+import com.distrimind.bcfips.crypto.SymmetricSecretKey;
 import com.distrimind.bcfips.crypto.internal.KeyGenerationParameters;
 import com.distrimind.bcfips.crypto.internal.Mac;
 import com.distrimind.bcfips.crypto.internal.ValidatedSymmetricKey;
 import com.distrimind.bcfips.crypto.internal.macs.TruncatingMac;
-import com.distrimind.bcfips.crypto.SymmetricKey;
 
 /**
  * Source class for implementations of SipHash based algorithms
@@ -137,7 +140,7 @@ public final class SipHash
 
     }
 
-    private static ValidatedSymmetricKey validateKey(SymmetricKey key, Parameters parameters)
+    private static ValidatedSymmetricKey validateKey(SymmetricKey key, com.distrimind.bcfips.crypto.Parameters parameters)
     {
         ValidatedSymmetricKey vKey = PrivilegedUtils.getValidatedKey(key);
 

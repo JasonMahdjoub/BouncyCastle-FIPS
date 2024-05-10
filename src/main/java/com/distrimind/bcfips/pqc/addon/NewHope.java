@@ -3,9 +3,9 @@ package com.distrimind.bcfips.pqc.addon;
 import java.io.IOException;
 import java.security.SecureRandom;
 
+import com.distrimind.bcfips.crypto.UpdateOutputStream;
 import com.distrimind.bcfips.crypto.fips.FipsOutputDigestCalculator;
 import com.distrimind.bcfips.crypto.fips.FipsSHS;
-import com.distrimind.bcfips.crypto.UpdateOutputStream;
 
 /**
  * This implementation is based heavily on the C reference implementation from https://cryptojedi.org/crypto/index.shtml.

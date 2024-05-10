@@ -30,7 +30,7 @@ import com.distrimind.bcfips.asn1.x500.DirectoryString;
  *               namingAuthorityText DirectoryString(SIZE(1..128)) OPTIONAL
  *             }
  * </pre>
- * @see AdmissionSyntax
+ * @see com.distrimind.bcfips.asn1.isismtt.x509.AdmissionSyntax
  * 
  */
 public class NamingAuthority
@@ -73,8 +73,8 @@ public class NamingAuthority
 
     /**
      * Constructor from ASN1Sequence.
-     * 
-     * 
+     * <p/>
+     * <p/>
      * <pre>
      *             NamingAuthority ::= SEQUENCE
      *             {

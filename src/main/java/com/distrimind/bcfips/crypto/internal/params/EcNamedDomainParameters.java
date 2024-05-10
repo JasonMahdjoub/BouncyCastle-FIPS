@@ -4,6 +4,8 @@ import java.math.BigInteger;
 
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.crypto.asymmetric.NamedECDomainParameters;
+import com.distrimind.bcfips.math.ec.ECCurve;
+import com.distrimind.bcfips.math.ec.ECPoint;
 
 public class EcNamedDomainParameters
     extends EcDomainParameters

@@ -34,8 +34,8 @@ public class CCMParameters
      * Accepted inputs:
      * <ul>
      * <li> null &rarr; null
-     * <li> {@link CCMParameters} object
-     * <li> {@link ASN1Sequence#getInstance(Object) ASN1Sequence} input formats with CCMParameters structure inside
+     * <li> {@link com.distrimind.bcfips.asn1.cms.CCMParameters} object
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1Sequence#getInstance(Object) ASN1Sequence} input formats with CCMParameters structure inside
      * </ul>
      *
      * @param obj the object we want converted.

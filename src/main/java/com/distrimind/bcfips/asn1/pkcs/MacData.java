@@ -5,7 +5,6 @@ package com.distrimind.bcfips.asn1.pkcs;
 
 import java.math.BigInteger;
 
-import com.distrimind.bcfips.asn1.x509.DigestInfo;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1Object;
@@ -14,6 +13,7 @@ import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.DEROctetString;
 import com.distrimind.bcfips.asn1.DERSequence;
+import com.distrimind.bcfips.asn1.x509.DigestInfo;
 import com.distrimind.bcfips.util.Arrays;
 
 public class MacData
@@ -21,7 +21,7 @@ public class MacData
 {
     private static final BigInteger ONE = BigInteger.valueOf(1);
 
-    DigestInfo digInfo;
+    DigestInfo                  digInfo;
     byte[]                      salt;
     BigInteger                  iterationCount;
 

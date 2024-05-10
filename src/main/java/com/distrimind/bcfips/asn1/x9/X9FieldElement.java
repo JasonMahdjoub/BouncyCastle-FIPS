@@ -3,10 +3,10 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.x9;
 
-import com.distrimind.bcfips.math.ec.ECFieldElement;
 import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.DEROctetString;
+import com.distrimind.bcfips.math.ec.ECFieldElement;
 
 /**
  * Class for processing an FieldElement as a DER object.
@@ -14,7 +14,7 @@ import com.distrimind.bcfips.asn1.DEROctetString;
 public class X9FieldElement
     extends ASN1Object
 {
-    protected ECFieldElement f;
+    protected ECFieldElement  f;
     
     private static X9IntegerConverter converter = new X9IntegerConverter();
 

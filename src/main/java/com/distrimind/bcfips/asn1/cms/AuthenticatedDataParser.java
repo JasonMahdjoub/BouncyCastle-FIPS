@@ -5,7 +5,6 @@ package com.distrimind.bcfips.asn1.cms;
 
 import java.io.IOException;
 
-import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1OctetString;
@@ -14,6 +13,7 @@ import com.distrimind.bcfips.asn1.ASN1SetParser;
 import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.ASN1TaggedObjectParser;
 import com.distrimind.bcfips.asn1.BERTags;
+import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 
 /**
  * Parse {@link AuthenticatedData} stream.

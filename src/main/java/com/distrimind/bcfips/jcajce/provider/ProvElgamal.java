@@ -326,7 +326,7 @@ class ProvElgamal
 
         /**
          * Return the X.509 ASN.1 structure ElGamalParameter.
-         * 
+         * <p/>
          * <pre>
          *  ElGamalParameter ::= SEQUENCE {
          *                   prime INTEGER, -- p

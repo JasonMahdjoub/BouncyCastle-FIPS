@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.SecureRandom;
 
+import com.distrimind.bcfips.crypto.fips.FipsSHS;
 import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.internal.params.AsymmetricKeyParameter;
 import com.distrimind.bcfips.math.ec.rfc8032.Ed25519;
-import com.distrimind.bcfips.crypto.fips.FipsSHS;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.io.Streams;
 

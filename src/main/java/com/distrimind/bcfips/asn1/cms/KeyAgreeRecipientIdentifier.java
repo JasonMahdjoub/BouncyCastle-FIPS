@@ -49,8 +49,8 @@ public class KeyAgreeRecipientIdentifier
      * Accepted inputs:
      * <ul>
      * <li> {@link KeyAgreeRecipientIdentifier} object
-     * <li> {@link ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with IssuerAndSerialNumber structure inside
-     * <li> {@link ASN1TaggedObject#getInstance(java.lang.Object) ASN1TaggedObject} with tag value 0: a KeyAgreeRecipientIdentifier data structure
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with IssuerAndSerialNumber structure inside
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1TaggedObject#getInstance(java.lang.Object) ASN1TaggedObject} with tag value 0: a KeyAgreeRecipientIdentifier data structure
      * </ul>
      * <p>
      * Note: no byte[] input!

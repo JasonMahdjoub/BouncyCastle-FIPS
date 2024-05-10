@@ -4,20 +4,19 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.SecureRandom;
 
-import com.distrimind.bcfips.crypto.*;
-import com.distrimind.bcfips.crypto.general.FipsRegister;
-import com.distrimind.bcfips.crypto.internal.io.CipherInputStream;
-import com.distrimind.bcfips.crypto.internal.io.CipherOutputStreamImpl;
-import com.distrimind.bcfips.crypto.internal.macs.CMac;
-import com.distrimind.bcfips.crypto.internal.params.DesEdeParameters;
-import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
-import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
-import com.distrimind.bcfips.crypto.internal.test.BasicKatTest;
-import com.distrimind.bcfips.crypto.internal.wrappers.SP80038FWrapEngine;
+import com.distrimind.bcfips.crypto.Algorithm;
+import com.distrimind.bcfips.crypto.AuthenticationParametersWithIV;
+import com.distrimind.bcfips.crypto.CipherOutputStream;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
+import com.distrimind.bcfips.crypto.IllegalKeyException;
+import com.distrimind.bcfips.crypto.InvalidWrappingException;
 import com.distrimind.bcfips.crypto.OperatorUsingSecureRandom;
 import com.distrimind.bcfips.crypto.OutputEncryptor;
+import com.distrimind.bcfips.crypto.ParametersWithIV;
+import com.distrimind.bcfips.crypto.PlainInputProcessingException;
 import com.distrimind.bcfips.crypto.SymmetricKey;
+import com.distrimind.bcfips.crypto.SymmetricSecretKey;
+import com.distrimind.bcfips.crypto.general.FipsRegister;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.BufferedBlockCipher;
 import com.distrimind.bcfips.crypto.internal.InvalidCipherTextException;
@@ -26,6 +25,14 @@ import com.distrimind.bcfips.crypto.internal.Mac;
 import com.distrimind.bcfips.crypto.internal.StreamCipher;
 import com.distrimind.bcfips.crypto.internal.ValidatedSymmetricKey;
 import com.distrimind.bcfips.crypto.internal.Wrapper;
+import com.distrimind.bcfips.crypto.internal.io.CipherInputStream;
+import com.distrimind.bcfips.crypto.internal.io.CipherOutputStreamImpl;
+import com.distrimind.bcfips.crypto.internal.macs.CMac;
+import com.distrimind.bcfips.crypto.internal.params.DesEdeParameters;
+import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
+import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
+import com.distrimind.bcfips.crypto.internal.test.BasicKatTest;
+import com.distrimind.bcfips.crypto.internal.wrappers.SP80038FWrapEngine;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Properties;
 import com.distrimind.bcfips.util.encoders.Hex;
@@ -276,7 +283,7 @@ public final class FipsTripleDES
 
         public AuthParameters withMACSize(int macSizeInBits)
         {
-            return new AuthParameters(this.getAlgorithm(), Arrays.clone(iv), macSizeInBits);
+            return new AuthParameters(this.getAlgorithm(), com.distrimind.bcfips.util.Arrays.clone(iv), macSizeInBits);
         }
     }
 

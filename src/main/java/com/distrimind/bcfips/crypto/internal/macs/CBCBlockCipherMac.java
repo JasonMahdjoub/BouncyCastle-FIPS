@@ -3,11 +3,11 @@
 /***************************************************************/
 package com.distrimind.bcfips.crypto.internal.macs;
 
-import com.distrimind.bcfips.crypto.internal.modes.CBCBlockCipher;
-import com.distrimind.bcfips.crypto.internal.paddings.BlockCipherPadding;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.Mac;
+import com.distrimind.bcfips.crypto.internal.modes.CBCBlockCipher;
+import com.distrimind.bcfips.crypto.internal.paddings.BlockCipherPadding;
 
 /**
  * standard CBC Block Cipher MAC - if no padding is specified the default of
@@ -21,7 +21,7 @@ public class CBCBlockCipherMac
     private byte[]              buf;
     private int                 bufOff;
     private BlockCipher         cipher;
-    private BlockCipherPadding padding;
+    private BlockCipherPadding  padding;
 
     private int                 macSize;
 

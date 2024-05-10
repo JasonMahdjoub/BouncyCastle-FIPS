@@ -19,7 +19,7 @@ import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
  * </p>
  */
 class Shacal2Engine
-	implements BlockCipher
+	implements BlockCipher 
 {
 	private final static int[] K = { // SHA-256-Constants
 			0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5, 
@@ -56,7 +56,7 @@ class Shacal2Engine
 	    return BLOCK_SIZE;
 	}
 
-	public void init(boolean _forEncryption, CipherParameters params)
+	public void init(boolean _forEncryption, CipherParameters  params)
 		throws IllegalArgumentException
 	{
 		if (!(params instanceof KeyParameter))
@@ -148,7 +148,7 @@ class Shacal2Engine
 	}
 
 	public int processBlock(byte[] in, int inOffset, byte[] out, int outOffset)	    
-			throws DataLengthException, IllegalStateException
+			throws DataLengthException, IllegalStateException 
 	{
 		if (workingKey == null)
 		{

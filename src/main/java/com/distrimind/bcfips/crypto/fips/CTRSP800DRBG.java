@@ -3,11 +3,11 @@ package com.distrimind.bcfips.crypto.fips;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
+import com.distrimind.bcfips.crypto.EntropySource;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
 import com.distrimind.bcfips.crypto.internal.params.KeyParameterImpl;
-import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
-import com.distrimind.bcfips.crypto.EntropySource;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Properties;
 import com.distrimind.bcfips.util.encoders.Hex;

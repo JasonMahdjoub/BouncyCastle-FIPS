@@ -5,10 +5,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.SecureRandom;
 
-import com.distrimind.bcfips.crypto.internal.AsymmetricCipherKeyPair;
-import com.distrimind.bcfips.crypto.internal.DSA;
-import com.distrimind.bcfips.crypto.internal.Digest;
-import com.distrimind.bcfips.crypto.internal.test.ConsistencyTest;
 import com.distrimind.bcfips.crypto.Algorithm;
 import com.distrimind.bcfips.crypto.AsymmetricPrivateKey;
 import com.distrimind.bcfips.crypto.AsymmetricPublicKey;
@@ -21,11 +17,14 @@ import com.distrimind.bcfips.crypto.asymmetric.AsymmetricKeyPair;
 import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
 import com.distrimind.bcfips.crypto.asymmetric.GOST3410Parameters;
 import com.distrimind.bcfips.crypto.asymmetric.NamedECDomainParameters;
+import com.distrimind.bcfips.crypto.internal.AsymmetricCipherKeyPair;
+import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.internal.params.EcDomainParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcNamedDomainParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcPrivateKeyParameters;
 import com.distrimind.bcfips.crypto.internal.params.EcPublicKeyParameters;
 import com.distrimind.bcfips.crypto.internal.params.ParametersWithRandom;
+import com.distrimind.bcfips.crypto.internal.test.ConsistencyTest;
 import com.distrimind.bcfips.util.encoders.Hex;
 
 /**
@@ -159,7 +158,7 @@ public final class ECGOST3410
         @Override
         public OutputSignerUsingSecureRandom<SignatureParameters> doCreateSigner(AsymmetricPrivateKey key, final SignatureParameters parameters)
         {
-            final DSA gost3410Signer = new EcGost3410Signer();
+            final com.distrimind.bcfips.crypto.internal.DSA gost3410Signer = new EcGost3410Signer();
             final Digest digest = Register.createDigest(parameters.getDigestAlgorithm());
 
             AsymmetricECGOST3410PrivateKey k = (AsymmetricECGOST3410PrivateKey)key;
@@ -168,7 +167,7 @@ public final class ECGOST3410
 
             return new DSAOutputSigner<SignatureParameters>(gost3410Signer, digest, parameters, new DSAOutputSigner.Initializer()
             {
-                public void initialize(DSA signer, SecureRandom random)
+                public void initialize(com.distrimind.bcfips.crypto.internal.DSA signer, SecureRandom random)
                 {
                     signer.init(true, new ParametersWithRandom(privateKeyParameters, random));
                 }
@@ -178,7 +177,7 @@ public final class ECGOST3410
         @Override
         public OutputVerifier<SignatureParameters> doCreateVerifier(AsymmetricPublicKey key, final SignatureParameters parameters)
         {
-            final DSA gost3410Signer = new EcGost3410Signer();
+            final com.distrimind.bcfips.crypto.internal.DSA gost3410Signer = new EcGost3410Signer();
             final Digest digest = Register.createDigest(parameters.getDigestAlgorithm());
 
             AsymmetricECGOST3410PublicKey k = (AsymmetricECGOST3410PublicKey)key;

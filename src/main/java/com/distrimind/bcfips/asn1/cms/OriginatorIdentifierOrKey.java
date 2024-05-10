@@ -3,7 +3,6 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.cms;
 
-import com.distrimind.bcfips.asn1.x509.SubjectKeyIdentifier;
 import com.distrimind.bcfips.asn1.ASN1Choice;
 import com.distrimind.bcfips.asn1.ASN1Encodable;
 import com.distrimind.bcfips.asn1.ASN1Object;
@@ -11,6 +10,7 @@ import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.DERTaggedObject;
+import com.distrimind.bcfips.asn1.x509.SubjectKeyIdentifier;
 
 /**
  * <a href="http://tools.ietf.org/html/rfc5652#section-6.2.2">RFC 5652</a>:
@@ -79,7 +79,7 @@ public class OriginatorIdentifierOrKey
      * <li> null &rarr; null
      * <li> {@link OriginatorIdentifierOrKey} object
      * <li> {@link IssuerAndSerialNumber} object
-     * <li> {@link ASN1TaggedObject#getInstance(java.lang.Object) ASN1TaggedObject} input formats with IssuerAndSerialNumber structure inside
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1TaggedObject#getInstance(java.lang.Object) ASN1TaggedObject} input formats with IssuerAndSerialNumber structure inside
      * </ul>
      *
      * @param o the object we want converted.

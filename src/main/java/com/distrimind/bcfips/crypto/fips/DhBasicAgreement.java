@@ -2,12 +2,12 @@ package com.distrimind.bcfips.crypto.fips;
 
 import java.math.BigInteger;
 
+import com.distrimind.bcfips.crypto.IllegalKeyException;
 import com.distrimind.bcfips.crypto.internal.BasicAgreement;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.params.DhParameters;
 import com.distrimind.bcfips.crypto.internal.params.DhPrivateKeyParameters;
 import com.distrimind.bcfips.crypto.internal.params.DhPublicKeyParameters;
-import com.distrimind.bcfips.crypto.IllegalKeyException;
 
 /**
  * a Diffie-Hellman key agreement class.
@@ -19,11 +19,11 @@ import com.distrimind.bcfips.crypto.IllegalKeyException;
 class DhBasicAgreement
     implements BasicAgreement
 {
-    private DhPrivateKeyParameters key;
-    private DhParameters dhParams;
+    private DhPrivateKeyParameters  key;
+    private DhParameters            dhParams;
 
     public void init(
-        CipherParameters param)
+        CipherParameters    param)
     {
         DhPrivateKeyParameters  kParam = (DhPrivateKeyParameters)param;
 
@@ -43,7 +43,7 @@ class DhBasicAgreement
     public BigInteger calculateAgreement(
         CipherParameters   pubKey)
     {
-        DhPublicKeyParameters pub = (DhPublicKeyParameters)pubKey;
+        DhPublicKeyParameters   pub = (DhPublicKeyParameters)pubKey;
         DhParameters pubParams = pub.getParameters();
 
         if (!pubParams.getG().equals(dhParams.getG()) || !pubParams.getP().equals(dhParams.getP()))

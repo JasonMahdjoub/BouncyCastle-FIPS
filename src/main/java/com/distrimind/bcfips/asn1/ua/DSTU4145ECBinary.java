@@ -5,10 +5,6 @@ package com.distrimind.bcfips.asn1.ua;
 
 import java.math.BigInteger;
 
-import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
-import com.distrimind.bcfips.math.ec.ECAlgorithms;
-import com.distrimind.bcfips.math.ec.ECCurve;
-import com.distrimind.bcfips.math.field.PolynomialExtensionField;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1Object;
@@ -19,6 +15,10 @@ import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.DEROctetString;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.DERTaggedObject;
+import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
+import com.distrimind.bcfips.math.ec.ECAlgorithms;
+import com.distrimind.bcfips.math.ec.ECCurve;
+import com.distrimind.bcfips.math.field.PolynomialExtensionField;
 import com.distrimind.bcfips.util.Arrays;
 
 public class DSTU4145ECBinary

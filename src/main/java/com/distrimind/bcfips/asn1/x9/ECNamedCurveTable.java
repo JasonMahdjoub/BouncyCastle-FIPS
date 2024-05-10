@@ -6,13 +6,13 @@ package com.distrimind.bcfips.asn1.x9;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.anssi.ANSSINamedCurves;
 import com.distrimind.bcfips.asn1.cryptopro.ECGOST3410NamedCurves;
 import com.distrimind.bcfips.asn1.nist.NISTNamedCurves;
 import com.distrimind.bcfips.asn1.sec.SECNamedCurves;
 import com.distrimind.bcfips.asn1.teletrust.TeleTrusTNamedCurves;
 import com.distrimind.bcfips.crypto.asymmetric.ECDomainParameters;
-import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 
 /**
  * A general class that reads all X9.62 style EC curve tables.

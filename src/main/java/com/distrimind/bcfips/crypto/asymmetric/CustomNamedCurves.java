@@ -8,8 +8,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import com.distrimind.bcfips.math.ec.endo.GLVTypeBEndomorphism;
-import com.distrimind.bcfips.math.ec.endo.GLVTypeBParameters;
 import com.distrimind.bcfips.asn1.ASN1ObjectIdentifier;
 import com.distrimind.bcfips.asn1.sec.SECObjectIdentifiers;
 import com.distrimind.bcfips.asn1.x9.X9ECParameters;
@@ -46,6 +44,8 @@ import com.distrimind.bcfips.math.ec.custom.sec.SecT409K1Curve;
 import com.distrimind.bcfips.math.ec.custom.sec.SecT409R1Curve;
 import com.distrimind.bcfips.math.ec.custom.sec.SecT571K1Curve;
 import com.distrimind.bcfips.math.ec.custom.sec.SecT571R1Curve;
+import com.distrimind.bcfips.math.ec.endo.GLVTypeBEndomorphism;
+import com.distrimind.bcfips.math.ec.endo.GLVTypeBParameters;
 import com.distrimind.bcfips.util.Strings;
 import com.distrimind.bcfips.util.encoders.Hex;
 

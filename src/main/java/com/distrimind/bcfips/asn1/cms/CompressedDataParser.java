@@ -5,9 +5,9 @@ package com.distrimind.bcfips.asn1.cms;
 
 import java.io.IOException;
 
-import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1SequenceParser;
+import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 
 /**
  * Parser of <a href="http://tools.ietf.org/html/rfc3274">RFC 3274</a> {@link CompressedData} object.

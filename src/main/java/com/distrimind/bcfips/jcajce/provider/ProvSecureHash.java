@@ -15,9 +15,15 @@ import com.distrimind.bcfips.asn1.teletrust.TeleTrusTObjectIdentifiers;
 import com.distrimind.bcfips.crypto.AuthenticationParameters;
 import com.distrimind.bcfips.crypto.CryptoServicesRegistrar;
 import com.distrimind.bcfips.crypto.DigestOperatorFactory;
+import com.distrimind.bcfips.crypto.OutputDigestCalculator;
+import com.distrimind.bcfips.crypto.Parameters;
 import com.distrimind.bcfips.crypto.SymmetricKeyGenerator;
+import com.distrimind.bcfips.crypto.UpdateOutputStream;
+import com.distrimind.bcfips.crypto.fips.FipsDigestOperatorFactory;
+import com.distrimind.bcfips.crypto.fips.FipsSHS;
 import com.distrimind.bcfips.crypto.general.GeneralParameters;
 import com.distrimind.bcfips.crypto.general.SecureHash;
+import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.util.Properties;
 
 class ProvSecureHash

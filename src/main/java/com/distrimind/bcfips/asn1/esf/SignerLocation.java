@@ -5,7 +5,6 @@ package com.distrimind.bcfips.asn1.esf;
 
 import java.util.Enumeration;
 
-import com.distrimind.bcfips.asn1.x500.DirectoryString;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
@@ -14,6 +13,7 @@ import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.DERSequence;
 import com.distrimind.bcfips.asn1.DERTaggedObject;
 import com.distrimind.bcfips.asn1.DERUTF8String;
+import com.distrimind.bcfips.asn1.x500.DirectoryString;
 
 /**
  * Signer-Location attribute (RFC3126).
@@ -30,7 +30,7 @@ import com.distrimind.bcfips.asn1.DERUTF8String;
 public class SignerLocation
     extends ASN1Object
 {
-    private DirectoryString countryName;
+    private DirectoryString   countryName;
     private DirectoryString   localityName;
     private ASN1Sequence      postalAddress;
     

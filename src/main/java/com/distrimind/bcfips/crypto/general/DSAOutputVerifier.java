@@ -3,10 +3,6 @@ package com.distrimind.bcfips.crypto.general;
 import java.io.IOException;
 import java.math.BigInteger;
 
-import com.distrimind.bcfips.crypto.UpdateOutputStream;
-import com.distrimind.bcfips.crypto.internal.DSA;
-import com.distrimind.bcfips.crypto.internal.Digest;
-import com.distrimind.bcfips.crypto.internal.io.DigestOutputStream;
 import com.distrimind.bcfips.asn1.ASN1Encoding;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1OctetString;
@@ -15,17 +11,20 @@ import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.crypto.InvalidSignatureException;
 import com.distrimind.bcfips.crypto.OutputVerifier;
 import com.distrimind.bcfips.crypto.Parameters;
+import com.distrimind.bcfips.crypto.internal.DSA;
+import com.distrimind.bcfips.crypto.internal.Digest;
+import com.distrimind.bcfips.crypto.internal.io.DigestOutputStream;
 import com.distrimind.bcfips.util.Arrays;
 
 class DSAOutputVerifier<T extends Parameters>
     implements OutputVerifier<T>
 {
-    private final com.distrimind.bcfips.crypto.internal.DSA dsa;
+    private final DSA dsa;
     private final Digest digest;
     private final T parameter;
     private final boolean reverse;
 
-    DSAOutputVerifier(com.distrimind.bcfips.crypto.internal.DSA dsa, Digest digest, T parameter)
+    DSAOutputVerifier(DSA dsa, Digest digest, T parameter)
     {
         this(dsa, digest, parameter, false);
     }
@@ -43,7 +42,7 @@ class DSAOutputVerifier<T extends Parameters>
         return parameter;
     }
 
-    public UpdateOutputStream getVerifyingStream()
+    public com.distrimind.bcfips.crypto.UpdateOutputStream getVerifyingStream()
     {
         return new DigestOutputStream(digest);
     }

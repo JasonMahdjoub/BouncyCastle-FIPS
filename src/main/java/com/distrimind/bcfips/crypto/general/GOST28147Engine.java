@@ -160,7 +160,7 @@ class GOST28147Engine
      */
     public void init(
         boolean           forEncryption,
-        CipherParameters params)
+        CipherParameters  params)
     {
         if (params instanceof GOST28147Parameters)
         {

@@ -24,7 +24,7 @@ class DsaParametersGenerator
     private static final BigInteger ONE = BigInteger.valueOf(1);
     private static final BigInteger TWO = BigInteger.valueOf(2);
 
-    private Digest digest;
+    private Digest          digest;
     private int             L, N;
     private int             certainty;
     private int             iterations;

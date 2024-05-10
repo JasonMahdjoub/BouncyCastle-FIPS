@@ -3,9 +3,9 @@ package com.distrimind.bcfips.crypto.general;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.distrimind.bcfips.crypto.internal.EngineProvider;
 import com.distrimind.bcfips.crypto.fips.FipsAlgorithm;
 import com.distrimind.bcfips.crypto.fips.FipsEngineProvider;
+import com.distrimind.bcfips.crypto.internal.EngineProvider;
 
 /**
  * Local register that provides access to engines for FIPS algorithms for use with general/non-FIPS-approved modes of use.

@@ -1,13 +1,13 @@
 package com.distrimind.bcfips.crypto.internal.macs;
 
-import com.distrimind.bcfips.crypto.internal.modes.AEADBlockCipher;
-import com.distrimind.bcfips.crypto.internal.params.AEADParameters;
-import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
-import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.DataLengthException;
 import com.distrimind.bcfips.crypto.internal.InvalidCipherTextException;
 import com.distrimind.bcfips.crypto.internal.Mac;
+import com.distrimind.bcfips.crypto.internal.modes.AEADBlockCipher;
+import com.distrimind.bcfips.crypto.internal.params.AEADParameters;
+import com.distrimind.bcfips.crypto.internal.params.KeyParameter;
+import com.distrimind.bcfips.crypto.internal.params.ParametersWithIV;
 
 public class AEADCipherMac
     implements Mac

@@ -2,10 +2,10 @@ package com.distrimind.bcfips.crypto.fips;
 
 import java.math.BigInteger;
 
+import com.distrimind.bcfips.crypto.IllegalKeyException;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
 import com.distrimind.bcfips.crypto.internal.params.DhuPrivateParameters;
 import com.distrimind.bcfips.crypto.internal.params.DhuPublicParameters;
-import com.distrimind.bcfips.crypto.IllegalKeyException;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.BigIntegers;
 

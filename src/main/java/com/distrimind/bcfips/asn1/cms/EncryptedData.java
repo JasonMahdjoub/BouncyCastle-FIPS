@@ -37,7 +37,7 @@ public class EncryptedData
      * <ul>
      * <li> null &rarr; null
      * <li> {@link EncryptedData} object
-     * <li> {@link ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats
      * </ul>
      *
      * @param o the object we want converted.

@@ -5,13 +5,13 @@ package com.distrimind.bcfips.asn1.pkcs;
 
 import java.math.BigInteger;
 
-import com.distrimind.bcfips.asn1.x500.X500Name;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.DERSequence;
+import com.distrimind.bcfips.asn1.x500.X500Name;
 
 public class IssuerAndSerialNumber
     extends ASN1Object

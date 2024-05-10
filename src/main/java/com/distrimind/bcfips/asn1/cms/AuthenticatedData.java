@@ -5,7 +5,6 @@ package com.distrimind.bcfips.asn1.cms;
 
 import java.util.Enumeration;
 
-import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 import com.distrimind.bcfips.asn1.ASN1EncodableVector;
 import com.distrimind.bcfips.asn1.ASN1Integer;
 import com.distrimind.bcfips.asn1.ASN1Object;
@@ -16,6 +15,7 @@ import com.distrimind.bcfips.asn1.ASN1Set;
 import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.BERSequence;
 import com.distrimind.bcfips.asn1.DERTaggedObject;
+import com.distrimind.bcfips.asn1.x509.AlgorithmIdentifier;
 
 /**
  * <a href="http://tools.ietf.org/html/rfc5652#section-9.1">RFC 5652</a> section 9.1:
@@ -151,7 +151,7 @@ public class AuthenticatedData
      * <ul>
      * <li> null &rarr; null
      * <li> {@link AuthenticatedData} object
-     * <li> {@link ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with AuthenticatedData structure inside
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats with AuthenticatedData structure inside
      * </ul>
      *
      * @param obj the object we want converted.

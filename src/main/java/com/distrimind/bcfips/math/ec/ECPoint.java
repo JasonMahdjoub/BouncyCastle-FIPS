@@ -7,14 +7,14 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Map;
 
-import com.distrimind.bcfips.crypto.fips.FipsDRBG;
-import com.distrimind.bcfips.crypto.fips.FipsStatus;
-import com.distrimind.bcfips.util.encoders.Hex;
 import com.distrimind.bcfips.crypto.EntropySource;
 import com.distrimind.bcfips.crypto.EntropySourceProvider;
+import com.distrimind.bcfips.crypto.fips.FipsDRBG;
+import com.distrimind.bcfips.crypto.fips.FipsStatus;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Pack;
 import com.distrimind.bcfips.util.Strings;
+import com.distrimind.bcfips.util.encoders.Hex;
 
 /**
  * base class for points on elliptic curves.

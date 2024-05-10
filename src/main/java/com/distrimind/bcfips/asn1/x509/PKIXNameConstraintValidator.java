@@ -12,7 +12,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.distrimind.bcfips.util.encoders.Hex;
 import com.distrimind.bcfips.asn1.ASN1OctetString;
 import com.distrimind.bcfips.asn1.ASN1Sequence;
 import com.distrimind.bcfips.asn1.DERIA5String;
@@ -20,6 +19,7 @@ import com.distrimind.bcfips.asn1.x500.X500Name;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.Integers;
 import com.distrimind.bcfips.util.Strings;
+import com.distrimind.bcfips.util.encoders.Hex;
 
 public class PKIXNameConstraintValidator
     implements NameConstraintValidator

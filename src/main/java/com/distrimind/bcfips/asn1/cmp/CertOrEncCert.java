@@ -3,12 +3,12 @@
 /***************************************************************/
 package com.distrimind.bcfips.asn1.cmp;
 
-import com.distrimind.bcfips.asn1.crmf.EncryptedValue;
 import com.distrimind.bcfips.asn1.ASN1Choice;
 import com.distrimind.bcfips.asn1.ASN1Object;
 import com.distrimind.bcfips.asn1.ASN1Primitive;
 import com.distrimind.bcfips.asn1.ASN1TaggedObject;
 import com.distrimind.bcfips.asn1.DERTaggedObject;
+import com.distrimind.bcfips.asn1.crmf.EncryptedValue;
 
 public class CertOrEncCert
     extends ASN1Object

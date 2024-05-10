@@ -4,7 +4,6 @@
  */
 package com.distrimind.bcfips.crypto.internal.modes;
 
-import com.distrimind.bcfips.crypto.InvalidCipherTextException;
 import com.distrimind.bcfips.crypto.internal.BlockCipher;
 import com.distrimind.bcfips.crypto.internal.BufferedBlockCipher;
 import com.distrimind.bcfips.crypto.internal.DataLengthException;
@@ -191,6 +190,8 @@ public class NISTCTSBlockCipher
      * the output.
      * @exception IllegalStateException if the underlying cipher is not
      * initialised.
+     * @exception com.distrimind.bcfips.crypto.InvalidCipherTextException if cipher text decrypts wrongly (in
+     * case the exception will never get thrown).
      */
     public int doFinal(
         byte[]  out,

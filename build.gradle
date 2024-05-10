@@ -89,7 +89,7 @@ idea {
         languageLevel = javaVersion
     }
 }
-version='1.0.2.4'
+version='1.0.2.5'
 allprojects {
 	group='com.distrimind.bcfips'
 
@@ -138,6 +138,10 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
         }
     }
 }
+tasks.withType(Javadoc).configureEach {
+    options.addStringOption('Xdoclint:-missing', '-quiet')
+}
+
 artifacts {
     archives jar
     archives sourcesJar

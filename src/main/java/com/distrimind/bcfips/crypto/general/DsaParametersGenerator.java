@@ -6,11 +6,11 @@ package com.distrimind.bcfips.crypto.general;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
+import com.distrimind.bcfips.crypto.fips.FipsSHS;
 import com.distrimind.bcfips.crypto.internal.Digest;
 import com.distrimind.bcfips.crypto.internal.params.DsaParameterGenerationParameters;
 import com.distrimind.bcfips.crypto.internal.params.DsaParameters;
 import com.distrimind.bcfips.crypto.internal.params.DsaValidationParameters;
-import com.distrimind.bcfips.crypto.fips.FipsSHS;
 import com.distrimind.bcfips.util.Arrays;
 import com.distrimind.bcfips.util.BigIntegers;
 import com.distrimind.bcfips.util.encoders.Hex;
@@ -20,7 +20,7 @@ import com.distrimind.bcfips.util.encoders.Hex;
  */
 class DsaParametersGenerator
 {
-    private Digest digest;
+    private Digest          digest;
     private int             L, N;
     private int             certainty;
     private SecureRandom    random;

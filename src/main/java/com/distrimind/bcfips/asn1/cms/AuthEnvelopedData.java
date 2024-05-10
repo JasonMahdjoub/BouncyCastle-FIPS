@@ -152,7 +152,7 @@ public class AuthEnvelopedData
      * <p>
      * Accepted inputs:
      * <ul>
-     * <li> {@link ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats
+     * <li> {@link com.distrimind.bcfips.asn1.ASN1Sequence#getInstance(java.lang.Object) ASN1Sequence} input formats
      * </ul>
      *
 

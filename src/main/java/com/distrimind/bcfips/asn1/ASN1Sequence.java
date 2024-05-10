@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import com.distrimind.bcfips.util.Arrays;
-import com.distrimind.bcfips.util.Iterable;
 
 /**
  * ASN.1 <code>SEQUENCE</code> and <code>SEQUENCE OF</code> constructs.
@@ -27,15 +26,15 @@ import com.distrimind.bcfips.util.Iterable;
  * the ASN.1 definition of the sequence type, in the order of
  * their appearance in the definition, unless the type was referenced
  * with the keyword <b>OPTIONAL</b> or the keyword <b>DEFAULT</b>.
- * <p>
+ * </p><p>
  * <b>8.9.3</b> The encoding of a data value may, but need not,
  * be present for a type which was referenced with the keyword
  * <b>OPTIONAL</b> or the keyword <b>DEFAULT</b>.
  * If present, it shall appear in the encoding at the point
  * corresponding to the appearance of the type in the ASN.1 definition.
- * <p>
+ * </p><p>
  * <b>8.10 Encoding of a sequence-of value </b>
- * <p>
+ * </p><p>
  * <b>8.10.1</b> The encoding of a sequence-of value shall be constructed.
  * <p>
  * <b>8.10.2</b> The contents octets shall consist of zero,
@@ -62,7 +61,7 @@ import com.distrimind.bcfips.util.Iterable;
  */
 public abstract class ASN1Sequence
     extends ASN1Primitive
-    implements Iterable<ASN1Encodable>
+    implements com.distrimind.bcfips.util.Iterable<ASN1Encodable>
 {
     protected Vector seq = new Vector();
 

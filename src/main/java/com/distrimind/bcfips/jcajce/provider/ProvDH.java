@@ -322,7 +322,7 @@ class ProvDH
 
         /**
          * Return the X.509 ASN.1 structure DHParameter.
-         * 
+         * <p/>
          * <pre>
          *  DHParameter ::= SEQUENCE {
          *                   prime INTEGER, -- p

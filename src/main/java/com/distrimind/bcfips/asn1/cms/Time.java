@@ -29,10 +29,10 @@ import com.distrimind.bcfips.asn1.DERUTCTime;
  * </pre>
  * <p>
  * This has a constructor using java.util.Date for input which generates
- * a {@link DERUTCTime DERUTCTime} object if the
+ * a {@link com.distrimind.bcfips.asn1.DERUTCTime DERUTCTime} object if the
  * supplied datetime is in range 1950-01-01-00:00:00 UTC until 2049-12-31-23:59:60 UTC.
  * If the datetime value is outside that range, the generated object will be
- * {@link DERGeneralizedTime DERGeneralizedTime}.
+ * {@link com.distrimind.bcfips.asn1.DERGeneralizedTime DERGeneralizedTime}.
  */
 public class Time
     extends ASN1Object
@@ -125,8 +125,8 @@ public class Time
      * <ul>
      * <li> null &rarr; null
      * <li> {@link Time} object
-     * <li> {@link DERUTCTime DERUTCTime} object
-     * <li> {@link DERGeneralizedTime DERGeneralizedTime} object
+     * <li> {@link com.distrimind.bcfips.asn1.DERUTCTime DERUTCTime} object
+     * <li> {@link com.distrimind.bcfips.asn1.DERGeneralizedTime DERGeneralizedTime} object
      * </ul>
      *
      * @param obj the object we want converted.

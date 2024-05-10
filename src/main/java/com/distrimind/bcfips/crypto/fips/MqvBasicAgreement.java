@@ -2,9 +2,9 @@ package com.distrimind.bcfips.crypto.fips;
 
 import java.math.BigInteger;
 
+import com.distrimind.bcfips.crypto.IllegalKeyException;
 import com.distrimind.bcfips.crypto.internal.BasicAgreement;
 import com.distrimind.bcfips.crypto.internal.CipherParameters;
-import com.distrimind.bcfips.crypto.IllegalKeyException;
 import com.distrimind.bcfips.crypto.internal.params.DhParameters;
 import com.distrimind.bcfips.crypto.internal.params.DhPrivateKeyParameters;
 import com.distrimind.bcfips.crypto.internal.params.DhPublicKeyParameters;
