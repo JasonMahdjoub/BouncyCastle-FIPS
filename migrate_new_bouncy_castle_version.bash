@@ -50,9 +50,9 @@ rm -Rf /tmp/bcfips-migration
 rm -Rf /tmp/bcfips-pqcadddon-migration
 
 
-find . -type f ! -name "migrate_new_bouncy_castle_version.bash" -exec sed -i 's/org\.bouncycastle/com\.distrimind\.bcfips/g' {} +
-find . -type f ! -name "migrate_new_bouncy_castle_version.bash" -exec sed -i 's/org\/bouncycastle/com\/distrimind\/bcfips/g' {} +
-find . -type f ! -name "migrate_new_bouncy_castle_version.bash" -exec sed -i 's/org\.bouncycastle/com\.distrimind\.bcfips/g' {} +
+find . \( -path "./.git" -o -path "./.gradle" -o -name "migrate_new_bouncy_castle_version.bash" \) -prune -o -type f -exec sed -i 's/org\.bouncycastle/com\.distrimind\.bouncycastle/g' {} +
+find . \( -path "./.git" -o -path "./.gradle" -o -name "migrate_new_bouncy_castle_version.bash" \) -prune -o -type f -exec sed -i 's/org\/bouncycastle/com\/distrimind\/bouncycastle/g' {} +
+find . \( -path "./.git" -o -path "./.gradle" -o -name "migrate_new_bouncy_castle_version.bash" \) -prune -o -type f -exec sed -i 's/org\.bouncycastle/com\.distrimind\.bouncycastle/g' {} +
 
 echo "Migration OK"
 echo "Do not forget to alter com.distrimind.bcfips.crypto.fips.FipsStatus"
